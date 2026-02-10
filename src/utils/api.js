@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { supabase } from './supabaseClient';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+const API_URL = process.env.REACT_APP_API_URL || '/api';
 
 const api = axios.create({
     baseURL: API_URL,
@@ -25,9 +25,9 @@ api.interceptors.response.use(
         // If the backend is unreachable (Network Error), simulate a successful response for demo
         if (!error.response) {
             console.warn('Backend unreachable. Serving mock data for demo.');
-            
+
             const url = error.config.url;
-            
+
             // Mock Generate Endpoint
             if (url.includes('/generate')) {
                 return {
@@ -57,7 +57,7 @@ sellSignal = ta.crossunder(rsiValue, 70)
 
 plotshape(buySignal, "Buy", shape.triangleup, location.belowbar, color.green, size=size.small)
 plotshape(sellSignal, "Sell", shape.triangledown, location.abovebar, color.red, size=size.small)
-` 
+`
                         },
                         thread_id: 'demo-thread-123'
                     }
@@ -74,7 +74,7 @@ plotshape(sellSignal, "Sell", shape.triangledown, location.abovebar, color.red, 
                     ]
                 };
             }
-            
+
             // Mock Profile Endpoint
             if (url.includes('/user/profile')) {
                 return {

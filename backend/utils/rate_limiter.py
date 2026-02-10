@@ -3,7 +3,7 @@ Rate limiting using Upstash Redis for distributed rate limiting
 Prevents abuse and stays within Gemini API free tier limits
 """
 from fastapi import HTTPException
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from typing import Optional
 import os
 import logging
@@ -119,7 +119,7 @@ def check_user_rate_limit(user_id: str, plan: str) -> None:
     limit = PLAN_RATE_LIMITS.get(plan, 10)
     
     # Create minute-based window key
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     window_key = f"rate:user:{user_id}:{now.strftime('%Y%m%d%H%M')}"
     
     # Get current count and increment
@@ -144,7 +144,7 @@ def check_gemini_limits(tokens_to_use: int) -> None:
     Check global Gemini API limits (free tier protection)
     Prevents exceeding daily token limits and per-minute request limits
     """
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     
     # Keys for tracking
     minute_key = f"gemini:minute:{now.strftime('%Y%m%d%H%M')}"
@@ -184,7 +184,7 @@ def record_gemini_usage(tokens_used: int) -> None:
     """
     Record actual Gemini token usage after successful API call
     """
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     daily_key = f"gemini:daily:{now.strftime('%Y%m%d')}"
     
     redis = get_redis()
@@ -208,7 +208,7 @@ def get_rate_limit_status(user_id: str, plan: str) -> dict:
     Get current rate limit status for a user
     """
     limit = PLAN_RATE_LIMITS.get(plan, 10)
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     window_key = f"rate:user:{user_id}:{now.strftime('%Y%m%d%H%M')}"
     
     current = _get_key(window_key) or 0
@@ -225,7 +225,7 @@ def get_gemini_status() -> dict:
     """
     Get current Gemini API usage status
     """
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     minute_key = f"gemini:minute:{now.strftime('%Y%m%d%H%M')}"
     daily_key = f"gemini:daily:{now.strftime('%Y%m%d')}"
     
@@ -243,8 +243,7 @@ def get_gemini_status() -> dict:
 
 def _seconds_until_midnight() -> int:
     """Calculate seconds until midnight UTC"""
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    from datetime import timedelta
     next_midnight = midnight + timedelta(days=1)
     return int((next_midnight - now).total_seconds())

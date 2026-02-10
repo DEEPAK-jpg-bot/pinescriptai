@@ -8,10 +8,11 @@ import os
 from datetime import datetime, timedelta
 from typing import Optional, Dict
 from .supabase_client import get_supabase
+from config import get_settings
 
 security = HTTPBearer()
+settings = get_settings()
 
-JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET")
 JWT_ALGORITHM = "HS256"
 
 def verify_token(token: str) -> Dict:
@@ -22,7 +23,7 @@ def verify_token(token: str) -> Dict:
     try:
         payload = jwt.decode(
             token,
-            JWT_SECRET,
+            settings.supabase_jwt_secret,
             algorithms=[JWT_ALGORITHM],
             audience="authenticated"
         )

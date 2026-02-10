@@ -2,10 +2,8 @@
 module.exports = {
     darkMode: ["class"],
     content: [
-        './pages/**/*.{js,jsx}',
-        './components/**/*.{js,jsx}',
-        './app/**/*.{js,jsx}',
-        './src/**/*.{js,jsx}',
+        "./src/**/*.{js,jsx,ts,tsx}",
+        "./public/index.html"
     ],
     theme: {
         container: {
@@ -52,6 +50,7 @@ module.exports = {
                 },
                 sidebar: {
                     DEFAULT: "hsl(var(--sidebar))",
+                    sidebar: "hsl(var(--sidebar))",
                     foreground: "hsl(var(--sidebar-foreground))",
                 },
             },
@@ -76,7 +75,7 @@ module.exports = {
             },
             fontFamily: {
                 sans: ["Inter", "sans-serif"],
-                mono: ["JetBrains Mono", "monospace"], // For code
+                mono: ["JetBrains Mono", "monospace"],
             },
         },
     },

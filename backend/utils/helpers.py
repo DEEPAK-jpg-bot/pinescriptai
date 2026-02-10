@@ -1,7 +1,4 @@
-"""
-Helper utility functions
-"""
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import hashlib
 import re
 import html
@@ -63,7 +60,7 @@ def calculate_expires_at(plan: str) -> Optional[datetime]:
     Calculate thread expiration time based on plan
     """
     if plan == "hobby":
-        return datetime.utcnow() + timedelta(hours=24)
+        return datetime.now(timezone.utc) + timedelta(hours=24)
     return None  # No expiration for paid plans
 
 
@@ -72,6 +69,8 @@ def hash_prompt(prompt: str) -> str:
     Create a secure hash of prompt for caching
     Uses SHA-256 for better security than MD5
     """
+    if not prompt:
+        return ""
     normalized = prompt.lower().strip()
     return hashlib.sha256(normalized.encode('utf-8')).hexdigest()[:32]
 
@@ -172,12 +171,15 @@ def get_days_until_reset(billing_cycle_start: datetime) -> int:
     if not billing_cycle_start:
         return 30
     
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     
     # Handle string dates
     if isinstance(billing_cycle_start, str):
         try:
-            billing_cycle_start = datetime.fromisoformat(billing_cycle_start.replace('Z', '+00:00').replace('+00:00', ''))
+            # Handle ISO format strings from DB
+            billing_cycle_start = datetime.fromisoformat(billing_cycle_start.replace('Z', '+00:00'))
+            if billing_cycle_start.tzinfo is None:
+                billing_cycle_start = billing_cycle_start.replace(tzinfo=timezone.utc)
         except ValueError:
             return 30
     

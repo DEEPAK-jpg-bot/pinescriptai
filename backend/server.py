@@ -23,7 +23,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Import routers
-from api import auth, generate, threads, scripts, tokens, payments, user, affiliate
+from routes import auth, generate, threads, scripts, tokens, payments, user, affiliate
 
 
 @asynccontextmanager
