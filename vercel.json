@@ -3,24 +3,11 @@
     "rewrites": [
         {
             "source": "/api/(.*)",
-            "destination": "/backend/server.py"
+            "destination": "/api/index.py"
         },
         {
             "source": "/(.*)",
-            "destination": "/frontend/public/index.html"
-        }
-    ],
-    "builds": [
-        {
-            "src": "backend/server.py",
-            "use": "@vercel/python"
-        },
-        {
-            "src": "frontend/package.json",
-            "use": "@vercel/static-build",
-            "config": {
-                "distDir": "build"
-            }
+            "destination": "/index.html"
         }
     ]
 }
