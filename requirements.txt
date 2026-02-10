@@ -1,31 +1,31 @@
-fastapi==0.109.0
-mangum==0.17.0
-python-dotenv==1.0.0
+fastapi>=0.115.0
+mangum>=0.21.0
+python-dotenv>=1.2.0
 
-# Database (Using 2.3.0 to avoid heavy Analytics dependencies like pyiceberg/pyarrow)
+# Database
 supabase==2.3.0
 
 # AI
-google-generativeai==0.3.2
+google-generativeai>=0.8.0
 
 # Auth & Security
-pyjwt==2.8.0
-python-multipart==0.0.12
-passlib[bcrypt]==1.7.4
+pyjwt>=2.9.0
+python-multipart>=0.0.20
+passlib[bcrypt]>=1.7.4
 
-# Validation
-pydantic==2.5.3
-pydantic-settings==2.1.0
-email-validator==2.1.0
+# Validation (Upgrading to latest for better compatibility with newer Python runtimes)
+pydantic>=2.10.0
+pydantic-settings>=2.6.0
+email-validator>=2.2.0
 
 # Payments
-stripe==7.8.0
+stripe>=11.0.0
 
 # Email
-resend==0.8.0
+resend>=2.4.0
 
 # Caching
-upstash-redis==1.6.0
+upstash-redis>=1.6.0
 
 # Utils
-python-dateutil==2.8.2
+python-dateutil>=2.9.0
