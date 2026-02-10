@@ -1,5 +1,12 @@
 {
     "version": 2,
+    "functions": {
+        "api/index.py": {
+            "maxDuration": 60,
+            "memory": 1024,
+            "excludeFiles": "{node_modules,src,public,build,package-lock.json,tailwind.config.js,postcss.config.js}/**"
+        }
+    },
     "rewrites": [
         {
             "source": "/api/(.*)",

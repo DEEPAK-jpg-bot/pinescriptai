@@ -1,0 +1,10 @@
+node_modules
+build
+.git
+.env
+*.sql
+README.md
+LICENSE
+backend/vercel.json
+backend/__pycache__
+api/__pycache__
