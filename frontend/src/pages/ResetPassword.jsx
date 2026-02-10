@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Code, Lock, Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
@@ -14,7 +14,7 @@ const ResetPassword = () => {
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
+
 
     // Password validation
     const hasUppercase = /[A-Z]/.test(password);
@@ -39,7 +39,7 @@ const ResetPassword = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (!hasUppercase || !hasNumber || !hasMinLength) {
             setError('Password does not meet requirements');
             return;
@@ -62,7 +62,7 @@ const ResetPassword = () => {
 
             setSuccess(true);
             toast.success('Password updated successfully!');
-            
+
             // Redirect to login after 3 seconds
             setTimeout(() => {
                 navigate('/login');
@@ -79,7 +79,7 @@ const ResetPassword = () => {
         return (
             <div className="min-h-screen bg-black flex items-center justify-center px-4">
                 <div className="noise-overlay" />
-                
+
                 <div className="w-full max-w-md relative z-10 text-center">
                     <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
                         <CheckCircle className="text-green-500" size={40} />
@@ -101,7 +101,7 @@ const ResetPassword = () => {
     return (
         <div className="min-h-screen bg-black flex items-center justify-center px-4">
             <div className="noise-overlay" />
-            
+
             <div className="w-full max-w-md relative z-10">
                 <div className="text-center mb-8">
                     <Link to="/" className="inline-flex items-center gap-2 mb-8">
@@ -140,7 +140,7 @@ const ResetPassword = () => {
                                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
                         </div>
-                        
+
                         {/* Password requirements */}
                         <div className="mt-3 space-y-2">
                             <div className={`text-xs flex items-center gap-2 ${hasMinLength ? 'text-green-500' : 'text-gray-500'}`}>
@@ -186,8 +186,8 @@ const ResetPassword = () => {
                 </form>
 
                 <div className="mt-8 text-center">
-                    <Link 
-                        to="/login" 
+                    <Link
+                        to="/login"
                         className="text-gray-400 hover:text-white transition-colors"
                     >
                         Back to Login

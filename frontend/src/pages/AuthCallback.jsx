@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Code, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { supabase } from '../utils/supabaseClient';
 import { Button } from '../components/ui/button';
@@ -8,7 +8,7 @@ const AuthCallback = () => {
     const [status, setStatus] = useState('loading'); // loading, success, error
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
+
 
     useEffect(() => {
         const handleAuthCallback = async () => {
@@ -41,7 +41,7 @@ const AuthCallback = () => {
 
                         setStatus('success');
                         setMessage('Your email has been verified successfully!');
-                        
+
                         // Redirect to dashboard after 2 seconds
                         setTimeout(() => {
                             navigate('/dashboard');
@@ -63,7 +63,7 @@ const AuthCallback = () => {
 
                         setStatus('success');
                         setMessage('Logged in successfully!');
-                        
+
                         setTimeout(() => {
                             navigate('/dashboard');
                         }, 2000);
@@ -71,7 +71,7 @@ const AuthCallback = () => {
                 } else {
                     // Unknown type or no type - check for session
                     const { data: { session } } = await supabase.auth.getSession();
-                    
+
                     if (session) {
                         setStatus('success');
                         setMessage('Authentication successful!');
@@ -96,7 +96,7 @@ const AuthCallback = () => {
     return (
         <div className="min-h-screen bg-black flex items-center justify-center px-4">
             <div className="noise-overlay" />
-            
+
             <div className="w-full max-w-md relative z-10 text-center">
                 <div className="inline-flex items-center gap-2 mb-8">
                     <Code className="text-[#3B82F6]" size={32} />

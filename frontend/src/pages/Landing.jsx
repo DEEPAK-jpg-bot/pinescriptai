@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { motion } from 'framer-motion';
 import {
-    Code, Zap, BarChart3, ArrowRight, Play, Check,
-    Terminal as TerminalIcon, Sparkles
+    Terminal as TerminalIcon
 } from 'lucide-react';
 import PricingCard from '../components/ui/PricingCard';
 
@@ -125,9 +124,9 @@ const Landing = () => {
                 {/* FOOTER */}
                 <footer className="py-12 px-6 border-t border-[#ffffff10] bg-black text-center text-sm text-gray-500">
                     <div className="flex flex-col items-center gap-6">
-                        <div className="flex gap-6">
-                            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-                            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+                        <div className="flex gap-6 text-gray-400">
+                            <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+                            <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
                         </div>
                         <p>© 2026 PineScript AI.</p>
                     </div>

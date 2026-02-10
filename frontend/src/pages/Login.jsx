@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { toast } from 'sonner';
-import { Code, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Code, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 const Login = () => {
     const [email, setEmail] = useState('');

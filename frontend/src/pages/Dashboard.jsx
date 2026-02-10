@@ -3,9 +3,9 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import {
     Sparkles, User, LogOut, Send, Plus,
-    MessageSquare, ChevronLeft, ChevronRight,
+    MessageSquare, ChevronRight,
     Copy, Download, Lightbulb, RefreshCw,
-    MoreHorizontal, Check, X, Loader2
+    MoreHorizontal, Check, Loader2
 } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 import { toast } from 'sonner';
