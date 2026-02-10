@@ -9,9 +9,4 @@ LICENSE
 backend/vercel.json
 backend/__pycache__
 api/__pycache__
-src
-public
-package-lock.json
-tailwind.config.js
-postcss.config.js
 frontend
