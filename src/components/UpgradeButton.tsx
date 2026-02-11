@@ -10,20 +10,27 @@ export default function UpgradeButton({ userId, email }: { userId: string, email
 
     const handleUpgrade = async () => {
         setLoading(true);
-        // Direct link logic for now (Simplest integration)
-        // In a real app, you might call an internal API that creates a checkout via Lemon Squeezy SDK to pass custom_data
+        try {
+            // Replace with your actual Variant ID from Lemon Squeezy product settings
+            const variantId = "your_variant_id_here";
 
-        // IMPORTANT: You MUST replace this URL with your actual Lemon Squeezy Checkout URL
-        // And append ?checkout[custom][user_id]=<userId>
-        const checkoutUrl = "https://your-store.lemonsqueezy.com/checkout/buy/variant-id";
+            const response = await fetch('/api/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ variantId })
+            });
 
-        // Construct URL with custom data
-        const url = new URL(checkoutUrl);
-        url.searchParams.append('checkout[custom][user_id]', userId);
-        url.searchParams.append('checkout[email]', email);
+            const data = await response.json();
 
-        window.open(url.toString(), '_blank');
-        setLoading(false);
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                throw new Error(data.error || 'Failed to create checkout');
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'Payment failed to initiate');
+            setLoading(false);
+        }
     };
 
     return (

@@ -102,11 +102,16 @@ export default function Dashboard() {
         <div className="flex flex-col h-[calc(100vh-64px)] md:h-screen w-full bg-slate-50">
             {/* Header / Quota Warning */}
             <div className="flex-shrink-0 px-6 py-4 bg-white border-b border-slate-200 flex justify-between items-center">
-                <div>
+                <div className="flex items-center gap-3">
                     <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                         <MessageSquare className="text-indigo-600" size={24} />
                         PineGen Chat
                     </h1>
+                    {quotaInfo.tier === 'pro' && (
+                        <span className="px-2 py-0.5 bg-gradient-to-r from-amber-400 to-amber-600 text-white text-[10px] font-bold rounded uppercase tracking-wider shadow-sm">
+                            Pro
+                        </span>
+                    )}
                 </div>
                 {quotaInfo.isExceeded && (
                     <div className="flex items-center gap-2 px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-medium border border-amber-200">
@@ -143,8 +148,8 @@ export default function Dashboard() {
                     messages.map((m) => (
                         <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                             <div className={`max-w-[85%] lg:max-w-[75%] rounded-2xl p-4 shadow-sm ${m.role === 'user'
-                                    ? 'bg-indigo-600 text-white rounded-tr-none'
-                                    : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none'
+                                ? 'bg-indigo-600 text-white rounded-tr-none'
+                                : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none'
                                 }`}>
                                 <div className={m.role === 'user' ? 'text-white' : 'text-slate-800'}>
                                     {m.role === 'user' ? m.content : formatMessage(m.content)}

@@ -40,7 +40,23 @@ const PricingCard = ({ plan, price, features, cta, popular }: any) => (
     </div>
 );
 
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/utils/supabase/client';
+
 export default function Landing() {
+    const router = useRouter();
+    const supabase = createClient();
+
+    React.useEffect(() => {
+        const checkUser = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                router.push('/dashboard');
+            }
+        };
+        checkUser();
+    }, [router, supabase]);
+
     return (
         <div className="min-h-screen bg-slate-50 font-sans overflow-x-hidden selection:bg-indigo-100 selection:text-indigo-900">
 

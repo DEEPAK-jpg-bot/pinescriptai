@@ -4,7 +4,7 @@ import { createClient } from '@/utils/supabase/client';
 export type User = {
     id: string;
     email: string;
-    // ... other auth fields
+    tier?: string;
 };
 
 export type Message = {
@@ -41,6 +41,7 @@ type ChatStore = {
         resetAt: string | null;
         isExceeded: boolean;
         waitSeconds: number;
+        tier: string;
     };
 
     setUser: (user: User | null) => void;
@@ -85,6 +86,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         resetAt: null,
         isExceeded: false,
         waitSeconds: 0,
+        tier: 'free',
     },
 
     setUser: (user) => set({ user }),
@@ -183,10 +185,11 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         set({
             quotaInfo: {
                 remaining: data.remaining || 0,
-                limit: 1500,
+                limit: data.tier === 'pro' ? 100000 : 1500,
                 resetAt: data.resetAt,
                 isExceeded: !data.allowed,
                 waitSeconds: data.waitSeconds || 0,
+                tier: data.tier || 'free',
             },
         });
         return data;

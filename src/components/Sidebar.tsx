@@ -1,43 +1,73 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
     Plus,
     MessageSquare,
-    User,
     LogOut,
     Settings,
-    History
+    History,
+    ChevronLeft,
+    ChevronRight,
+    Trash2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useChatStore } from "@/store/useChatStore";
+import { createClient } from "@/utils/supabase/client";
 
 export function Sidebar() {
     const pathname = usePathname();
+    const router = useRouter();
+    const supabase = createClient();
     const [isCollapsed, setIsCollapsed] = useState(false);
 
-    // Simplified navigation matching the original app's intent (Chat centric)
-    const navigation = [
-        { name: "New Chat", href: "/dashboard", icon: Plus },
-        // Mock history items
-        { name: "RSI Strategy", href: "#", icon: MessageSquare },
-        { name: "MACD Alert", href: "#", icon: MessageSquare },
-        { name: "Volume Spike", href: "#", icon: MessageSquare },
-    ];
+    const {
+        user,
+        conversations,
+        activeConversationId,
+        setActiveConversation,
+        deleteConversation,
+        createConversation,
+        fetchConversations,
+        quotaInfo
+    } = useChatStore();
 
-    const secondaryNavigation = [
-        { name: "Settings", href: "#", icon: Settings },
-    ];
+    useEffect(() => {
+        if (user) {
+            fetchConversations();
+        }
+    }, [user, fetchConversations]);
+
+    const handleNewChat = async () => {
+        const id = await createConversation();
+        if (id) {
+            router.push('/dashboard');
+        }
+    };
+
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        router.push('/login');
+    };
 
     return (
         <div className={cn(
-            "flex flex-col h-screen border-r border-slate-200 bg-white transition-all duration-300",
+            "flex flex-col h-screen border-r border-slate-200 bg-white transition-all duration-300 relative",
             isCollapsed ? "w-20" : "w-64"
         )}>
+            {/* Collapse Toggle */}
+            <button
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className="absolute -right-3 top-20 w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center shadow-sm z-10 hover:bg-slate-50"
+            >
+                {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+            </button>
+
             {/* Brand */}
-            <div className="flex items-center h-16 px-6 border-b border-slate-100">
-                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">
+            <div className="flex items-center h-16 px-6 border-b border-slate-100 flex-shrink-0">
+                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-sm">
                     P
                 </div>
                 {!isCollapsed && (
@@ -46,47 +76,105 @@ export function Sidebar() {
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
-                <div className="mb-6">
-                    <Link
-                        href="/dashboard"
+            <div className="flex-1 overflow-hidden flex flex-col">
+                <div className="p-3">
+                    <button
+                        onClick={handleNewChat}
                         className={cn(
-                            "flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors bg-indigo-600 text-white hover:bg-indigo-700 mb-4 shadow-sm"
+                            "flex items-center w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-all bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm hover:shadow-md",
+                            isCollapsed && "justify-center"
                         )}
                     >
                         <Plus className="w-5 h-5 flex-shrink-0" />
                         {!isCollapsed && <span className="ml-3">New Chat</span>}
-                    </Link>
-
-                    {!isCollapsed && <h3 className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">History</h3>}
-                    {navigation.slice(1).map((item) => (
-                        <Link
-                            key={item.name}
-                            href={item.href}
-                            className="flex items-center px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 group transition-colors"
-                        >
-                            <item.icon className="w-4 h-4 flex-shrink-0 text-slate-400 group-hover:text-slate-600" />
-                            {!isCollapsed && <span className="ml-3 truncate">{item.name}</span>}
-                        </Link>
-                    ))}
+                    </button>
                 </div>
-            </nav>
 
-            {/* User Footer */}
-            <div className="p-4 border-t border-slate-100">
-                <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-medium text-sm">
-                        AT
-                    </div>
+                <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1 custom-scrollbar">
                     {!isCollapsed && (
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-slate-900 truncate">Alex Trader</p>
-                            <p className="text-xs text-slate-500 truncate">Pro Plan</p>
+                        <div className="flex items-center justify-between px-3 mt-4 mb-2">
+                            <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">History</h3>
+                            <History size={14} className="text-slate-300" />
                         </div>
                     )}
-                    <button className="text-slate-400 hover:text-slate-600">
-                        <LogOut size={18} />
-                    </button>
+
+                    {conversations.length === 0 && !isCollapsed && (
+                        <p className="px-3 py-4 text-xs text-slate-400 text-center italic">No history yet</p>
+                    )}
+
+                    {conversations.map((convo) => (
+                        <div key={convo.id} className="group relative">
+                            <button
+                                onClick={() => {
+                                    setActiveConversation(convo.id);
+                                    if (pathname !== '/dashboard') router.push('/dashboard');
+                                }}
+                                className={cn(
+                                    "flex items-center w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors group",
+                                    activeConversationId === convo.id
+                                        ? "bg-slate-100 text-indigo-700"
+                                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                                )}
+                            >
+                                <MessageSquare className={cn(
+                                    "w-4 h-4 flex-shrink-0",
+                                    activeConversationId === convo.id ? "text-indigo-600" : "text-slate-400"
+                                )} />
+                                {!isCollapsed && <span className="ml-3 truncate pr-6">{convo.title}</span>}
+                            </button>
+                            {!isCollapsed && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        deleteConversation(convo.id);
+                                    }}
+                                    className="absolute right-2 top-1.5 p-1 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <Trash2 size={14} />
+                                </button>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* User Footer */}
+            <div className="p-4 border-t border-slate-100 bg-slate-50/50">
+                <div className="flex flex-col gap-4">
+                    <Link href="/settings" className={cn(
+                        "flex items-center px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-white hover:shadow-sm transition-all",
+                        pathname === "/settings" && "bg-white shadow-sm text-indigo-700"
+                    )}>
+                        <Settings className="w-4 h-4" />
+                        {!isCollapsed && <span className="ml-3 font-medium">Settings</span>}
+                    </Link>
+
+                    <div className="flex items-center gap-3 px-1">
+                        <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-xs shadow-sm border border-indigo-200">
+                            {user?.email?.substring(0, 2).toUpperCase() || "U"}
+                        </div>
+                        {!isCollapsed && (
+                            <div className="flex-1 min-w-0">
+                                <p className="text-xs font-bold text-slate-900 truncate">{user?.email}</p>
+                                <div className="flex items-center gap-1.5">
+                                    <span className={cn(
+                                        "inline-block w-1.5 h-1.5 rounded-full",
+                                        quotaInfo.tier === 'pro' ? "bg-emerald-500" : "bg-slate-400"
+                                    )} />
+                                    <p className="text-[10px] font-medium text-slate-500 uppercase tracking-tighter">
+                                        {quotaInfo.tier === 'pro' ? "Pro Member" : "Free Tier"}
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+                        <button
+                            onClick={handleLogout}
+                            className="text-slate-400 hover:text-red-500 transition-colors p-1"
+                            title="Sign Out"
+                        >
+                            <LogOut size={16} />
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
