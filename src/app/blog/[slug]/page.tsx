@@ -1,6 +1,7 @@
 import { getPostBySlug, getPosts } from '@/lib/posts';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, Calendar, User, Code, Share2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
@@ -38,19 +39,85 @@ export default async function BlogPostPage({ params }: any) {
         notFound();
     }
 
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        headline: post.title,
+        description: post.excerpt,
+        image: post.coverImage,
+        author: {
+            '@type': 'Person',
+            name: post.author,
+        },
+        datePublished: post.date,
+        dateModified: post.date,
+        publisher: {
+            '@type': 'Organization',
+            name: 'PineGen',
+            logo: {
+                '@type': 'ImageObject',
+                url: 'https://pinescript.vercel.app/logo.png', // Placeholder
+            },
+        },
+        mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': `https://pinescript.vercel.app/blog/${post.slug}`,
+        },
+    };
+
+    const breadcrumbJsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+            {
+                '@type': 'ListItem',
+                position: 1,
+                name: 'Home',
+                item: 'https://pinescript.vercel.app',
+            },
+            {
+                '@type': 'ListItem',
+                position: 2,
+                name: 'Blog',
+                item: 'https://pinescript.vercel.app/blog',
+            },
+            {
+                '@type': 'ListItem',
+                position: 3,
+                name: post.title,
+                item: `https://pinescript.vercel.app/blog/${post.slug}`,
+            },
+        ],
+    };
+
     return (
         <div className="min-h-screen bg-white font-sans selection:bg-indigo-50">
+            {/* Structured Data */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+            />
+
             {/* Header */}
             <nav className="w-full bg-white/80 backdrop-blur-md border-b border-slate-100 px-6 py-4 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <Link href="/blog" className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors">
-                        <ChevronLeft size={20} />
-                        <span className="text-sm font-medium">Back to Blog</span>
-                    </Link>
-                    <Link href="/" className="flex items-center gap-2">
-                        <div className="w-7 h-7 bg-indigo-600 rounded flex items-center justify-center text-white font-bold text-sm">P</div>
-                        <span className="hidden sm:inline font-bold text-slate-900 tracking-tight">PineGen</span>
-                    </Link>
+                    <div className="flex items-center gap-8">
+                        <Link href="/" className="flex items-center gap-2">
+                            <div className="w-7 h-7 bg-indigo-600 rounded flex items-center justify-center text-white font-bold text-sm">P</div>
+                            <span className="hidden sm:inline font-bold text-slate-900 tracking-tight">PineGen</span>
+                        </Link>
+                        {/* Breadcrumbs UI */}
+                        <div className="hidden md:flex items-center text-sm font-medium text-slate-500">
+                            <Link href="/blog" className="hover:text-indigo-600 transition-colors">Blog</Link>
+                            <span className="mx-2">/</span>
+                            <span className="text-slate-900 truncate max-w-[200px]">{post.title}</span>
+                        </div>
+                    </div>
+
                     <div className="flex items-center gap-4">
                         <Link href="/signup">
                             <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white">Try PineGen</Button>
@@ -60,6 +127,13 @@ export default async function BlogPostPage({ params }: any) {
             </nav>
 
             <article className="max-w-4xl mx-auto px-6 py-12 md:py-20">
+                <div className="mb-8">
+                    <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors">
+                        <ChevronLeft size={16} />
+                        Back to all posts
+                    </Link>
+                </div>
+
                 {/* Meta Header */}
                 <header className="mb-12">
                     <div className="flex items-center gap-2 text-indigo-600 text-xs font-bold uppercase tracking-wider mb-4">
@@ -87,11 +161,13 @@ export default async function BlogPostPage({ params }: any) {
                 </header>
 
                 {/* Hero Image */}
-                <div className="rounded-3xl overflow-hidden mb-16 shadow-2xl border border-slate-100">
-                    <img
+                <div className="relative w-full aspect-[21/9] rounded-3xl overflow-hidden mb-16 shadow-2xl border border-slate-100">
+                    <Image
                         src={post.coverImage}
                         alt={post.title}
-                        className="w-full aspect-[21/9] object-cover"
+                        fill
+                        className="object-cover"
+                        priority
                     />
                 </div>
 

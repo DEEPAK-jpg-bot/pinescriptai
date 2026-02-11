@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { getPosts } from '@/lib/posts';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pinegen-ai.vercel.app';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pinescript.vercel.app';
     const posts = await getPosts();
 
     const blogPosts = posts.map((post) => ({

@@ -12,12 +12,16 @@ export default function UpgradeButton({ userId, email }: { userId: string, email
         setLoading(true);
         try {
             // Replace with your actual Variant ID from Lemon Squeezy product settings
-            const variantId = "your_variant_id_here";
+            const variantId = process.env.NEXT_PUBLIC_LEMONSQUEEZY_VARIANT_ID || "567890"; // Fallback/Test ID
 
             const response = await fetch('/api/checkout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ variantId })
+                body: JSON.stringify({
+                    variantId,
+                    userId,
+                    email
+                })
             });
 
             const data = await response.json();

@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { getPosts } from '@/lib/posts';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
@@ -13,8 +14,33 @@ export const metadata: Metadata = {
 export default async function BlogPage() {
     const posts = await getPosts();
 
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'Blog',
+        name: 'PineGen Blog',
+        description: 'Expert guides and tutorials for TradingView Pine Script v6.',
+        url: 'https://pinescript.vercel.app/blog',
+        blogPost: posts.map(post => ({
+            '@type': 'BlogPosting',
+            headline: post.title,
+            description: post.excerpt,
+            image: post.coverImage,
+            datePublished: post.date,
+            url: `https://pinescript.vercel.app/blog/${post.slug}`,
+            author: {
+                '@type': 'Person',
+                name: post.author
+            }
+        }))
+    };
+
     return (
         <div className="min-h-screen bg-slate-50 font-sans">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+            {/* ... rest of the component */}
             {/* Header */}
             <nav className="w-full bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -45,12 +71,13 @@ export default async function BlogPage() {
                         <Link href={`/blog/${post.slug}`} key={post.slug} className="group">
                             <Card className="h-full border-slate-200 hover:border-indigo-200 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
                                 <div className="aspect-video relative overflow-hidden">
-                                    <img
+                                    <Image
                                         src={post.coverImage}
                                         alt={post.title}
+                                        fill
                                         className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
                                     />
-                                    <div className="absolute top-4 left-4">
+                                    <div className="absolute top-4 left-4 z-10">
                                         <span className="bg-white/90 backdrop-blur-sm text-indigo-700 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider shadow-sm">
                                             {post.category}
                                         </span>

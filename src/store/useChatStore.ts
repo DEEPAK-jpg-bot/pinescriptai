@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { createClient } from '@/utils/supabase/client';
 import { User, Message, Conversation, QuotaInfo } from '@/lib/types';
+import { Session } from '@supabase/supabase-js';
 
 // Utility for formatting input
 const sanitizeInput = (input: string) => {
@@ -11,9 +12,18 @@ const sanitizeInput = (input: string) => {
         .replace(/javascript:/gi, '');
 };
 
+interface RateLimitResponse {
+    allowed: boolean;
+    remaining?: number;
+    resetAt?: string | null;
+    tier?: string;
+    reason?: string;
+    waitSeconds?: number;
+}
+
 type ChatStore = {
     user: User | null;
-    session: any | null; // Supabase session type
+    session: Session | null; // Supabase session type
 
     conversations: Conversation[];
     activeConversationId: string | null;
@@ -27,7 +37,7 @@ type ChatStore = {
     quotaInfo: QuotaInfo;
 
     setUser: (user: User | null) => void;
-    setSession: (session: any | null) => void;
+    setSession: (session: Session | null) => void;
     setError: (error: string | null) => void;
     clearError: () => void;
 
@@ -38,12 +48,10 @@ type ChatStore = {
 
     fetchMessages: (conversationId: string) => Promise<void>;
     sendMessage: (content: string) => Promise<void>;
-    checkRateLimit: () => Promise<any>;
+    checkRateLimit: () => Promise<RateLimitResponse>;
 };
 
 const supabase = createClient();
-
-
 
 export const useChatStore = create<ChatStore>((set, get) => ({
     user: null,
@@ -182,7 +190,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         if (rateCheck && !rateCheck.allowed) {
             set({
                 currentError: rateCheck.reason === 'daily_quota_exceeded'
-                    ? `Daily quota exceeded. Resets at ${new Date(rateCheck.resetAt).toLocaleString()}`
+                    ? `Daily quota exceeded. Resets at ${new Date(rateCheck.resetAt!).toLocaleString()}`
                     : `Rate limit exceeded. Wait ${rateCheck.waitSeconds} seconds.`,
             });
             return;
@@ -263,7 +271,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
                                 // Optional: Update a "streaming" message in UI here if needed
                                 // set(state => ({ streamingMessageContent: aiResponse })); 
                             }
-                        } catch (e) {
+                        } catch {
                             // ignore partial JSON parse errors
                         }
                     }
@@ -296,8 +304,9 @@ export const useChatStore = create<ChatStore>((set, get) => ({
             });
             await checkRateLimit();
 
-        } catch (error: any) {
-            set({ currentError: error.message, isGenerating: false });
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+            set({ currentError: errorMessage, isGenerating: false });
         }
     },
 }));

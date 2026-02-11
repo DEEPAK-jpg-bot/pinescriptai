@@ -7,6 +7,6 @@ export default function robots() {
                 disallow: ['/api/', '/dashboard/', '/settings/', '/auth/'],
             },
         ],
-        sitemap: `${process.env.NEXT_PUBLIC_APP_URL || 'https://pinegen-ai.vercel.app'}/sitemap.xml`,
+        sitemap: `${process.env.NEXT_PUBLIC_APP_URL || 'https://pinescript.vercel.app'}/sitemap.xml`,
     }
 }

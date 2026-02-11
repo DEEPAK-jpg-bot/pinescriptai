@@ -10,12 +10,14 @@ import {
     History,
     ChevronLeft,
     ChevronRight,
-    Trash2
+    Trash2,
+    Zap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { useChatStore } from "@/store/useChatStore";
 import { createClient } from "@/utils/supabase/client";
+import UpgradeButton from "./UpgradeButton";
 
 export function Sidebar() {
     const pathname = usePathname();
@@ -137,6 +139,20 @@ export function Sidebar() {
                     ))}
                 </div>
             </div>
+
+            {/* Upgrade Plan Card */}
+            {!isCollapsed && quotaInfo.tier === 'free' && (
+                <div className="p-4 mx-2 mb-2 bg-gradient-to-br from-indigo-50 to-violet-50 rounded-xl border border-indigo-100 shadow-sm">
+                    <div className="flex items-center gap-2 mb-2 text-indigo-900 font-bold text-sm">
+                        <Zap size={14} className="fill-indigo-600 text-indigo-600" />
+                        <span>Upgrade to Pro</span>
+                    </div>
+                    <p className="text-xs text-slate-600 mb-3 leading-relaxed">
+                        Unlock unlimited generations, faster speeds, and advanced models.
+                    </p>
+                    <UpgradeButton userId={user?.id || ''} email={user?.email || ''} />
+                </div>
+            )}
 
             {/* User Footer */}
             <div className="p-4 border-t border-slate-100 bg-slate-50/50">

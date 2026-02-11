@@ -27,14 +27,14 @@ export const metadata: Metadata = {
         address: false,
         telephone: false,
     },
-    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://pinegen-ai.vercel.app'),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://pinescript.vercel.app'),
     alternates: {
         canonical: '/',
     },
     openGraph: {
         title: "PineGen - The Most Powerful AI Pine Script Generator",
         description: "Turn your trading ideas into code instantly. Optimized for v6 syntax.",
-        url: 'https://pinegen-ai.vercel.app',
+        url: 'https://pinescript.vercel.app',
         siteName: 'PineGen',
         images: [
             {

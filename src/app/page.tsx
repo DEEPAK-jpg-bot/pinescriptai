@@ -68,6 +68,7 @@ export default function Landing() {
                         "@context": "https://schema.org",
                         "@type": "SoftwareApplication",
                         "name": "PineGen",
+                        "url": "https://pinescript.vercel.app",
                         "operatingSystem": "Web",
                         "applicationCategory": "FinTech / Trading Tool",
                         "description": "AI-powered Pine Script generator for TradingView. Create strategies in seconds.",

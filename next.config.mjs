@@ -7,6 +7,14 @@ const nextConfig = {
             allowedOrigins: ['localhost:3000'],
         },
     },
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'images.unsplash.com',
+            },
+        ],
+    },
 };
 
 export default nextConfig;
