@@ -10,7 +10,6 @@ import { createClient } from '@/utils/supabase/client';
 
 export default function Signup() {
     const [loading, setLoading] = useState<string | null>(null);
-    const router = useRouter();
     const supabase = createClient();
 
     const handleOAuthSignup = async (provider: 'google' | 'github' | 'azure' | 'apple') => {
@@ -28,8 +27,9 @@ export default function Signup() {
             }
             // User will be redirected
 
-        } catch (error: any) {
-            toast.error(error.message || 'Registration failed');
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Registration failed';
+            toast.error(message);
             setLoading(null);
         }
     };

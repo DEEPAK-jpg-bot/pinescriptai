@@ -10,7 +10,6 @@ import { createClient } from '@/utils/supabase/client';
 
 export default function Login() {
     const [loading, setLoading] = useState<string | null>(null);
-    const router = useRouter();
     const supabase = createClient();
 
     const handleOAuthLogin = async (provider: 'google' | 'github' | 'azure' | 'apple') => {
@@ -28,8 +27,9 @@ export default function Login() {
             }
             // User will be redirected to the provider
 
-        } catch (error: any) {
-            toast.error(error.message || 'Authentication failed');
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Authentication failed';
+            toast.error(message);
             setLoading(null);
         }
     };
@@ -131,7 +131,7 @@ export default function Login() {
                 </div>
 
                 <p className="text-sm text-center text-slate-500">
-                    Don't have an account?{' '}
+                    Don&apos;t have an account?{' '}
                     <Link href="/signup" className="text-indigo-600 font-semibold hover:underline">
                         Sign up
                     </Link>

@@ -44,8 +44,9 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ url: checkout.data?.data.attributes.url });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Checkout Error:', error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        const message = error instanceof Error ? error.message : 'Internal Server Error';
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

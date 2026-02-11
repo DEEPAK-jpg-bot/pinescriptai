@@ -16,7 +16,6 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60; // Increased duration for detailed response
 
 import { generateSchema } from '@/lib/schemas';
-import { z } from 'zod';
 
 // ... (existing imports)
 
@@ -75,7 +74,7 @@ OUTPUT INSTRUCTIONS:
 ${lastMessage.content}
 ---USER_PROMPT_END---`;
 
-        const history = messages.slice(0, -1).map((msg: any) => ({
+        const history = messages.slice(0, -1).map((msg: { role: string; content: string }) => ({
             role: msg.role === 'user' ? 'user' : 'model',
             parts: [{ text: msg.content }]
         }));
@@ -114,7 +113,7 @@ ${lastMessage.content}
                     // Ideally we decrement 1 "request" credit here.
                     await supabase.rpc('record_request', { p_user_id: user.id, p_tokens_used: 1 });
 
-                } catch (e) {
+                } catch (e: unknown) {
                     controller.error(e);
                 } finally {
                     controller.close();
@@ -126,7 +125,7 @@ ${lastMessage.content}
             headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' },
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('API Error:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }

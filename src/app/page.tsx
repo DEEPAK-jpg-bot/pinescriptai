@@ -8,7 +8,7 @@ import {
     Terminal as TerminalIcon, Code, Zap, BarChart2, CheckCircle2, ArrowRight
 } from 'lucide-react';
 
-const FeatureCard = ({ icon, title, description }: any) => (
+const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
     <div className="p-6 rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
         <div className="w-12 h-12 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600 mb-4">{icon}</div>
         <h3 className="text-lg font-bold mb-2 text-slate-900">{title}</h3>
@@ -16,7 +16,7 @@ const FeatureCard = ({ icon, title, description }: any) => (
     </div>
 );
 
-const PricingCard = ({ plan, price, features, cta, popular }: any) => (
+const PricingCard = ({ plan, price, features, cta, popular }: { plan: string, price: string, features: string[], cta: string, popular?: boolean }) => (
     <div className={`p-8 rounded-2xl border ${popular ? 'border-indigo-600 ring-4 ring-indigo-50' : 'border-slate-200'} bg-white shadow-sm flex flex-col relative overflow-hidden`}>
         {popular && <div className="absolute top-0 right-0 bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">POPULAR</div>}
         <h3 className="text-xl font-bold text-slate-900 mb-2">{plan}</h3>

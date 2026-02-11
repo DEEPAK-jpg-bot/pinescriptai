@@ -8,21 +8,25 @@ import { User, LogOut, FileText, CreditCard, ExternalLink } from 'lucide-react';
 import { useChatStore } from '@/store/useChatStore';
 import UpgradeButton from '@/components/UpgradeButton';
 
+interface Subscription {
+    status: string;
+}
+
 export default function Settings() {
     const supabase = createClient();
     const router = useRouter();
     const { user, quotaInfo } = useChatStore();
     const [loading, setLoading] = useState(false);
-    const [subscription, setSubscription] = useState<any>(null);
+    const [subscription, setSubscription] = useState<Subscription | null>(null);
 
     useEffect(() => {
         const loadSub = async () => {
             if (!user) return;
             const { data } = await supabase.from('subscriptions').select('*').eq('user_id', user.id).single();
-            setSubscription(data);
+            setSubscription(data as Subscription);
         };
         loadSub();
-    }, [user]);
+    }, [user, supabase]);
 
     const handleLogout = async () => {
         setLoading(true);

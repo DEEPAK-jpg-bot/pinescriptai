@@ -4,23 +4,20 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useChatStore } from '@/store/useChatStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input'; // Assuming standard input
-import { Loader2, Send, Copy, Download, RefreshCw, AlertTriangle, MessageSquare } from 'lucide-react';
+import { Loader2, Send, Copy, AlertTriangle, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/utils/supabase/client';
-import ReactMarkdown from 'react-markdown'; // Assuming standard, or we render raw text if not available (will use raw text with code block detection for now or basic rendering)
 
 export default function Dashboard() {
     const {
-        user, setUser,
+        setUser,
         messages,
         isGenerating,
         currentError,
         quotaInfo,
         fetchConversations,
-        fetchMessages,
         sendMessage,
         checkRateLimit,
-        activeConversationId
     } = useChatStore();
 
     const [input, setInput] = useState('');
@@ -48,7 +45,7 @@ export default function Dashboard() {
         });
 
         return () => subscription.unsubscribe();
-    }, [setUser, fetchConversations, checkRateLimit]);
+    }, [setUser, fetchConversations, checkRateLimit, supabase]);
 
     // 2. Auto-scroll
     useEffect(() => {
@@ -142,7 +139,7 @@ export default function Dashboard() {
                             <Send className="text-slate-400 ml-1" size={32} />
                         </div>
                         <h3 className="text-lg font-medium text-slate-900">Start a new strategy</h3>
-                        <p className="text-slate-500 max-w-xs mt-2">Describe your trading idea, and I'll generate the Pine Script code for you.</p>
+                        <p className="text-slate-500 max-w-xs mt-2">Describe your trading idea, and I&apos;ll generate the Pine Script code for you.</p>
                     </div>
                 ) : (
                     messages.map((m) => (

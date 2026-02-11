@@ -31,8 +31,9 @@ export default function UpgradeButton({ userId, email }: { userId: string, email
             } else {
                 throw new Error(data.error || 'Failed to create checkout');
             }
-        } catch (error: any) {
-            toast.error(error.message || 'Payment failed to initiate');
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Payment failed to initiate';
+            toast.error(message);
             setLoading(false);
         }
     };
