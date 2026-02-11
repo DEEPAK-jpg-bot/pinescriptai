@@ -91,11 +91,6 @@ export default function Landing() {
                                     Start Generating <ArrowRight size={20} />
                                 </Button>
                             </Link>
-                            <Link href="#demo">
-                                <Button variant="outline" className="h-14 px-8 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl font-semibold text-lg shadow-sm">
-                                    View Demo
-                                </Button>
-                            </Link>
                         </div>
 
                         {/* Hero Image / Preview */}
