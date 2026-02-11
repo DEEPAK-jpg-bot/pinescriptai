@@ -89,6 +89,10 @@ export default function Landing() {
                         </div>
                         <span className="text-xl font-bold text-slate-900 tracking-tight">PineGen</span>
                     </div>
+                    <div className="hidden md:flex items-center gap-8 mr-8">
+                        <Link href="/blog" className="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors">Blog</Link>
+                        <Link href="/#pricing" className="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors">Pricing</Link>
+                    </div>
                     <div className="flex items-center gap-4">
                         <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors hidden sm:block">Log in</Link>
                         <Link href="/signup">
@@ -230,6 +234,7 @@ export default function Landing() {
                             <span className="font-bold text-slate-900">PineGen</span>
                         </div>
                         <nav className="flex gap-8 text-slate-500 text-sm" aria-label="Footer Navigation">
+                            <Link href="/blog" className="hover:text-indigo-600 transition-colors">Blog</Link>
                             <Link href="#" className="hover:text-indigo-600 transition-colors">Privacy Policy</Link>
                             <Link href="#" className="hover:text-indigo-600 transition-colors">Terms of Service</Link>
                             <Link href="#" className="hover:text-indigo-600 transition-colors">Contact</Link>
