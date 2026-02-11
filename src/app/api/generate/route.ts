@@ -6,78 +6,75 @@ import { NextResponse } from 'next/server';
 const apiKey = process.env.GOOGLE_AI_SERVER_KEY || process.env.GEMINI_API_KEY || '';
 const genAI = new GoogleGenerativeAI(apiKey);
 
-// Initialize Supabase (Service Role optional, but safer to use Standard Client if possible, 
-// but checklist implies server-side operations. We will use the client created with env vars)
+// Initialize Supabase Admin
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''; // Prefer Service Key for server ops if available, else Anon
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY || ''; // Must use Service Key for RLS bypass to check sub if needed, or rely on RLS
+// Ideally we rely on token validation.
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-export const dynamic = 'force-dynamic'; // Prevent caching
-export const maxDuration = 30; // 30s timeout as per checklist
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60; // Increased duration for detailed response
 
 export async function POST(req: Request) {
-    if (!apiKey) {
-        return NextResponse.json({ error: 'Google AI API key not configured' }, { status: 500 });
-    }
+    if (!apiKey) return NextResponse.json({ error: 'Google AI API key not configured' }, { status: 500 });
 
     try {
         // 1. Verify Auth
         const authHeader = req.headers.get('authorization');
-        if (!authHeader) {
-            return NextResponse.json({ error: 'Missing authorization header' }, { status: 401 });
-        }
+        if (!authHeader) return NextResponse.json({ error: 'Missing authorization header' }, { status: 401 });
 
         const token = authHeader.replace('Bearer ', '');
         const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
-        if (authError || !user) {
-            return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
+        if (authError || !user) return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
+
+        // 2. Check Quota / Plan (Commercial Logic)
+        // Check local profile for tokens
+        const { data: profile } = await supabase.from('user_profiles').select('tokens_remaining, tier').eq('id', user.id).single();
+
+        if (profile) {
+            if (profile.tokens_remaining <= 0) {
+                return NextResponse.json({ error: 'Quota exceeded. Please upgrade to Pro.' }, { status: 429 });
+            }
         }
 
-        // 2. Parse Body
+        // 3. Parse Body
         const body = await req.json();
-        const { messages, conversationId } = body;
+        const { messages } = body;
 
-        if (!messages || !Array.isArray(messages) || messages.length === 0) {
-            return NextResponse.json({ error: 'Invalid messages format' }, { status: 400 });
-        }
-
-        // 3. Prepare Prompt
+        // 4. Prepare Prompt (ENHANCED WITH V6 RULES from rag.md Knowledge)
         const lastMessage = messages[messages.length - 1];
-        const systemPrompt = `You are an expert Pine Script v6 developer for TradingView. Generate clean, production-ready code.
 
-RULES:
-1. ALWAYS use Pine Script v6 syntax (start with //@version=6)
-2. For indicators: Use indicator() function
-3. For strategies: Use strategy() function with strategy.entry() and strategy.exit()
-4. Include input parameters for all configurable values
-5. Add clear comments explaining complex logic
-6. Follow TradingView naming conventions (camelCase)
-7. Include plot() statements for visual output
-8. Keep explanation brief and focused.
+        // This System Prompt is derived from your rag.md file
+        const systemPrompt = `You are an expert Pine Script v6 developer for TradingView. 
+STRICT V6 RULES:
+1. ALWAYS start with \`//@version=6\`.
+2. NEVER use \`transp\` parameter in color functions. Use \`color.new(color.red, 50)\`.
+3. \`int\`/\`float\` are NOT auto-cast to \`bool\`. Use \`bool(nz(val))\` for conditions.
+4. Boolean values can NEVER be \`na\`.
+5. Use \`for i in range(start, end)\` for loops. Old \`for i = 0 to 10\` syntax is REMOVED.
+6. Arrays: Use \`array.get(arr, index)\`. Indexing \`arr[0]\` is INVALID.
+7. Use \`indicator()\` or \`strategy()\` declaration immediately after version.
 
-OUTPUT FORMAT:
-1. Provide complete Pine Script code in a \`\`\`pinescript code block
-2. Then provide brief explanation of strategy/indicator logic
+OUTPUT INSTRUCTIONS:
+- Return ONLY the valid Pine Script code in a \`\`\`pinescript block.
+- Followed by a very short explanation.
+- If the user asks to "fix" code, explain the specific v6 breaking change you fixed (e.g. "Removed deprecated 'transp' parameter").
 
 ---USER_PROMPT_START---
 ${lastMessage.content}
 ---USER_PROMPT_END---`;
 
-        // 4. Format History (excluding last message which is in system prompt context/user prompt)
-        // Actually, Gemini expects history + new message.
-        // Checklist says: history: slice(0, -1), message: last.
         const history = messages.slice(0, -1).map((msg: any) => ({
             role: msg.role === 'user' ? 'user' : 'model',
             parts: [{ text: msg.content }]
         }));
 
         // 5. Call Gemini
-        // Checklist requested 'gemini-2.0-flash-exp'. If unavailable, fallback logic isn't here but user can change string.
         const model = genAI.getGenerativeModel({
             model: 'gemini-2.0-flash-exp',
             generationConfig: {
-                temperature: 0.7,
+                temperature: 0.5, // Lower temperature for code precision
                 maxOutputTokens: 8192,
             }
         });
@@ -101,8 +98,13 @@ ${lastMessage.content}
                         }
                     }
                     controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+
+                    // 7. Deduct Token Quota (Server-side enforcement)
+                    // We do this asynchronously or after stream? 
+                    // Ideally we decrement 1 "request" credit here.
+                    await supabase.rpc('record_request', { p_user_id: user.id, p_tokens_used: 1 });
+
                 } catch (e) {
-                    console.error('Streaming error:', e);
                     controller.error(e);
                 } finally {
                     controller.close();
@@ -111,18 +113,11 @@ ${lastMessage.content}
         });
 
         return new NextResponse(stream, {
-            headers: {
-                'Content-Type': 'text/event-stream',
-                'Cache-Control': 'no-cache',
-                'Connection': 'keep-alive',
-            },
+            headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' },
         });
 
     } catch (error: any) {
         console.error('API Error:', error);
-        return NextResponse.json(
-            { error: 'Internal Server Error', details: error.message },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

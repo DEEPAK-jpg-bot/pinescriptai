@@ -4,14 +4,25 @@ import React, { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import { User, LogOut, FileText, CreditCard } from 'lucide-react';
+import { User, LogOut, FileText, CreditCard, ExternalLink } from 'lucide-react';
 import { useChatStore } from '@/store/useChatStore';
+import UpgradeButton from '@/components/UpgradeButton';
 
 export default function Settings() {
     const supabase = createClient();
     const router = useRouter();
     const { user, quotaInfo } = useChatStore();
     const [loading, setLoading] = useState(false);
+    const [subscription, setSubscription] = useState<any>(null);
+
+    useEffect(() => {
+        const loadSub = async () => {
+            if (!user) return;
+            const { data } = await supabase.from('subscriptions').select('*').eq('user_id', user.id).single();
+            setSubscription(data);
+        };
+        loadSub();
+    }, [user]);
 
     const handleLogout = async () => {
         setLoading(true);
@@ -37,12 +48,29 @@ export default function Settings() {
                     </div>
 
                     <div className="grid gap-4">
-                        <div className="p-4 bg-slate-50 rounded-lg border border-slate-100 flex justify-between items-center">
+                        <div className="p-4 bg-slate-50 rounded-lg border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
                             <div className="flex items-center gap-3">
                                 <CreditCard className="text-slate-400" size={20} />
-                                <span className="font-medium text-slate-700">Current Plan</span>
+                                <div>
+                                    <span className="block font-medium text-slate-700">Current Plan</span>
+                                    <span className="text-xs text-slate-500">
+                                        {subscription ?
+                                            (subscription.status === 'active' ? 'Pro Plan active' : `Status: ${subscription.status}`)
+                                            : 'Free Tier'}
+                                    </span>
+                                </div>
                             </div>
-                            <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold uppercase tracking-wide">Free Tier</span>
+
+                            {/* UPGRADE / MANAGE BUTTON */}
+                            <div className="w-full md:w-auto">
+                                {subscription && subscription.status === 'active' ? (
+                                    <Button variant="outline" onClick={() => window.open('https://your-store.lemonsqueezy.com/billing', '_blank')}>
+                                        Manage Billing <ExternalLink size={14} className="ml-2" />
+                                    </Button>
+                                ) : (
+                                    user && <UpgradeButton userId={user.id} email={user.email} />
+                                )}
+                            </div>
                         </div>
 
                         <div className="p-4 bg-slate-50 rounded-lg border border-slate-100 flex justify-between items-center">
@@ -52,7 +80,7 @@ export default function Settings() {
                             </div>
                             <div className="text-right">
                                 <span className="block font-bold text-slate-900">{quotaInfo.remaining} / {quotaInfo.limit}</span>
-                                <span className="text-xs text-slate-400">Requests remaining today</span>
+                                <span className="text-xs text-slate-400">Tokens remaining today</span>
                             </div>
                         </div>
                     </div>
