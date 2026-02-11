@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme {
+    --color-primary: #4F46E5;
+    /* Indigo 600 */
+    --color-secondary: #0F172A;
+    /* Slate 900 */
+    --color-accent: #10B981;
+    /* Emerald 500 */
+    --color-background: #F8FAFC;
+    /* Slate 50 */
+    --color-surface: #FFFFFF;
+    /* White */
+
+    --font-sans: "Inter", sans-serif;
+}
+
+/* Custom Utilities */
+@layer utilities {
+    .glass-panel {
+        @apply bg-white/80 backdrop-blur-lg border border-slate-200 shadow-sm;
+    }
+}
+
+body {
+    @apply bg-slate-50 text-slate-900 font-sans antialiased;
+}

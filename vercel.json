@@ -1,19 +1,18 @@
 {
     "version": 2,
-    "functions": {
-        "api/index.py": {
-            "maxDuration": 60,
-            "excludeFiles": "{node_modules,src,public,build,package-lock.json,tailwind.config.js,postcss.config.js,*.sql,*.md,*.txt}/**"
-        }
-    },
-    "rewrites": [
+    "builds": [
         {
-            "source": "/api/(.*)",
-            "destination": "/api/index.py"
-        },
-        {
-            "source": "/(.*)",
-            "destination": "/index.html"
+            "src": "api/index.py",
+            "use": "@vercel/python"
         }
-    ]
+    ],
+    "routes": [
+        {
+            "src": "/api/(.*)",
+            "dest": "api/index.py"
+        }
+    ],
+    "env": {
+        "PYTHON_VERSION": "3.9"
+    }
 }
