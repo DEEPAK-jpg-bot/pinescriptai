@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Code, Loader2, ShieldCheck, Mail, Lock } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
-import { isDisposableEmail } from '@/lib/email-check';
+import { isAllowedEmail } from '@/lib/email-check';
 import { Input } from '@/components/ui/input';
+import { getURL } from '@/utils/get-url';
 
 export default function Signup() {
     const [loading, setLoading] = useState(false);
@@ -29,8 +30,8 @@ export default function Signup() {
             return;
         }
 
-        if (isDisposableEmail(email)) {
-            toast.error('Disposable or temporary emails are not allowed. Please use a real email.');
+        if (!isAllowedEmail(email)) {
+            toast.error('Please use a standard email provider (Gmail, Outlook, etc.). Business or disposable emails are restricted.');
             return;
         }
 
@@ -40,7 +41,7 @@ export default function Signup() {
                 email,
                 password,
                 options: {
-                    emailRedirectTo: `${location.origin}/auth/callback`,
+                    emailRedirectTo: `${getURL()}auth/callback`,
                 },
             });
 

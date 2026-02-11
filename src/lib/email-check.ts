@@ -1,28 +1,39 @@
-export const disposableDomains = [
-    "yopmail.com",
-    "temp-mail.org",
-    "guerrillamail.com",
-    "sharklasers.com",
-    "mailinator.com",
-    "dispostable.com",
-    "getairmail.com",
-    "10minutemail.com",
-    "tempmail.com",
-    "fake-mail.net",
-    "trashmail.com",
-    "mailnesia.com",
-    "mailspout.com",
-    "owlymail.com",
-    "temp-mail.io",
-    "minutemail.com",
-    "tempmailaddress.com",
-    "tempmailo.com",
-    "dropmail.me",
-    "moakt.com"
+/**
+ * Strictly allowed email domains. 
+ * Any email not matching these will be rejected to prevent disposable/fake accounts.
+ */
+export const allowedDomains = [
+    "gmail.com",
+    "outlook.com",
+    "hotmail.com",
+    "live.com",
+    "icloud.com",
+    "yahoo.com",
+    "protonmail.com",
+    "proton.me",
+    "me.com",
+    "msn.com"
 ];
 
-export function isDisposableEmail(email: string): boolean {
+/**
+ * Validates if an email is from a trusted provider.
+ * This also prevents common disposable email patterns.
+ */
+export function isAllowedEmail(email: string): boolean {
+    if (!email || !email.includes('@')) return false;
+
     const domain = email.split('@')[1]?.toLowerCase();
-    if (!domain) return true;
-    return disposableDomains.some(d => domain === d || domain.endsWith('.' + d));
+    if (!domain) return false;
+
+    // Check if domain is in whitelist
+    const isWhitelisted = allowedDomains.some(d => domain === d);
+
+    // Check for common 'temp' keywords in domain as a secondary safeguard
+    const isSuspicious = domain.includes('temp') ||
+        domain.includes('fake') ||
+        domain.includes('trash') ||
+        domain.includes('disposable') ||
+        domain.includes('yopmail');
+
+    return isWhitelisted && !isSuspicious;
 }

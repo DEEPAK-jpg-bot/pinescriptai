@@ -91,7 +91,6 @@ export default function Landing() {
                         <span className="text-xl font-bold text-slate-900 tracking-tight">PineGen</span>
                     </div>
                     <div className="hidden md:flex items-center gap-8 mr-8">
-                        <Link href="/blog" className="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors">Blog</Link>
                         <Link href="/#pricing" className="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors">Pricing</Link>
                     </div>
                     <div className="flex items-center gap-4">
@@ -202,54 +201,6 @@ export default function Landing() {
                     </div>
                 </section>
 
-                {/* BLOG PREVIEW SECTION */}
-                <section className="py-24 px-6 bg-white border-b border-slate-200" aria-labelledby="blog-title">
-                    <div className="max-w-6xl mx-auto">
-                        <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-                            <div>
-                                <h2 id="blog-title" className="text-3xl font-bold text-slate-900 mb-4">Latest Insights</h2>
-                                <p className="text-slate-500 max-w-xl">Updates on Pine Script v6, AI trading tips, and expert tutorials.</p>
-                            </div>
-                            <Link href="/blog">
-                                <Button variant="outline" className="rounded-xl border-slate-200 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50">
-                                    View All Posts <ArrowRight className="ml-2" size={16} />
-                                </Button>
-                            </Link>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            {[
-                                {
-                                    title: "Mastering Pine Script v6",
-                                    slug: "mastering-pinescript-v6",
-                                    excerpt: "Dive into the latest updates in Pine Script v6. From enhanced array handling to simplified color management...",
-                                    cat: "Development"
-                                },
-                                {
-                                    title: "AI Revolution in Trading",
-                                    slug: "ai-tradingview-revolution",
-                                    excerpt: "Discover how AI generators like PineGen are leveling the playing field for retail traders and strategy developers.",
-                                    cat: "AI & Trading"
-                                },
-                                {
-                                    title: "Common Pine Script Errors",
-                                    slug: "common-pinescript-errors",
-                                    excerpt: "Struggling with 'Undeclared Identifier' or 'Mutable Variable' errors? Learn how to fix the 5 most common mistakes.",
-                                    cat: "Tutorial"
-                                }
-                            ].map((post, i) => (
-                                <Link href={`/blog/${post.slug}`} key={i} className="group flex flex-col p-6 rounded-2xl border border-slate-100 bg-white hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/5 transition-all">
-                                    <span className="text-[10px] uppercase tracking-wider font-bold text-indigo-500 mb-3">{post.cat}</span>
-                                    <h3 className="text-lg font-bold text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors">{post.title}</h3>
-                                    <p className="text-sm text-slate-500 leading-relaxed mb-6 flex-1">{post.excerpt}</p>
-                                    <div className="flex items-center text-xs font-semibold text-indigo-600 group-hover:gap-2 transition-all">
-                                        Read More <ArrowRight size={12} className="ml-1" />
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
                 {/* PRICING SECTION */}
                 <section className="py-24 px-6 bg-slate-50" id="pricing" aria-labelledby="pricing-title">
                     <div className="max-w-5xl mx-auto">
@@ -283,7 +234,6 @@ export default function Landing() {
                             <span className="font-bold text-slate-900">PineGen</span>
                         </div>
                         <nav className="flex gap-8 text-slate-500 text-sm" aria-label="Footer Navigation">
-                            <Link href="/blog" className="hover:text-indigo-600 transition-colors">Blog</Link>
                             <Link href="#" className="hover:text-indigo-600 transition-colors">Privacy</Link>
                             <Link href="#" className="hover:text-indigo-600 transition-colors">Terms</Link>
                             <Link href="#" className="hover:text-indigo-600 transition-colors">Contact</Link>
