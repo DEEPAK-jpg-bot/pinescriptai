@@ -5,34 +5,31 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Code, Loader2, Github, Mail, Globe, Apple } from 'lucide-react';
-// import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { Code, Loader2, Github, Apple } from 'lucide-react';
+import { createClient } from '@/utils/supabase/client';
 
 export default function Login() {
     const [loading, setLoading] = useState<string | null>(null);
     const router = useRouter();
-    // const supabase = createClientComponentClient();
+    const supabase = createClient();
 
     const handleOAuthLogin = async (provider: 'google' | 'github' | 'azure' | 'apple') => {
         setLoading(provider);
         try {
-            // Real implementation would be:
-            // const { error } = await supabase.auth.signInWithOAuth({
-            //     provider: provider,
-            //     options: {
-            //         redirectTo: `${location.origin}/auth/callback`,
-            //     },
-            // });
-            // if (error) throw error;
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: provider,
+                options: {
+                    redirectTo: `${location.origin}/auth/callback`,
+                },
+            });
 
-            // Simulation for now
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            toast.success(`Successfully connected with ${provider.charAt(0).toUpperCase() + provider.slice(1)}`);
-            router.push('/dashboard');
+            if (error) {
+                throw error;
+            }
+            // User will be redirected to the provider
 
         } catch (error: any) {
             toast.error(error.message || 'Authentication failed');
-        } finally {
             setLoading(null);
         }
     };

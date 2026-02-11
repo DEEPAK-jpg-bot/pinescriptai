@@ -6,21 +6,30 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Code, Loader2, Github, Apple, ShieldCheck } from 'lucide-react';
+import { createClient } from '@/utils/supabase/client';
 
 export default function Signup() {
     const [loading, setLoading] = useState<string | null>(null);
     const router = useRouter();
+    const supabase = createClient();
 
     const handleOAuthSignup = async (provider: 'google' | 'github' | 'azure' | 'apple') => {
         setLoading(provider);
         try {
-            // Simulation for now
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            toast.success(`Account created with ${provider.charAt(0).toUpperCase() + provider.slice(1)}`);
-            router.push('/dashboard');
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: provider,
+                options: {
+                    redirectTo: `${location.origin}/auth/callback`,
+                },
+            });
+
+            if (error) {
+                throw error;
+            }
+            // User will be redirected
+
         } catch (error: any) {
             toast.error(error.message || 'Registration failed');
-        } finally {
             setLoading(null);
         }
     };
