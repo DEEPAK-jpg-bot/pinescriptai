@@ -1,13 +1,74 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
-// import { Sidebar } from "@/components/Sidebar"; // Don't import globally
+import { Toaster } from "sonner";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
+const outfit = Outfit({ subsets: ["latin"], variable: '--font-outfit' });
+
+export const viewport: Viewport = {
+    themeColor: "#4f46e5",
+    width: "device-width",
+    initialScale: 1,
+};
 
 export const metadata: Metadata = {
-    title: "PineGen - AI PineScript Generator",
-    description: "Generate PineScript strategies with AI",
+    title: {
+        default: "PineGen | AI-Powered Pine Script Generator for TradingView",
+        template: "%s | PineGen"
+    },
+    description: "Instantly create TradingView strategies and indicators with AI. PineGen converts natural language into error-free Pine Script v6 code for modern traders.",
+    keywords: ["Pine Script", "TradingView", "AI Strategy Generator", "Algo Trading", "PineScript v6", "Trading Bot", "Technical Indicators"],
+    authors: [{ name: "PineGen Team" }],
+    creator: "PineGen",
+    publisher: "PineGen",
+    formatDetection: {
+        email: false,
+        address: false,
+        telephone: false,
+    },
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://pinegen-ai.vercel.app'),
+    alternates: {
+        canonical: '/',
+    },
+    openGraph: {
+        title: "PineGen - The Most Powerful AI Pine Script Generator",
+        description: "Turn your trading ideas into code instantly. Optimized for v6 syntax.",
+        url: 'https://pinegen-ai.vercel.app',
+        siteName: 'PineGen',
+        images: [
+            {
+                url: '/og-image.png', // We should generate this or provide a path
+                width: 1200,
+                height: 630,
+                alt: 'PineGen Dashboard Preview',
+            },
+        ],
+        locale: 'en_US',
+        type: 'website',
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: "PineGen | Next-Gen Pine Script AI",
+        description: "Generate indicators and strategies in seconds with natural language.",
+        images: ['/og-image.png'],
+    },
+    robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+            index: true,
+            follow: true,
+            'max-video-preview': -1,
+            'max-image-preview': 'large',
+            'max-snippet': -1,
+        },
+    },
+    icons: {
+        icon: '/favicon.ico',
+        shortcut: '/favicon-16x16.png',
+        apple: '/apple-touch-icon.png',
+    },
 };
 
 export default function RootLayout({
@@ -16,9 +77,10 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
-            <body className={inter.className}>
+        <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
+            <body className={`${inter.className} antialiased selection:bg-indigo-100 selection:text-indigo-900`}>
                 {children}
+                <Toaster position="top-right" expand={false} richColors />
             </body>
         </html>
     );

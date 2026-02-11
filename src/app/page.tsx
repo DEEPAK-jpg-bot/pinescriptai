@@ -33,7 +33,7 @@ const PricingCard = ({ plan, price, features, cta, popular }: any) => (
             ))}
         </ul>
         <Link href="/dashboard" className="w-full">
-            <Button className={`w-full h-12 text-base ${popular ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-white border-2 border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'}`}>
+            <Button id={`cta-pricing-${plan.toLowerCase()}`} className={`w-full h-12 text-base ${popular ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-white border-2 border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'}`}>
                 {cta}
             </Button>
         </Link>
@@ -60,9 +60,29 @@ export default function Landing() {
     return (
         <div className="min-h-screen bg-slate-50 font-sans overflow-x-hidden selection:bg-indigo-100 selection:text-indigo-900">
 
+            {/* Structured Data for SEO */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "SoftwareApplication",
+                        "name": "PineGen",
+                        "operatingSystem": "Web",
+                        "applicationCategory": "FinTech / Trading Tool",
+                        "description": "AI-powered Pine Script generator for TradingView. Create strategies in seconds.",
+                        "offers": {
+                            "@type": "Offer",
+                            "price": "0",
+                            "priceCurrency": "USD"
+                        }
+                    })
+                }}
+            />
+
             {/* HEADER */}
-            <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4">
-                <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4">
+                <nav className="max-w-7xl mx-auto flex items-center justify-between" aria-label="Main Navigation">
                     <div className="flex items-center gap-2">
                         <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shadow-sm">
                             <Code className="text-white" size={20} />
@@ -72,26 +92,24 @@ export default function Landing() {
                     <div className="flex items-center gap-4">
                         <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors hidden sm:block">Log in</Link>
                         <Link href="/signup">
-                            <Button className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-5 py-2 text-sm font-medium shadow-sm transition-all hover:shadow-md">
+                            <Button id="cta-header-signup" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-5 py-2 text-sm font-medium shadow-sm transition-all hover:shadow-md">
                                 Get Started
                             </Button>
                         </Link>
                     </div>
-                </div>
-            </nav>
+                </nav>
+            </header>
 
             <main className="pt-32 pb-20">
                 {/* HERO SECTION */}
-                <section className="px-6 mb-32">
+                <section className="px-6 mb-32" aria-labelledby="hero-title">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
                         className="max-w-4xl mx-auto text-center"
                     >
-                        {/* REMOVED V2.0 BADGE */}
-
-                        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 text-slate-900 leading-[1.1]">
+                        <h1 id="hero-title" className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 text-slate-900 leading-[1.1]">
                             PineScript generator <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">for modern traders.</span>
                         </h1>
@@ -103,7 +121,7 @@ export default function Landing() {
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link href="/signup">
-                                <Button className="h-14 px-8 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold text-lg shadow-lg shadow-indigo-200 transition-all hover:scale-105 flex items-center gap-2">
+                                <Button id="cta-hero-start-primary" className="h-14 px-8 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold text-lg shadow-lg shadow-indigo-200 transition-all hover:scale-105 flex items-center gap-2">
                                     Start Generating <ArrowRight size={20} />
                                 </Button>
                             </Link>
@@ -140,42 +158,50 @@ export default function Landing() {
                 </section>
 
                 {/* FEATURES SECTION */}
-                <section className="py-24 px-6 bg-white border-y border-slate-200">
+                <section className="py-24 px-6 bg-white border-y border-slate-200" aria-labelledby="features-title">
                     <div className="max-w-6xl mx-auto">
                         <div className="text-center mb-16">
-                            <h2 className="text-3xl font-bold text-slate-900 mb-4">Everything you need</h2>
+                            <h2 id="features-title" className="text-3xl font-bold text-slate-900 mb-4">Everything you need</h2>
                             <p className="text-slate-500 max-w-2xl mx-auto">From simple indicators to complex backtesting strategies, PineGen handles it all.</p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                            <FeatureCard
-                                icon={<TerminalIcon size={24} />}
-                                title="Code Generation"
-                                description="Natural language to PineScript v6. Just describe your strategy."
-                            />
-                            <FeatureCard
-                                icon={<Code size={24} />}
-                                title="Editor Optimized"
-                                description="Integrated Monaco environment to review and refine your scripts."
-                            />
-                            <FeatureCard
-                                icon={<Zap size={24} />}
-                                title="Instant Refinement"
-                                description="Iterate on your code. Add filters, stops, and logic in seconds."
-                            />
-                            <FeatureCard
-                                icon={<BarChart2 size={24} />}
-                                title="Strategy Library"
-                                description="Access common patterns and indicator templates instantly."
-                            />
+                            <article>
+                                <FeatureCard
+                                    icon={<TerminalIcon size={24} />}
+                                    title="Code Generation"
+                                    description="Natural language to PineScript v6. Just describe your strategy."
+                                />
+                            </article>
+                            <article>
+                                <FeatureCard
+                                    icon={<Code size={24} />}
+                                    title="Editor Optimized"
+                                    description="Integrated Monaco environment to review and refine your scripts."
+                                />
+                            </article>
+                            <article>
+                                <FeatureCard
+                                    icon={<Zap size={24} />}
+                                    title="Instant Refinement"
+                                    description="Iterate on your code. Add filters, stops, and logic in seconds."
+                                />
+                            </article>
+                            <article>
+                                <FeatureCard
+                                    icon={<BarChart2 size={24} />}
+                                    title="Strategy Library"
+                                    description="Access common patterns and indicator templates instantly."
+                                />
+                            </article>
                         </div>
                     </div>
                 </section>
 
                 {/* PRICING SECTION */}
-                <section className="py-24 px-6 bg-slate-50">
+                <section className="py-24 px-6 bg-slate-50" aria-labelledby="pricing-title">
                     <div className="max-w-5xl mx-auto">
                         <div className="text-center mb-16">
-                            <h2 className="text-3xl font-bold text-slate-900 mb-4">Simple Pricing</h2>
+                            <h2 id="pricing-title" className="text-3xl font-bold text-slate-900 mb-4">Simple Pricing</h2>
                             <p className="text-slate-500">Start for free, upgrade when you need more power.</p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
@@ -203,11 +229,11 @@ export default function Landing() {
                             <div className="w-6 h-6 bg-indigo-600 rounded-md flex items-center justify-center text-white font-bold text-xs">P</div>
                             <span className="font-bold text-slate-900">PineGen</span>
                         </div>
-                        <div className="flex gap-8 text-slate-500 text-sm">
+                        <nav className="flex gap-8 text-slate-500 text-sm" aria-label="Footer Navigation">
                             <Link href="#" className="hover:text-indigo-600 transition-colors">Privacy Policy</Link>
                             <Link href="#" className="hover:text-indigo-600 transition-colors">Terms of Service</Link>
                             <Link href="#" className="hover:text-indigo-600 transition-colors">Contact</Link>
-                        </div>
+                        </nav>
                         <p className="text-slate-400 text-sm">© 2026 PineScript AI.</p>
                     </div>
                 </footer>
