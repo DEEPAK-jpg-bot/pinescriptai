@@ -8,8 +8,16 @@ export async function createClient() {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.error('Supabase client env vars missing');
-    return null as any;
+    console.warn('Supabase configuration missing for server client.');
+    return {
+      auth: {
+        getUser: async () => ({ data: { user: null }, error: null }),
+        getSession: async () => ({ data: { session: null }, error: null }),
+      },
+      from: () => ({
+        select: () => ({ eq: () => ({ single: () => ({ data: null, error: null }) }) }),
+      })
+    } as any;
   }
 
   return createServerClient(
