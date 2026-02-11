@@ -1,8 +1,21 @@
--- 1. UTILS
+-- 1. AGGRESSIVE CLEANUP
+drop trigger if exists on_auth_user_created on auth.users;
+drop function if exists public.handle_new_user() cascade;
+drop function if exists public.check_rate_limit(uuid) cascade;
+drop function if exists public.record_request(uuid, int) cascade;
+
+-- Drop tables in reverse order of dependency
+drop table if exists public.messages cascade;
+drop table if exists public.conversations cascade;
+drop table if exists public.user_profiles cascade;
+drop table if exists public.subscriptions cascade;
+drop table if exists public.webhook_events cascade;
+
+-- 2. UTILS
 create extension if not exists "uuid-ossp";
 
--- 2. CREATE TABLES (In order of dependency)
-create table if not exists public.user_profiles (
+-- 3. USER PROFILES
+create table public.user_profiles (
   id uuid references auth.users on delete cascade primary key,
   email text,
   tier text default 'free' check (tier in ('free', 'pro')),
@@ -13,7 +26,8 @@ create table if not exists public.user_profiles (
   updated_at timestamptz default now()
 );
 
-create table if not exists public.conversations (
+-- 4. CONVERSATIONS
+create table public.conversations (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users on delete cascade not null,
   title text not null,
@@ -22,7 +36,8 @@ create table if not exists public.conversations (
   updated_at timestamptz default now()
 );
 
-create table if not exists public.messages (
+-- 5. MESSAGES
+create table public.messages (
   id uuid primary key default gen_random_uuid(),
   conversation_id uuid references public.conversations on delete cascade not null,
   role text not null check (role in ('user', 'assistant', 'system')),
@@ -31,7 +46,8 @@ create table if not exists public.messages (
   created_at timestamptz default now()
 );
 
-create table if not exists public.subscriptions (
+-- 6. SUBSCRIPTIONS
+create table public.subscriptions (
   id text primary key,
   user_id uuid references auth.users on delete cascade not null,
   status text not null,
@@ -42,7 +58,8 @@ create table if not exists public.subscriptions (
   updated_at timestamptz default now()
 );
 
-create table if not exists public.webhook_events (
+-- 7. WEBHOOK EVENTS
+create table public.webhook_events (
   id bigserial primary key,
   event_type text,
   payload jsonb,
@@ -50,52 +67,30 @@ create table if not exists public.webhook_events (
   created_at timestamptz default now()
 );
 
--- 3. ENABLE RLS
+-- 8. RLS
 alter table public.user_profiles enable row level security;
 alter table public.conversations enable row level security;
 alter table public.messages enable row level security;
 alter table public.subscriptions enable row level security;
 alter table public.webhook_events enable row level security;
 
--- 4. POLICIES (Check table existence implicitly or just execute)
--- User Profiles
-do $$ begin
-    drop policy if exists "Users can view own profile" on public.user_profiles;
-    create policy "Users can view own profile" on public.user_profiles for select using (auth.uid() = id);
-exception when others then null; end $$;
+-- 9. POLICIES
+create policy "Users can view own profile" on public.user_profiles for select using (auth.uid() = id);
+create policy "Users can manage own conversations" on public.conversations for all using (auth.uid() = user_id);
+create policy "Users can manage messages" on public.messages for all using (
+    exists (select 1 from public.conversations where id = conversation_id and user_id = auth.uid())
+);
 
--- Conversations
-do $$ begin
-    drop policy if exists "Users can manage own conversations" on public.conversations;
-    create policy "Users can manage own conversations" on public.conversations for all using (auth.uid() = user_id);
-exception when others then null; end $$;
-
--- Messages
-do $$ begin
-    drop policy if exists "Users can manage messages" on public.messages;
-    create policy "Users can manage messages" on public.messages for all using (
-        exists (select 1 from public.conversations where id = conversation_id and user_id = auth.uid())
-    );
-exception when others then null; end $$;
-
--- 5. FUNCTIONS & TRIGGERS
+-- 10. FUNCTIONS
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
   insert into public.user_profiles (id, email, tier, tokens_monthly_limit, tokens_remaining)
-  values (new.id, new.email, 'free', 1500, 1500)
-  on conflict (id) do nothing;
+  values (new.id, new.email, 'free', 1500, 1500);
   return new;
 end;
 $$ language plpgsql security definer;
 
--- Trigger creation
-drop trigger if exists on_auth_user_created on auth.users;
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute procedure public.handle_new_user();
-
--- 6. RPCs
 create or replace function public.check_rate_limit(p_user_id uuid)
 returns json as $$
 declare
@@ -139,4 +134,12 @@ begin
   where id = p_user_id;
 end;
 $$ language plpgsql security definer;
+
+-- 11. TRIGGERS
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
+-- 12. RELOAD
+NOTIFY pgrst, 'reload schema';
 
