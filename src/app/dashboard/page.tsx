@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input'; // Assuming standard input
 import { Loader2, Send, Copy, AlertTriangle, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/utils/supabase/client';
+import ReactMarkdown from 'react-markdown';
+import { CodeBlock } from '@/components/CodeBlock';
 
 export default function Dashboard() {
     const {
@@ -67,36 +69,38 @@ export default function Dashboard() {
     };
 
     const formatMessage = (content: string) => {
-        // Basic parser to detect code blocks
-        if (content.includes('```')) {
-            const parts = content.split(/(```[\s\S]*?```)/g);
-            return parts.map((part, i) => {
-                if (part.startsWith('```')) {
-                    const code = part.replace(/```(?:pinescript|pine)?\n?/, '').replace(/```$/, '');
-                    return (
-                        <div key={i} className="my-4 rounded-lg overflow-hidden border border-slate-200 bg-slate-900 text-slate-50">
-                            <div className="flex justify-between items-center px-4 py-2 bg-slate-800 border-b border-slate-700">
-                                <span className="text-xs font-mono text-slate-400">Pine Script (v6)</span>
-                                <div className="flex gap-2">
-                                    <button onClick={() => handleCopy(code)} className="p-1 hover:bg-slate-700 rounded text-slate-300">
-                                        <Copy size={14} />
-                                    </button>
-                                </div>
-                            </div>
-                            <pre className="p-4 overflow-x-auto text-sm font-mono leading-relaxed">
-                                <code>{code}</code>
-                            </pre>
-                        </div>
-                    );
-                }
-                return <p key={i} className="whitespace-pre-wrap mb-2 leading-relaxed text-slate-700">{part}</p>;
-            });
-        }
-        return <p className="whitespace-pre-wrap leading-relaxed text-slate-700">{content}</p>;
+        return (
+            <div className="prose prose-slate max-w-none prose-p:text-slate-700 prose-p:leading-relaxed prose-pre:bg-transparent prose-pre:p-0">
+                <ReactMarkdown
+                    components={{
+                        code({ node, inline, className, children, ...props }: any) {
+                            const match = /language-(\w+)/.exec(className || '');
+                            const codeValue = String(children).replace(/\n$/, '');
+
+                            return !inline ? (
+                                <CodeBlock
+                                    code={codeValue}
+                                    language={match ? match[1] : 'pinescript'}
+                                />
+                            ) : (
+                                <code className="bg-slate-100 text-indigo-600 px-1.5 py-0.5 rounded text-sm font-semibold" {...props}>
+                                    {children}
+                                </code>
+                            );
+                        },
+                        p({ children }) {
+                            return <p className="mb-4 last:mb-0 text-slate-700 leading-relaxed">{children}</p>;
+                        }
+                    }}
+                >
+                    {content}
+                </ReactMarkdown>
+            </div>
+        );
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-64px)] md:h-screen w-full bg-slate-50">
+        <div className="flex flex-col h-full w-full bg-slate-50">
             {/* Header / Quota Warning */}
             <div className="flex-shrink-0 px-6 py-4 bg-white border-b border-slate-200 flex justify-between items-center">
                 <div className="flex items-center gap-3">

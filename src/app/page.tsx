@@ -179,8 +179,8 @@ export default function Landing() {
                             <article>
                                 <FeatureCard
                                     icon={<Code size={24} />}
-                                    title="Editor Optimized"
-                                    description="Integrated Monaco environment to review and refine your scripts."
+                                    title="Pro Generation"
+                                    description="Deeply optimized for Pine Script v6. Get clean, error-free strategy code."
                                 />
                             </article>
                             <article>

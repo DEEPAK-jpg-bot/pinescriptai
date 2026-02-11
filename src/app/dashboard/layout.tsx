@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { Sidebar } from '@/components/Sidebar';
 
 export const metadata: Metadata = {
     title: 'Dashboard | Active Strategies',
@@ -6,5 +7,12 @@ export const metadata: Metadata = {
 };
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-    return <>{children}</>;
+    return (
+        <div className="flex h-screen overflow-hidden bg-slate-50">
+            <Sidebar />
+            <main className="flex-1 overflow-hidden relative">
+                {children}
+            </main>
+        </div>
+    );
 }

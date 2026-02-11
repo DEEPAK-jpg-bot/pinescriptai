@@ -83,7 +83,7 @@ ${lastMessage.content}
         const model = genAI.getGenerativeModel({
             model: 'gemini-3-pro-preview',
             generationConfig: {
-                temperature: 0.5, // Lower temperature for code precision
+                temperature: 0.5,
                 maxOutputTokens: 8192,
             }
         });
@@ -125,8 +125,16 @@ ${lastMessage.content}
             headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' },
         });
 
-    } catch (error: unknown) {
+    } catch (error: any) {
         console.error('API Error:', error);
+
+        // Handle Rate Limits (429) specifically
+        if (error.message?.includes('429') || error.message?.includes('Slow down')) {
+            return NextResponse.json({
+                error: 'Google AI Rate Limit exceeded. Please wait a minute and try again.'
+            }, { status: 429 });
+        }
+
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
