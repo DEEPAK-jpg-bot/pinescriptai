@@ -1,155 +1,146 @@
-/*
-    PineGen Supabase Schema - Optimized for PineScript AI Generator
-    
-    This includes:
-    1. User Profiles & Plans
-    2. Threads (Conversations)
-    3. Messages (Chat history)
-    4. Scripts (Saved generated scripts)
-    5. Subscriptions (Stripe)
-    
-    Copy and paste this into the Supabase SQL Editor.
-*/
-
--- 1. Enable UUID extension
+-- 1. UTILS: Enable UUID extension
 create extension if not exists "uuid-ossp";
 
--- 2. Create ENUMs for strict typing
-create type plan_type as enum ('hobby', 'starter', 'pro', 'business');
-create type message_role as enum ('user', 'assistant', 'system');
-create type strategy_type as enum ('indicator', 'strategy', 'other');
-
--- 3. PROFILES TABLE (Extends default auth.users)
-create table public.user_profiles (
-    id uuid references auth.users on delete cascade not null primary key,
-    email text unique not null,
-    name text,
-    plan plan_type default 'hobby',
-    tokens_remaining int default 10000,
-    tokens_monthly_limit int default 10000,
-    tokens_used_this_month int default 0,
-    max_input_tokens int default 1000,
-    stripe_customer_id text,
-    billing_cycle_start timestamptz default now(),
-    created_at timestamptz default now(),
-    updated_at timestamptz default now()
+-- 2. TABLES
+-- User Profiles
+create table if not exists public.user_profiles (
+  id uuid references auth.users on delete cascade primary key,
+  email text,
+  tier text default 'free' check (tier in ('free', 'pro')),
+  tokens_monthly_limit bigint default 1500,
+  tokens_remaining bigint default 1500,
+  last_reset_at timestamptz default now(),
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
 );
 
--- 4. THREADS TABLE (Conversations)
-create table public.threads (
-    id uuid default uuid_generate_v4() primary key,
-    user_id uuid references public.user_profiles(id) on delete cascade not null,
-    title text,
-    total_tokens_used int default 0,
-    is_saved boolean default true,
-    expires_at timestamptz, -- For temporary/hobby threads
-    last_activity timestamptz default now(),
-    created_at timestamptz default now()
+-- Conversations
+create table if not exists public.conversations (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references auth.users on delete cascade not null,
+  title text not null,
+  total_tokens bigint default 0,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
 );
 
--- 5. MESSAGES TABLE (Chat History)
-create table public.messages (
-    id uuid default uuid_generate_v4() primary key,
-    thread_id uuid references public.threads(id) on delete cascade not null,
-    role message_role not null,
-    content text not null,
-    tokens_used int default 0, -- Tokens cost of this specific message
-    input_tokens int default 0,
-    output_tokens int default 0,
-    created_at timestamptz default now()
+-- Messages
+create table if not exists public.messages (
+  id uuid primary key default uuid_generate_v4(),
+  conversation_id uuid references public.conversations on delete cascade not null,
+  role text not null check (role in ('user', 'assistant', 'system')),
+  content text not null,
+  tokens bigint default 0,
+  created_at timestamptz default now()
 );
 
--- 6. SCRIPTS TABLE (Saved Code)
-create table public.scripts (
-    id uuid default uuid_generate_v4() primary key,
-    user_id uuid references public.user_profiles(id) on delete cascade not null,
-    thread_id uuid references public.threads(id) on delete set null,
-    name text not null,
-    description text,
-    code text not null,
-    strategy_type strategy_type default 'strategy',
-    tokens_used int default 0, -- Total cost to generate this script
-    is_public boolean default false,
-    created_at timestamptz default now(),
-    updated_at timestamptz default now()
+-- Subscriptions (Lemon Squeezy Sync)
+create table if not exists public.subscriptions (
+  id text primary key,
+  user_id uuid references auth.users on delete cascade not null,
+  status text not null,
+  plan_id text,
+  current_period_end timestamptz,
+  customer_id text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
 );
 
--- 7. CACHE TABLE (For AI Responses - Saves Money)
-create table public.response_cache (
-    id uuid default uuid_generate_v4() primary key,
-    prompt_hash text unique not null,
-    prompt text not null,
-    response text not null,
-    tokens_used int default 0,
-    created_at timestamptz default now()
+-- Webhook Events (Audit Log)
+create table if not exists public.webhook_events (
+  id bigserial primary key,
+  event_type text,
+  payload jsonb,
+  processed boolean default false,
+  created_at timestamptz default now()
 );
 
--- 8. RLS POLICIES (Row Level Security)
+-- 3. RLS POLICIES (Row Level Security)
 alter table public.user_profiles enable row level security;
-alter table public.threads enable row level security;
+alter table public.conversations enable row level security;
 alter table public.messages enable row level security;
-alter table public.scripts enable row level security;
+alter table public.subscriptions enable row level security;
+alter table public.webhook_events enable row level security; -- Admin only usually
 
--- Users can only see their own profile
+-- User Profiles: Users can read their own profile
 create policy "Users can view own profile" on public.user_profiles
-    for select using (auth.uid() = id);
+  for select using (auth.uid() = id);
 
-create policy "Users can update own profile" on public.user_profiles
-    for update using (auth.uid() = id);
+-- Conversations: Users can manage their own conversations
+create policy "Users can manage own conversations" on public.conversations
+  for all using (auth.uid() = user_id);
 
--- Threads policies
-create policy "Users can view own threads" on public.threads
-    for select using (auth.uid() = user_id);
+-- Messages: Users can manage messages in their conversations
+create policy "Users can manage messages" on public.messages
+  for all using (
+    exists (
+      select 1 from public.conversations
+      where id = public.messages.conversation_id
+      and user_id = auth.uid()
+    )
+  );
 
-create policy "Users can insert own threads" on public.threads
-    for insert with check (auth.uid() = user_id);
+-- 4. FUNCTIONS & TRIGGERS
 
-create policy "Users can update own threads" on public.threads
-    for update using (auth.uid() = user_id);
-
-create policy "Users can delete own threads" on public.threads
-    for delete using (auth.uid() = user_id);
-
--- Messages policies (inherited from threads usually, but explicit here)
-create policy "Users can view messages in own threads" on public.messages
-    for select using (
-        exists (select 1 from public.threads where id = messages.thread_id and user_id = auth.uid())
-    );
-
-create policy "Users can insert messages in own threads" on public.messages
-    for insert with check (
-        exists (select 1 from public.threads where id = messages.thread_id and user_id = auth.uid())
-    );
-
--- Scripts policies
-create policy "Users can view own scripts" on public.scripts
-    for select using (auth.uid() = user_id);
-
-create policy "Users can insert own scripts" on public.scripts
-    for insert with check (auth.uid() = user_id);
-
-create policy "Users can update own scripts" on public.scripts
-    for update using (auth.uid() = user_id);
-
-create policy "Users can delete own scripts" on public.scripts
-    for delete using (auth.uid() = user_id);
-
--- 9. TRIGGERS (Auto-create profile on signup)
+-- Auto-create profile on signup
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-    insert into public.user_profiles (id, email, name)
-    values (new.id, new.email, new.raw_user_meta_data->>'full_name');
-    return new;
+  insert into public.user_profiles (id, email, tier, tokens_monthly_limit, tokens_remaining)
+  values (new.id, new.email, 'free', 1500, 1500);
+  return new;
 end;
 $$ language plpgsql security definer;
 
 create trigger on_auth_user_created
-    after insert on auth.users
-    for each row execute procedure public.handle_new_user();
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
 
--- 10. INDEXES (Performance)
-create index idx_threads_user_id on public.threads(user_id);
-create index idx_messages_thread_id on public.messages(thread_id);
-create index idx_scripts_user_id on public.scripts(user_id);
-create index idx_cache_hash on public.response_cache(prompt_hash);
+-- Rate Limit Check RPC
+create or replace function public.check_rate_limit(p_user_id uuid)
+returns json as $$
+declare
+  v_profile public.user_profiles%rowtype;
+begin
+  select * into v_profile from public.user_profiles where id = p_user_id;
+  
+  -- Daily Reset Logic (Example: every 24h)
+  if v_profile.last_reset_at < now() - interval '24 hours' then
+    update public.user_profiles
+    set tokens_remaining = tokens_monthly_limit,
+        last_reset_at = now()
+    where id = p_user_id;
+    
+    return json_build_object(
+      'allowed', true,
+      'remaining', v_profile.tokens_monthly_limit,
+      'tier', v_profile.tier
+    );
+  end if;
+
+  if v_profile.tokens_remaining > 0 then
+    return json_build_object(
+      'allowed', true,
+      'remaining', v_profile.tokens_remaining,
+      'tier', v_profile.tier
+    );
+  else
+    return json_build_object(
+      'allowed', false,
+      'reason', 'daily_quota_exceeded',
+      'resetAt', v_profile.last_reset_at + interval '24 hours'
+    );
+  end if;
+end;
+$$ language plpgsql security definer;
+
+-- Record Request RPC
+create or replace function public.record_request(p_user_id uuid, p_tokens_used int)
+returns void as $$
+begin
+  update public.user_profiles
+  set tokens_remaining = tokens_remaining - p_tokens_used,
+      updated_at = now()
+  where id = p_user_id;
+end;
+$$ language plpgsql security definer;
