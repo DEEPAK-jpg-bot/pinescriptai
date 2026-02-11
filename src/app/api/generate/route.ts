@@ -81,7 +81,7 @@ ${lastMessage.content}
 
         // 5. Call Gemini
         const model = genAI.getGenerativeModel({
-            model: 'gemini-3-pro',
+            model: 'gemini-3-pro-preview',
             generationConfig: {
                 temperature: 0.5, // Lower temperature for code precision
                 maxOutputTokens: 8192,
