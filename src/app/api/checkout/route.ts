@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
 import { lemonSqueezySetup, createCheckout } from '@lemonsqueezy/lemonsqueezy.js';
+import { checkoutSchema } from '@/lib/schemas';
 
 export async function POST(req: Request) {
     try {
@@ -11,11 +12,15 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { variantId } = await req.json();
+        const body = await req.json();
 
-        if (!variantId) {
-            return NextResponse.json({ error: 'Variant ID is required' }, { status: 400 });
+        // Validate with Zod
+        const result = checkoutSchema.safeParse(body);
+        if (!result.success) {
+            return NextResponse.json({ error: result.error.issues[0].message }, { status: 400 });
         }
+
+        const { variantId } = result.data;
 
         // Initialize LS
         lemonSqueezySetup({ apiKey: process.env.LEMONSQUEEZY_API_KEY! });

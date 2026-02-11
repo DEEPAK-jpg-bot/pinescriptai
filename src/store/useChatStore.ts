@@ -1,30 +1,19 @@
 import { create } from 'zustand';
 import { createClient } from '@/utils/supabase/client';
+import { User, Message, Conversation, QuotaInfo } from '@/lib/types';
 
-export type User = {
-    id: string;
-    email: string;
-    tier?: string;
-};
-
-export type Message = {
-    id: string;
-    conversation_id: string;
-    role: 'user' | 'assistant';
-    content: string;
-    created_at: string;
-};
-
-export type Conversation = {
-    id: string;
-    title: string;
-    updated_at: string;
-    total_tokens: number;
+// Utility for formatting input
+const sanitizeInput = (input: string) => {
+    return input
+        .trim()
+        .slice(0, 2000)
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        .replace(/javascript:/gi, '');
 };
 
 type ChatStore = {
     user: User | null;
-    session: any | null;
+    session: any | null; // Supabase session type
 
     conversations: Conversation[];
     activeConversationId: string | null;
@@ -35,14 +24,7 @@ type ChatStore = {
     isLoadingMessages: boolean;
     currentError: string | null;
 
-    quotaInfo: {
-        remaining: number;
-        limit: number;
-        resetAt: string | null;
-        isExceeded: boolean;
-        waitSeconds: number;
-        tier: string;
-    };
+    quotaInfo: QuotaInfo;
 
     setUser: (user: User | null) => void;
     setSession: (session: any | null) => void;
@@ -61,14 +43,7 @@ type ChatStore = {
 
 const supabase = createClient();
 
-// Utility for formatting input
-const sanitizeInput = (input: string) => {
-    return input
-        .trim()
-        .slice(0, 2000)
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-        .replace(/javascript:/gi, '');
-};
+
 
 export const useChatStore = create<ChatStore>((set, get) => ({
     user: null,

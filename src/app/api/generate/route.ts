@@ -15,11 +15,16 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60; // Increased duration for detailed response
 
+import { generateSchema } from '@/lib/schemas';
+import { z } from 'zod';
+
+// ... (existing imports)
+
 export async function POST(req: Request) {
     if (!apiKey) return NextResponse.json({ error: 'Google AI API key not configured' }, { status: 500 });
 
     try {
-        // 1. Verify Auth
+        // ... (auth logic)
         const authHeader = req.headers.get('authorization');
         if (!authHeader) return NextResponse.json({ error: 'Missing authorization header' }, { status: 401 });
 
@@ -28,8 +33,7 @@ export async function POST(req: Request) {
 
         if (authError || !user) return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
 
-        // 2. Check Quota / Plan (Commercial Logic)
-        // Check local profile for tokens
+        // ... (quota logic)
         const { data: profile } = await supabase.from('user_profiles').select('tokens_remaining, tier').eq('id', user.id).single();
 
         if (profile) {
@@ -38,17 +42,23 @@ export async function POST(req: Request) {
             }
         }
 
-        // 3. Parse Body
+        // 3. Parse Body & Validate
         const body = await req.json();
-        const { messages } = body;
+        const validation = generateSchema.safeParse(body);
 
-        // 4. Prepare Prompt (ENHANCED WITH V6 RULES from rag.md Knowledge)
+        if (!validation.success) {
+            return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
+        }
+
+        const { messages } = validation.data;
+
+        // 4. Prepare Prompt
         const lastMessage = messages[messages.length - 1];
 
         // This System Prompt is derived from your rag.md file
         const systemPrompt = `You are an expert Pine Script v6 developer for TradingView. 
 STRICT V6 RULES:
-1. ALWAYS start with \`//@version=6\`.
+            1. ALWAYS start with \`//@version=6\`.
 2. NEVER use \`transp\` parameter in color functions. Use \`color.new(color.red, 50)\`.
 3. \`int\`/\`float\` are NOT auto-cast to \`bool\`. Use \`bool(nz(val))\` for conditions.
 4. Boolean values can NEVER be \`na\`.
