@@ -1,16 +1,10 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { createClient } from '@supabase/supabase-js';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { NextResponse } from 'next/server';
 
 // Initialize Google AI
 const apiKey = process.env.GOOGLE_AI_SERVER_KEY || process.env.GEMINI_API_KEY || '';
 const genAI = new GoogleGenerativeAI(apiKey);
-
-// Initialize Supabase Admin
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY || ''; // Must use Service Key for RLS bypass to check sub if needed, or rely on RLS
-// Ideally we rely on token validation.
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60; // Increased duration for detailed response
@@ -21,6 +15,12 @@ import { generateSchema } from '@/lib/schemas';
 
 export async function POST(req: Request) {
     if (!apiKey) return NextResponse.json({ error: 'Google AI API key not configured' }, { status: 500 });
+
+    const supabase = createAdminClient();
+    if (!supabase) {
+        console.error('Supabase admin client not initialized');
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
 
     try {
         // ... (auth logic)

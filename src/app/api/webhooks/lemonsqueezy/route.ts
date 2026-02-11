@@ -1,18 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-
-// Initialize Supabase Admin Client
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_KEY!,
-    {
-        auth: {
-            autoRefreshToken: false,
-            persistSession: false
-        }
-    }
-);
 
 // Verify Webhook Signature
 const verifySignature = (rawBody: string, signature: string, secret: string) => {
@@ -23,6 +11,12 @@ const verifySignature = (rawBody: string, signature: string, secret: string) => 
 };
 
 export async function POST(req: NextRequest) {
+    const supabase = createAdminClient();
+    if (!supabase) {
+        console.error('Supabase admin client not initialized');
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
+
     try {
         const rawBody = await req.text();
         const signature = req.headers.get('x-signature');
