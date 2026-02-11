@@ -14,7 +14,12 @@ import { generateSchema } from '@/lib/schemas';
 // ... (existing imports)
 
 export async function POST(req: Request) {
-    if (!apiKey) return NextResponse.json({ error: 'Google AI API key not configured' }, { status: 500 });
+    // 0. Get Keys Dynamically
+    const dynamicApiKey = process.env.GOOGLE_AI_SERVER_KEY || process.env.GEMINI_API_KEY || '';
+    if (!dynamicApiKey) return NextResponse.json({ error: 'Google AI API key not configured' }, { status: 500 });
+
+    // Re-initialize genAI with latest key
+    const genAI = new GoogleGenerativeAI(dynamicApiKey);
 
     const supabase = createAdminClient();
     if (!supabase) {
