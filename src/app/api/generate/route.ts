@@ -114,7 +114,7 @@ ${lastMessage.content}
 
         // 5. Call Gemini
         const model = genAI.getGenerativeModel({
-            model: 'gemini-3-pro-preview',
+            model: 'gemini-1.5-pro',
             generationConfig: {
                 temperature: 0.5,
                 maxOutputTokens: 8192,
@@ -161,13 +161,18 @@ ${lastMessage.content}
     } catch (error: any) {
         console.error('API Error:', error);
 
-        // Handle Rate Limits (429) specifically
-        if (error.message?.includes('429') || error.message?.includes('Slow down')) {
+        // Specific handling for Google AI errors
+        const errorMsg = error.message || String(error);
+
+        if (errorMsg.includes('429') || errorMsg.includes('Slow down')) {
             return NextResponse.json({
                 error: 'Google AI Rate Limit exceeded. Please wait a minute and try again.'
             }, { status: 429 });
         }
 
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        // Return the actual error message for debugging purposes (User requested "error free")
+        return NextResponse.json({
+            error: `Internal Server Error: ${errorMsg}`
+        }, { status: 500 });
     }
 }
