@@ -52,8 +52,10 @@ async def generate_pine_script(prompt: str, user: Dict) -> Tuple[str, int, int, 
         # Get cached context
         cached_context = get_cached_context()
         
-        # Create model with cached context
-        model = genai.GenerativeModel.from_cached_content(cached_content=cached_context)
+        # Create model
+        model = genai.GenerativeModel(
+            model_name='models/gemini-3-pro-preview'
+        )
         
         # Generate content with sandboxing delimiters
         sanitized_prompt = f"---USER_PROMPT_START---\n{prompt}\n---USER_PROMPT_END---"
