@@ -84,13 +84,10 @@ export async function POST(req: Request) {
 
         const { messages } = validation.data;
 
-        // 4. Prepare Prompt
-        const lastMessage = messages[messages.length - 1];
-
-        // This System Prompt is derived from your rag.md file
+        // 4. Prepare Prompt Rules (Clean System Instruction)
         const systemPrompt = `You are an expert Pine Script v6 developer for TradingView. 
 STRICT V6 RULES:
-            1. ALWAYS start with \`//@version=6\`.
+1. ALWAYS start with \`//@version=6\`.
 2. NEVER use \`transp\` parameter in color functions. Use \`color.new(color.red, 50)\`.
 3. \`int\`/\`float\` are NOT auto-cast to \`bool\`. Use \`bool(nz(val))\` for conditions.
 4. Boolean values can NEVER be \`na\`.
@@ -101,11 +98,7 @@ STRICT V6 RULES:
 OUTPUT INSTRUCTIONS:
 - Return ONLY the valid Pine Script code in a \`\`\`pinescript block.
 - Followed by a very short explanation.
-- If the user asks to "fix" code, explain the specific v6 breaking change you fixed (e.g. "Removed deprecated 'transp' parameter").
-
----USER_PROMPT_START---
-${lastMessage.content}
----USER_PROMPT_END---`;
+- If the user asks to "fix" code, explain the specific v6 breaking change you fixed (e.g. "Removed deprecated 'transp' parameter").`;
 
         const history = messages.slice(0, -1).map((msg: { role: string; content: string }) => ({
             role: msg.role === 'user' ? 'user' : 'model',
@@ -115,6 +108,10 @@ ${lastMessage.content}
         // 5. Call Gemini
         const model = genAI.getGenerativeModel({
             model: 'gemini-1.5-pro',
+            systemInstruction: {
+                role: 'system',
+                parts: [{ text: systemPrompt }]
+            },
             generationConfig: {
                 temperature: 0.5,
                 maxOutputTokens: 8192,
@@ -123,10 +120,10 @@ ${lastMessage.content}
 
         const chat = model.startChat({
             history: history,
-            systemInstruction: systemPrompt
         });
 
         // 6. Stream Response
+        const lastMessage = messages[messages.length - 1];
         const result = await chat.sendMessageStream(lastMessage.content);
 
         const stream = new ReadableStream({
