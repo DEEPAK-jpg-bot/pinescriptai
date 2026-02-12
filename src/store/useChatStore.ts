@@ -228,9 +228,13 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
         try {
             // 4. Call API
+            const { session } = get();
             const response = await fetch('/api/generate', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session?.access_token}`
+                },
                 body: JSON.stringify({
                     messages: get().messages.map(m => ({ role: m.role, content: m.content })),
                     conversationId: conversationId,
