@@ -16,7 +16,19 @@ import { generateSchema } from '@/lib/schemas';
 export async function POST(req: Request) {
     // 0. Get Keys Dynamically
     const dynamicApiKey = process.env.GOOGLE_AI_SERVER_KEY || process.env.GEMINI_API_KEY || '';
-    if (!dynamicApiKey) return NextResponse.json({ error: 'Google AI API key not configured' }, { status: 500 });
+    
+    // DEBUG LOG
+    console.log('DEBUG: API Key Check:', {
+        hasServerKey: !!process.env.GOOGLE_AI_SERVER_KEY,
+        hasGeminiKey: !!process.env.GEMINI_API_KEY,
+        keyLength: dynamicApiKey ? dynamicApiKey.length : 0
+    });
+
+    if (!dynamicApiKey) {
+        return NextResponse.json({ 
+            error: `Google AI API key not configured. (Detected: ServerKey=${!!process.env.GOOGLE_AI_SERVER_KEY}, GeminiKey=${!!process.env.GEMINI_API_KEY})` 
+        }, { status: 500 });
+    }
 
     // Re-initialize genAI with latest key
     const genAI = new GoogleGenerativeAI(dynamicApiKey);

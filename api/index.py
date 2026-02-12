@@ -14,6 +14,10 @@ from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
+if os.path.exists(".env.local"):
+    load_dotenv(".env.local")
+elif os.path.exists("../.env.local"):
+    load_dotenv("../.env.local")
 
 # Configure logging
 logging.basicConfig(
