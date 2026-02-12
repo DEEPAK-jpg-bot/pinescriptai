@@ -251,7 +251,10 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || 'AI generation failed');
+                const errorMessage = errorData.suggestion
+                    ? `${errorData.error} - ${errorData.suggestion}`
+                    : (errorData.error || 'AI generation failed');
+                throw new Error(errorMessage);
             }
             if (!response.body) throw new Error('No response body');
 

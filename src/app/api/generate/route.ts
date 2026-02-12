@@ -65,13 +65,18 @@ export async function POST(req: Request) {
             }, { status: 401 });
         }
 
-        // ... (quota logic)
-        const { data: profile } = await supabase.from('user_profiles').select('tokens_remaining, tier').eq('id', user.id).single();
+        // 2. Quota & Reset Logic (Trigger via RPC)
+        const { data: quota, error: quotaError } = await supabase.rpc('check_token_quota', { p_user_id: user.id });
 
-        if (profile) {
-            if (profile.tokens_remaining <= 0) {
-                return NextResponse.json({ error: 'Quota exceeded. Please upgrade to Pro.' }, { status: 429 });
-            }
+        if (quotaError) {
+            console.error('Quota Check Failed:', quotaError);
+            return NextResponse.json({ error: 'Failed to verify account quota' }, { status: 500 });
+        }
+
+        if (quota && !quota.allowed) {
+            return NextResponse.json({
+                error: `Quota exceeded: ${quota.reason === 'daily_quota_exceeded' ? 'You have used your daily limit.' : quota.reason}. Resets at: ${quota.resetAt}`
+            }, { status: 429 });
         }
 
         // 3. Parse Body & Validate
@@ -138,10 +143,12 @@ OUTPUT INSTRUCTIONS:
                     }
                     controller.enqueue(encoder.encode('data: [DONE]\n\n'));
 
-                    // 7. Deduct Token Quota (Server-side enforcement)
-                    // We do this asynchronously or after stream? 
-                    // Ideally we decrement 1 "request" credit here.
-                    await supabase.rpc('record_request', { p_user_id: user.id, p_tokens_used: 1 });
+                    // 7. Deduct Token Quota (Atomic)
+                    await supabase.rpc('deduct_user_tokens', {
+                        p_user_id: user.id,
+                        p_tokens_to_deduct: 1,
+                        p_action: 'generate'
+                    });
 
                 } catch (e: unknown) {
                     controller.error(e);
@@ -158,18 +165,13 @@ OUTPUT INSTRUCTIONS:
     } catch (error: any) {
         console.error('API Error:', error);
 
-        // Specific handling for Google AI errors
         const errorMsg = error.message || String(error);
+        const status = error.status || (errorMsg.includes('429') ? 429 : 500);
 
-        if (errorMsg.includes('429') || errorMsg.includes('Slow down')) {
-            return NextResponse.json({
-                error: 'Google AI Rate Limit exceeded. Please wait a minute and try again.'
-            }, { status: 429 });
-        }
-
-        // Return the actual error message for debugging purposes (User requested "error free")
+        // Return a clear diagnostic message
         return NextResponse.json({
-            error: `Internal Server Error: ${errorMsg}`
-        }, { status: 500 });
+            error: `AI Service Error (${status}): ${errorMsg}`,
+            suggestion: status === 429 ? 'You may have reached your Google AI daily quota or per-minute rate limit. Please try again later or check your Google Cloud console.' : 'Please try refreshing the page.'
+        }, { status });
     }
 }
