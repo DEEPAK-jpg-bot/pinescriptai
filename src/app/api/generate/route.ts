@@ -70,7 +70,9 @@ export async function POST(req: Request) {
 
         if (quotaError) {
             console.error('Quota Check Failed:', quotaError);
-            return NextResponse.json({ error: 'Failed to verify account quota' }, { status: 500 });
+            return NextResponse.json({
+                error: `Failed to verify account quota: ${quotaError.message}. (Note: Ensure Supabase functions are updated with the latest supabase_schema.sql)`
+            }, { status: 500 });
         }
 
         if (quota && !quota.allowed) {

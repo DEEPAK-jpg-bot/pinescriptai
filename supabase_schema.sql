@@ -91,7 +91,7 @@ begin
 end;
 $$ language plpgsql security definer;
 
-create or replace function public.check_rate_limit(p_user_id uuid)
+create or replace function public.check_token_quota(p_user_id uuid)
 returns json as $$
 declare
   v_profile record;
@@ -125,6 +125,14 @@ begin
 end;
 $$ language plpgsql security definer;
 
+-- Backward compatibility wrapper
+create or replace function public.check_rate_limit(p_user_id uuid)
+returns json as $$
+begin
+  return public.check_token_quota(p_user_id);
+end;
+$$ language plpgsql security definer;
+
 create or replace function public.record_request(p_user_id uuid, p_tokens_used int)
 returns void as $$
 begin
@@ -132,6 +140,29 @@ begin
   set tokens_remaining = tokens_remaining - p_tokens_used,
       updated_at = now()
   where id = p_user_id;
+end;
+$$ language plpgsql security definer;
+
+-- Atomic token deduction for Python backend compatibility
+create or replace function public.deduct_user_tokens(
+    p_user_id uuid, 
+    p_tokens_to_deduct int,
+    p_thread_id uuid default null,
+    p_action text default 'generate'
+)
+returns json as $$
+declare
+    v_remaining bigint;
+begin
+    update public.user_profiles
+    set tokens_remaining = tokens_remaining - p_tokens_to_deduct,
+        updated_at = now()
+    where id = p_user_id
+    returning tokens_remaining into v_remaining;
+
+    return json_build_object('success', true, 'data', json_build_object('tokens_remaining', v_remaining));
+exception when others then
+    return json_build_object('success', false, 'error', SQLERRM);
 end;
 $$ language plpgsql security definer;
 

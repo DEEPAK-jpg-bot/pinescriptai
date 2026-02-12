@@ -157,7 +157,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         const user = get().user;
         if (!user) return { allowed: false };
 
-        const { data, error } = await supabase.rpc('check_rate_limit', { p_user_id: user.id });
+        const { data, error } = await supabase.rpc('check_token_quota', { p_user_id: user.id });
 
         if (error) {
             console.error('Rate limit check failed:', error);
