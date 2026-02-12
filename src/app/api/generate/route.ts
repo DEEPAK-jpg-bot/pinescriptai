@@ -1,12 +1,8 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { NextResponse } from 'next/server';
-import dotenv from 'dotenv';
-import path from 'path';
-
-// Self-Healing: Force load .env.local if standard loading fails
-dotenv.config();
-dotenv.config({ path: path.join(process.cwd(), '.env.local') });
+// Next.js automatically loads environment variables from .env / .env.local
+// Manual dotenv config can break Vercel Turbopack builds
 
 // Initialize Google AI
 const apiKey = process.env.GOOGLE_AI_SERVER_KEY || process.env.GEMINI_API_KEY || '';
@@ -20,11 +16,10 @@ import { generateSchema } from '@/lib/schemas';
 // ... (existing imports)
 
 export async function POST(req: Request) {
-    // 0. Get Keys Dynamically with recursive fallbacks
+    // 0. Get Keys Dynamically
     const dynamicApiKey =
         process.env.GOOGLE_AI_SERVER_KEY ||
         process.env.GEMINI_API_KEY ||
-        process.env.NEXT_PUBLIC_GEMINI_API_KEY ||
         '';
 
     // DEBUG LOG

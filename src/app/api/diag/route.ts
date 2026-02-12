@@ -1,11 +1,8 @@
 import { createAdminClient } from '@/utils/supabase/admin';
 import { NextResponse } from 'next/server';
-import dotenv from 'dotenv';
-import path from 'path';
 
-// Load envs for diagnostic
-dotenv.config();
-dotenv.config({ path: path.join(process.cwd(), '.env.local') });
+// Next.js handles environment variables automatically.
+// Manual dotenv can break Vercel Turbopack builds.
 
 export const dynamic = 'force-dynamic';
 
