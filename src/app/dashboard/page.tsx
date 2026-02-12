@@ -12,6 +12,7 @@ import { CodeBlock } from '@/components/CodeBlock';
 
 export default function Dashboard() {
     const {
+        user,
         setUser,
         messages,
         isGenerating,
@@ -26,28 +27,13 @@ export default function Dashboard() {
     const scrollRef = useRef<HTMLDivElement>(null);
     const supabase = createClient();
 
-    // 1. Auth & Init
+    // 1. Initial Data Load (Auth is handled by AuthSync)
     useEffect(() => {
-        const init = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session?.user) {
-                setUser({ id: session.user.id, email: session.user.email! });
-                await fetchConversations();
-                await checkRateLimit();
-            }
-        };
-        init();
-
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
-            if (session?.user) {
-                setUser({ id: session.user.id, email: session.user.email! });
-            } else {
-                setUser(null);
-            }
-        });
-
-        return () => subscription.unsubscribe();
-    }, [setUser, fetchConversations, checkRateLimit, supabase]);
+        if (user) {
+            fetchConversations();
+            checkRateLimit();
+        }
+    }, [user, fetchConversations, checkRateLimit]);
 
     // 2. Auto-scroll
     useEffect(() => {

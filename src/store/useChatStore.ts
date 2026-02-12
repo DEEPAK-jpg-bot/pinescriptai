@@ -227,8 +227,16 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         }));
 
         try {
-            // 4. Call API
-            const { session } = get();
+            // 4. Call API with fresh session check
+            let { session } = get();
+
+            // If session in store is missing, try to get it from supabase directly
+            if (!session) {
+                const { data } = await supabase.auth.getSession();
+                session = data.session;
+                set({ session });
+            }
+
             const response = await fetch('/api/generate', {
                 method: 'POST',
                 headers: {

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import AuthSync from "@/components/AuthSync";
 
 const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
 const outfit = Outfit({ subsets: ["latin"], variable: '--font-outfit' });
@@ -79,6 +80,7 @@ export default function RootLayout({
     return (
         <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
             <body className={`${inter.className} antialiased selection:bg-indigo-100 selection:text-indigo-900`}>
+                <AuthSync />
                 {children}
                 <Toaster position="top-right" expand={false} richColors />
             </body>
