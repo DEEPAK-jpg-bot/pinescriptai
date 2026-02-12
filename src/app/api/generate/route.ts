@@ -1,6 +1,12 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { NextResponse } from 'next/server';
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Self-Healing: Force load .env.local if standard loading fails
+dotenv.config();
+dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 
 // Initialize Google AI
 const apiKey = process.env.GOOGLE_AI_SERVER_KEY || process.env.GEMINI_API_KEY || '';
@@ -14,19 +20,24 @@ import { generateSchema } from '@/lib/schemas';
 // ... (existing imports)
 
 export async function POST(req: Request) {
-    // 0. Get Keys Dynamically
-    const dynamicApiKey = process.env.GOOGLE_AI_SERVER_KEY || process.env.GEMINI_API_KEY || '';
-    
+    // 0. Get Keys Dynamically with recursive fallbacks
+    const dynamicApiKey =
+        process.env.GOOGLE_AI_SERVER_KEY ||
+        process.env.GEMINI_API_KEY ||
+        process.env.NEXT_PUBLIC_GEMINI_API_KEY ||
+        '';
+
     // DEBUG LOG
     console.log('DEBUG: API Key Check:', {
         hasServerKey: !!process.env.GOOGLE_AI_SERVER_KEY,
         hasGeminiKey: !!process.env.GEMINI_API_KEY,
-        keyLength: dynamicApiKey ? dynamicApiKey.length : 0
+        keyLength: dynamicApiKey ? dynamicApiKey.length : 0,
+        availableKeys: Object.keys(process.env).filter(k => k.includes('KEY')).length
     });
 
     if (!dynamicApiKey) {
-        return NextResponse.json({ 
-            error: `Google AI API key not configured. (Detected: ServerKey=${!!process.env.GOOGLE_AI_SERVER_KEY}, GeminiKey=${!!process.env.GEMINI_API_KEY})` 
+        return NextResponse.json({
+            error: `Google AI API key not configured. (Detected: ServerKey=${!!process.env.GOOGLE_AI_SERVER_KEY}, GeminiKey=${!!process.env.GEMINI_API_KEY})`
         }, { status: 500 });
     }
 
