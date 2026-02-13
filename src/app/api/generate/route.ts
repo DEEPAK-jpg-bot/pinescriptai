@@ -112,9 +112,9 @@ OUTPUT INSTRUCTIONS:
             parts: [{ text: msg.content }]
         }));
 
-        // 5. Call Gemini
+        // 5. Call Gemini (Using 2.5-flash to bypass 2.0-flash daily quota limits)
         const model = genAI.getGenerativeModel({
-            model: 'gemini-2.0-flash',
+            model: 'gemini-2.5-flash',
             systemInstruction: {
                 role: 'system',
                 parts: [{ text: systemPrompt }]
