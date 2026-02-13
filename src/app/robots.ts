@@ -1,12 +1,14 @@
-export default function robots() {
+import { MetadataRoute } from 'next';
+
+export default function robots(): MetadataRoute.Robots {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pinegen.ai';
+
     return {
-        rules: [
-            {
-                userAgent: '*',
-                allow: '/',
-                disallow: ['/api/', '/dashboard/', '/settings/', '/auth/'],
-            },
-        ],
-        sitemap: `${process.env.NEXT_PUBLIC_APP_URL || 'https://pinescript.vercel.app'}/sitemap.xml`,
-    }
+        rules: {
+            userAgent: '*',
+            allow: '/',
+            disallow: ['/api/', '/admin/'],
+        },
+        sitemap: `${baseUrl}/sitemap.xml`,
+    };
 }

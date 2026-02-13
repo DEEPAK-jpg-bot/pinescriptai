@@ -23,7 +23,7 @@ interface RateLimitResponse {
 
 type ChatStore = {
     user: User | null;
-    session: Session | null; // Supabase session type
+    session: Session | null;
 
     conversations: Conversation[];
     activeConversationId: string | null;
@@ -44,6 +44,7 @@ type ChatStore = {
     fetchConversations: () => Promise<void>;
     createConversation: (title?: string) => Promise<string | null>;
     deleteConversation: (id: string) => Promise<void>;
+    renameConversation: (id: string, title: string) => Promise<void>;
     setActiveConversation: (id: string) => void;
 
     fetchMessages: (conversationId: string) => Promise<void>;
@@ -72,9 +73,9 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         tier: 'free',
     },
 
-    setUser: (user) => set({ user }),
-    setSession: (session) => set({ session }),
-    setError: (error) => set({ currentError: error }),
+    setUser: (user: User | null) => set({ user }),
+    setSession: (session: Session | null) => set({ session }),
+    setError: (error: string | null) => set({ currentError: error }),
     clearError: () => set({ currentError: null }),
 
     fetchConversations: async () => {
@@ -92,7 +93,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         set({ conversations: data as Conversation[] || [], isLoadingConversations: false });
     },
 
-    createConversation: async (title) => {
+    createConversation: async (title?: string) => {
         const user = get().user;
         if (!user) return null;
 
@@ -114,13 +115,13 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         set((state) => ({
             conversations: [data, ...state.conversations],
             activeConversationId: data.id,
-            messages: [], // Clear messages for new convo
+            messages: [],
         }));
 
         return data.id;
     },
 
-    deleteConversation: async (id) => {
+    deleteConversation: async (id: string) => {
         const { error } = await supabase.from('conversations').delete().eq('id', id);
         if (error) {
             set({ currentError: error.message });
@@ -132,12 +133,24 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         }));
     },
 
-    setActiveConversation: (id) => {
+    renameConversation: async (id: string, title: string) => {
+        if (!title.trim()) return;
+        const { error } = await supabase.from('conversations').update({ title: title.trim() }).eq('id', id);
+        if (error) {
+            set({ currentError: error.message });
+            return;
+        }
+        set((state) => ({
+            conversations: state.conversations.map((c) => c.id === id ? { ...c, title: title.trim() } : c)
+        }));
+    },
+
+    setActiveConversation: (id: string) => {
         set({ activeConversationId: id });
         get().fetchMessages(id);
     },
 
-    fetchMessages: async (conversationId) => {
+    fetchMessages: async (conversationId: string) => {
         if (!conversationId) return;
         set({ isLoadingMessages: true });
         const { data, error } = await supabase
@@ -161,7 +174,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
         if (error) {
             console.error('Rate limit check failed:', error);
-            // Fail open if check fails? Or closed? Let's be permissive if DB is down but warn.
             return { allowed: true };
         }
 
@@ -178,14 +190,13 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         return data;
     },
 
-    sendMessage: async (content) => {
+    sendMessage: async (content: string) => {
         const { user, activeConversationId, checkRateLimit } = get();
         if (!user) {
             set({ currentError: "You must be logged in." });
             return;
         }
 
-        // 1. Check Quota
         const rateCheck = await checkRateLimit();
         if (rateCheck && !rateCheck.allowed) {
             set({
@@ -197,13 +208,11 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         }
 
         let conversationId = activeConversationId;
-        // 2. Auto-create conversation if none active
         if (!conversationId) {
             conversationId = await get().createConversation(content.slice(0, 30) + '...');
-            if (!conversationId) return; // Error handled inside createConversation
+            if (!conversationId) return;
         }
 
-        // 3. Save User Message
         const { data: userMessage, error: userError } = await supabase
             .from('messages')
             .insert({
@@ -220,50 +229,62 @@ export const useChatStore = create<ChatStore>((set, get) => ({
             return;
         }
 
-        // Optimistic UI update
         set((state) => ({
             messages: [...state.messages, userMessage],
             isGenerating: true,
         }));
 
         try {
-            // 4. Call API with fresh session check
-            let { session } = get();
+            let response;
+            let attempt = 0;
+            const maxAttempts = 3;
 
-            // If session in store is missing, try to get it from supabase directly
-            if (!session) {
-                const { data } = await supabase.auth.getSession();
-                session = data.session;
-                set({ session });
+            while (attempt < maxAttempts) {
+                try {
+                    if (attempt > 0) await new Promise(r => setTimeout(r, 1000));
+
+                    let { session } = get();
+                    if (!session) {
+                        const { data } = await supabase.auth.getSession();
+                        session = data.session;
+                        set({ session });
+                    }
+
+                    response = await fetch('/api/generate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${session?.access_token}`
+                        },
+                        body: JSON.stringify({
+                            messages: get().messages.map(m => ({ role: m.role, content: m.content })),
+                            conversationId: conversationId,
+                        }),
+                    });
+
+                    if (response.ok) break;
+                    if (response.status !== 429 && response.status < 500) break;
+                } catch (e) {
+                    if (attempt === maxAttempts - 1) throw e;
+                }
+                attempt++;
             }
 
-            const response = await fetch('/api/generate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session?.access_token}`
-                },
-                body: JSON.stringify({
-                    messages: get().messages.map(m => ({ role: m.role, content: m.content })),
-                    conversationId: conversationId,
-                }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                const errorMessage = errorData.suggestion
+            if (!response || !response.ok) {
+                const errorData = await response?.json().catch(() => ({}));
+                const errorMessage = errorData?.suggestion
                     ? `${errorData.error} - ${errorData.suggestion}`
-                    : (errorData.error || 'AI generation failed');
+                    : (errorData?.error || 'AI generation failed');
                 throw new Error(errorMessage);
             }
-            if (!response.body) throw new Error('No response body');
 
-            const reader = response.body.getReader();
+            const reader = response.body?.getReader();
             const decoder = new TextDecoder();
+            if (!reader) throw new Error('No response body');
+
             let aiResponse = '';
             let loop = true;
 
-            // 5. Stream Handling
             while (loop) {
                 const { done, value } = await reader.read();
                 if (done) {
@@ -272,7 +293,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
                 }
 
                 const chunk = decoder.decode(value, { stream: true });
-                // We expect SSE format: 'data: {"text": "..."}\n\n'
                 const lines = chunk.split('\n');
 
                 for (const line of lines) {
@@ -286,17 +306,19 @@ export const useChatStore = create<ChatStore>((set, get) => ({
                             const parsed = JSON.parse(data);
                             if (parsed.text) {
                                 aiResponse += parsed.text;
-                                // Optional: Update a "streaming" message in UI here if needed
-                                // set(state => ({ streamingMessageContent: aiResponse })); 
+                                // Simple update strategy
+                                set((state) => ({
+                                    messages: state.messages.map(m =>
+                                        m.id === undefined ? m : (m.role === 'assistant' && m.content === '') ? { ...m, content: aiResponse } : m
+                                    )
+                                }));
                             }
-                        } catch {
-                            // ignore partial JSON parse errors
-                        }
+                        } catch { /* ignore */ }
                     }
                 }
             }
 
-            // 6. Save Assistant Message
+            // Save AI Message
             const { data: aiMessage, error: aiError } = await supabase
                 .from('messages')
                 .insert({
@@ -310,21 +332,17 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
             if (aiError) throw aiError;
 
+            // Correct mapping for UI update
             set((state) => ({
-                messages: [...state.messages, aiMessage],
+                messages: [...state.messages.filter(m => m.id !== undefined), aiMessage],
                 isGenerating: false,
             }));
 
-            // 7. Update Quota
-            await supabase.rpc('record_request', {
-                p_user_id: user.id,
-                p_tokens_used: 1 // Increment by 1 request as per checklist daily limit logic
-            });
+            await supabase.from('conversations').update({ updated_at: new Date().toISOString() }).eq('id', conversationId);
             await checkRateLimit();
 
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-            set({ currentError: errorMessage, isGenerating: false });
+        } catch (error: any) {
+            set({ currentError: error.message || 'An unknown error occurred', isGenerating: false });
         }
     },
 }));

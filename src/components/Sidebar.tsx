@@ -122,18 +122,37 @@ export function Sidebar() {
                                     "w-4 h-4 flex-shrink-0",
                                     activeConversationId === convo.id ? "text-indigo-600" : "text-slate-400"
                                 )} />
-                                {!isCollapsed && <span className="ml-3 truncate pr-6">{convo.title}</span>}
+                                {!isCollapsed && (
+                                    <span className="ml-3 truncate pr-10 text-left">
+                                        {convo.title}
+                                    </span>
+                                )}
                             </button>
+
                             {!isCollapsed && (
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        deleteConversation(convo.id);
-                                    }}
-                                    className="absolute right-2 top-1.5 p-1 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                    <Trash2 size={14} />
-                                </button>
+                                <div className="absolute right-2 top-1.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            const newTitle = prompt("Rename conversation:", convo.title);
+                                            if (newTitle) useChatStore.getState().renameConversation(convo.id, newTitle);
+                                        }}
+                                        className="p-1 text-slate-300 hover:text-indigo-600 transition-colors"
+                                        title="Rename"
+                                    >
+                                        <Plus size={14} className="rotate-45" /> {/* Use a small icon for edit or just a pencil */}
+                                    </button>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (confirm("Delete this conversation?")) deleteConversation(convo.id);
+                                        }}
+                                        className="p-1 text-slate-300 hover:text-red-500 transition-colors"
+                                        title="Delete"
+                                    >
+                                        <Trash2 size={14} />
+                                    </button>
+                                </div>
                             )}
                         </div>
                     ))}

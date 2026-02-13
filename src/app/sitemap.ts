@@ -1,26 +1,26 @@
 import { MetadataRoute } from 'next';
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pinescript.vercel.app';
+export default function sitemap(): MetadataRoute.Sitemap {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pinegen.ai';
 
     return [
         {
             url: baseUrl,
             lastModified: new Date(),
-            changeFrequency: 'monthly',
+            changeFrequency: 'daily',
             priority: 1,
         },
         {
-            url: `${baseUrl}/login`,
+            url: `${baseUrl}/dashboard`,
             lastModified: new Date(),
-            changeFrequency: 'monthly',
+            changeFrequency: 'weekly',
             priority: 0.8,
         },
         {
-            url: `${baseUrl}/signup`,
+            url: `${baseUrl}/settings`,
             lastModified: new Date(),
             changeFrequency: 'monthly',
-            priority: 0.8,
+            priority: 0.5,
         },
-    ]
+    ];
 }

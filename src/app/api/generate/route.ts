@@ -112,18 +112,43 @@ OUTPUT INSTRUCTIONS:
             parts: [{ text: msg.content }]
         }));
 
-        // 5. Call Gemini (Using 2.5-flash to bypass 2.0-flash daily quota limits)
-        const model = genAI.getGenerativeModel({
-            model: 'gemini-2.5-flash',
-            systemInstruction: {
-                role: 'system',
-                parts: [{ text: systemPrompt }]
-            },
-            generationConfig: {
-                temperature: 0.5,
-                maxOutputTokens: 8192,
+        // 5. Model Fallback Logic (Resilience)
+        const modelsToTry = [
+            'gemini-2.5-flash',
+            'gemini-2.0-flash',
+            'gemini-1.5-flash',
+            'gemini-pro'
+        ];
+
+        let model;
+        let lastGenerationError;
+
+        for (const modelId of modelsToTry) {
+            try {
+                console.log(`Trying model: ${modelId}`);
+                model = genAI.getGenerativeModel({
+                    model: modelId,
+                    systemInstruction: {
+                        role: 'system',
+                        parts: [{ text: systemPrompt }]
+                    },
+                    generationConfig: {
+                        temperature: 0.5,
+                        maxOutputTokens: 8192,
+                    }
+                });
+
+                // Test the model with a tiny message if needed, or just proceed
+                break;
+            } catch (e) {
+                console.error(`Model ${modelId} configuration failed, trying next...`);
+                lastGenerationError = e;
             }
-        });
+        }
+
+        if (!model) {
+            throw new Error(`All models failed to initialize. Last error: ${(lastGenerationError as any)?.message}`);
+        }
 
         const chat = model.startChat({
             history: history,
