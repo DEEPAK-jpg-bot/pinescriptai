@@ -21,14 +21,29 @@ export async function POST(req: Request) {
         }
 
         const { variantId } = result.data;
+        const storeId = process.env.LEMONSQUEEZY_STORE_ID;
+        const apiKey = process.env.LEMONSQUEEZY_API_KEY;
+
+        console.log('API DEBUG: Initiating Checkout', {
+            hasUserId: !!user.id,
+            hasVariantId: !!variantId,
+            hasStoreId: !!storeId,
+            hasApiKey: !!apiKey,
+            storeIdValue: storeId
+        });
+
+        if (!storeId || !apiKey) {
+            console.error('API Error: Lemon Squeezy configuration missing');
+            return NextResponse.json({ error: 'Payment service configuration missing on server.' }, { status: 500 });
+        }
 
         // Initialize LS
-        lemonSqueezySetup({ apiKey: process.env.LEMONSQUEEZY_API_KEY! });
+        lemonSqueezySetup({ apiKey });
 
         // Create Checkout Session
         const checkout = await createCheckout(
-            process.env.LEMONSQUEEZY_STORE_ID!,
-            variantId,
+            storeId,
+            variantId.toString(),
             {
                 checkoutData: {
                     email: user.email,
@@ -41,6 +56,11 @@ export async function POST(req: Request) {
                 }
             }
         );
+
+        if (checkout.error) {
+            console.error('Lemon Squeezy SDK Error:', checkout.error);
+            return NextResponse.json({ error: checkout.error.message }, { status: 500 });
+        }
 
         return NextResponse.json({ url: checkout.data?.data.attributes.url });
 
