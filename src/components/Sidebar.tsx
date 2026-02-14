@@ -187,7 +187,7 @@ export function Sidebar() {
                                 <Zap size={10} className="fill-indigo-400" /> Unlock Pro
                             </h4>
                             <p className="text-[11px] font-bold text-slate-400 leading-normal mb-4">Get 20x daily credits & priorityPine v6 speed.</p>
-                            <Link href="/#pricing">
+                            <Link href="/?ref=upgrade#pricing">
                                 <button className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
                                     Upgrade <ArrowUpRight size={12} />
                                 </button>

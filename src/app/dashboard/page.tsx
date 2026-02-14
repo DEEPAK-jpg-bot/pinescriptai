@@ -133,7 +133,7 @@ export default function Dashboard() {
             )}
 
             {/* Chat Area */}
-            <div className="flex-1 overflow-y-auto px-4 md:px-8 py-10 space-y-10 custom-scrollbar scroll-smooth" ref={scrollRef}>
+            <div className="flex-1 overflow-y-auto px-4 md:px-8 py-10 space-y-10 custom-scrollbar" ref={scrollRef}>
                 {messages.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-center opacity-80 select-none">
                         <motion.div
@@ -243,8 +243,8 @@ export default function Dashboard() {
                                 disabled={isGenerating || !input.trim() || quotaInfo.isExceeded}
                                 size="sm"
                                 className={`h-8 px-4 font-black uppercase text-[10px] tracking-widest rounded-lg transition-all ${input.trim() && !isGenerating
-                                        ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 hover:scale-105 active:scale-95'
-                                        : 'bg-slate-100 text-slate-400 border-slate-200'
+                                    ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 hover:scale-105 active:scale-95'
+                                    : 'bg-slate-100 text-slate-400 border-slate-200'
                                     }`}
                             >
                                 {isGenerating ? <Loader2 className="animate-spin" size={12} /> : "Transmit →"}

@@ -178,7 +178,7 @@ export default function Settings() {
 
                                 {quotaInfo.tier === 'free' ? (
                                     <div className="space-y-4">
-                                        <Link href="/#pricing">
+                                        <Link href="/?ref=upgrade#pricing">
                                             <Button className="w-full h-12 rounded-xl bg-white text-slate-950 hover:bg-slate-100 font-black transition-all group">
                                                 Upgrade Now <ArrowUpRight size={18} className="ml-2 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                                             </Button>
