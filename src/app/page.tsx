@@ -217,38 +217,61 @@ function LandingContent() {
                         ))}
                     </section>
 
-                    <section id="pricing" className="space-y-16">
-                        <div className="text-center space-y-4">
-                            <h2 className="text-5xl font-black tracking-tighter">Scalable Power.</h2>
-                            <p className="text-zinc-500 dark:text-zinc-400 font-medium max-w-sm mx-auto">From independent testers to institutional logic deployment.</p>
+                    <section id="pricing" className="space-y-16 py-20">
+                        <div className="text-center space-y-6">
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                whileInView={{ opacity: 1 }}
+                                className="inline-flex items-center gap-2 px-3 py-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full text-[10px] font-black uppercase tracking-[0.2em]"
+                            >
+                                <Target size={12} className="text-primary" /> Scalable Compute Protocols
+                            </motion.div>
+                            <h2 className="text-6xl font-black tracking-tighter leading-[0.8] mb-4">Select your logic <br /><span className="text-primary">bandwidth.</span></h2>
+                            <p className="text-zinc-500 dark:text-zinc-400 font-medium max-w-sm mx-auto text-sm">Deploy high-performance Pine Script generation across 4 specialized bandwidth tiers.</p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             {pricingPlans.map((p: any, i) => (
-                                <div key={i} className={cn(
-                                    "relative p-1.5 rounded-[2.5rem] transition-all duration-500 hover:scale-[1.02]",
-                                    p.highlight ? "bg-gradient-to-br from-primary to-blue-600 shadow-[0_0_40px_-10px_rgba(79,70,229,0.3)]" : "bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700"
-                                )}>
+                                <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: i * 0.1 }}
+                                    className={cn(
+                                        "relative p-[2px] rounded-[2.5rem] transition-all duration-500",
+                                        p.highlight
+                                            ? "bg-gradient-to-br from-primary via-blue-400 to-indigo-600 shadow-[0_20px_60px_-15px_rgba(79,70,229,0.3)] scale-[1.05] z-10"
+                                            : "bg-zinc-200 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 shadow-xl opacity-90 hover:opacity-100"
+                                    )}
+                                >
                                     {p.highlight && (
-                                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg z-20">
-                                            Most Popular
+                                        <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-5 py-1.5 bg-primary text-white text-[9px] font-black uppercase tracking-[0.3em] rounded-full shadow-2xl z-20 flex items-center gap-2">
+                                            <Sparkles size={10} className="fill-white" /> Institutional Choice
                                         </div>
                                     )}
-                                    <div className="bg-white dark:bg-zinc-900 h-full p-8 rounded-[2rem] flex flex-col items-center text-center space-y-8 shadow-inner">
-                                        <div className="space-y-1">
-                                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">{p.name}</h3>
-                                            <div className="flex items-baseline justify-center gap-1">
-                                                <span className="text-4xl font-black tracking-tighter">{p.price}</span>
-                                                <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">/dev</span>
+                                    <div className="bg-white dark:bg-zinc-900 h-full p-8 rounded-[2.4rem] flex flex-col items-center text-center space-y-8">
+                                        <div className="space-y-2">
+                                            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">{p.name}</h3>
+                                            <div className="flex flex-col items-center">
+                                                <div className="flex items-baseline gap-1">
+                                                    <span className="text-5xl font-black tracking-tighter">{p.price}</span>
+                                                    <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest leading-none">/ mo</span>
+                                                </div>
+                                                <span className="text-[9px] font-black text-primary/60 uppercase tracking-widest mt-2 px-3 py-1 bg-primary/5 rounded-full border border-primary/10">
+                                                    {p.price === "$0" ? "Standard Core" : (p.highlight ? "v6 Alpha Logic" : "Enhanced v6")}
+                                                </span>
                                             </div>
                                         </div>
 
                                         <div className="w-full h-px bg-zinc-100 dark:bg-zinc-800" />
 
-                                        <ul className="space-y-4 flex-1">
+                                        <ul className="space-y-4 flex-1 w-full">
                                             {p.features.map((f: string, fi: number) => (
-                                                <li key={fi} className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 dark:text-zinc-500 uppercase tracking-widest">
-                                                    <Check size={14} className="text-primary" /> {f}
+                                                <li key={fi} className="flex items-center gap-3 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest text-left">
+                                                    <div className="w-4 h-4 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                                        <Check size={10} className="text-primary" />
+                                                    </div>
+                                                    {f}
                                                 </li>
                                             ))}
                                         </ul>
@@ -257,17 +280,19 @@ function LandingContent() {
                                             onClick={() => handleTierSelection(p)}
                                             disabled={isCheckingOut === p.name}
                                             className={cn(
-                                                "w-full h-12 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-[0.97] group flex items-center justify-center gap-2",
+                                                "w-full h-14 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all active:scale-[0.97] group flex items-center justify-center gap-3",
                                                 p.highlight
-                                                    ? "bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary-dark"
-                                                    : "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                                                    ? "bg-primary text-white shadow-xl shadow-primary/30 hover:bg-primary-dark hover:shadow-primary/40"
+                                                    : p.price === "$0"
+                                                        ? "bg-zinc-50 dark:bg-zinc-800/50 text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                                                        : "bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white border-2 border-primary/20 hover:border-primary/50 hover:bg-zinc-50 dark:hover:bg-zinc-800"
                                             )}
                                         >
-                                            {isCheckingOut === p.name ? <Loader2 className="animate-spin" size={14} /> : (p.price === "$0" ? "Initialize" : "Select Tier")}
-                                            {!isCheckingOut && p.highlight && <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />}
+                                            {isCheckingOut === p.name ? <Loader2 className="animate-spin" size={14} /> : (p.price === "$0" ? "Open Lab" : "Sync Tier")}
+                                            {!isCheckingOut && p.price !== "$0" && <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform opacity-50" />}
                                         </button>
                                     </div>
-                                </div>
+                                </motion.div>
                             ))}
                         </div>
                     </section>

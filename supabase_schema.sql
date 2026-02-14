@@ -118,7 +118,7 @@ begin
       return json_build_object('allowed', false, 'reason', 'profile_not_found');
   end if;
 
-  if v_profile.last_reset_at < now() - interval '24 hours' then
+  if v_profile.last_reset_at < now() - interval '30 days' then
     update public.user_profiles
     set tokens_remaining = tokens_monthly_limit,
         last_reset_at = now()

@@ -146,15 +146,15 @@ export default function Settings() {
                                     <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-700/50 flex items-center gap-3 group hover:border-primary/30 transition-all">
                                         <Clock className="text-zinc-400 group-hover:text-primary transition-colors" size={20} />
                                         <div>
-                                            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Reset Window</p>
-                                            <p className="text-xs font-bold">24-hour Floating</p>
+                                            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Frequency Cycle</p>
+                                            <p className="text-xs font-bold">Standard Monthly Cycle</p>
                                         </div>
                                     </div>
                                     <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-700/50 flex items-center gap-3 group hover:border-primary/30 transition-all">
                                         <Zap className="text-zinc-400 group-hover:text-primary transition-colors" size={20} />
                                         <div>
-                                            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Priority</p>
-                                            <p className="text-xs font-bold">{quotaInfo.tier !== 'free' ? 'Tier 1 Logic' : 'Standard Logic'}</p>
+                                            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Compute Priority</p>
+                                            <p className="text-xs font-bold">{quotaInfo.tier !== 'free' ? 'Institutional (Pro)' : 'Standard Core'}</p>
                                         </div>
                                     </div>
                                 </div>

@@ -135,6 +135,12 @@ export async function POST(req: NextRequest) {
             }
         }
 
+        // Mark event as processed
+        await supabase.from('webhook_events')
+            .update({ processed: true })
+            .eq('event_type', eventName)
+            .eq('created_at', data.meta.timestamp || new Date().toISOString());
+
         return NextResponse.json({ received: true }, { status: 200 });
 
     } catch (error: unknown) {
