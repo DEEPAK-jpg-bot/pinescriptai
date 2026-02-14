@@ -114,13 +114,13 @@ begin
     set tokens_remaining = tokens_monthly_limit,
         last_reset_at = now()
     where id = p_user_id;
-    return json_build_object('allowed', true, 'remaining', v_profile.tokens_monthly_limit, 'tier', v_profile.tier);
+    return json_build_object('allowed', true, 'remaining', v_profile.tokens_monthly_limit, 'limit', v_profile.tokens_monthly_limit, 'tier', v_profile.tier);
   end if;
 
   if v_profile.tokens_remaining > 0 then
-    return json_build_object('allowed', true, 'remaining', v_profile.tokens_remaining, 'tier', v_profile.tier);
+    return json_build_object('allowed', true, 'remaining', v_profile.tokens_remaining, 'limit', v_profile.tokens_monthly_limit, 'tier', v_profile.tier);
   else
-    return json_build_object('allowed', false, 'reason', 'daily_quota_exceeded', 'resetAt', v_profile.last_reset_at + interval '24 hours');
+    return json_build_object('allowed', false, 'reason', 'daily_quota_exceeded', 'remaining', 0, 'limit', v_profile.tokens_monthly_limit, 'tier', v_profile.tier, 'resetAt', v_profile.last_reset_at + interval '24 hours');
   end if;
 end;
 $$ language plpgsql security definer;

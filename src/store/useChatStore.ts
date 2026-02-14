@@ -180,7 +180,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         set({
             quotaInfo: {
                 remaining: data.remaining || 0,
-                limit: data.tier === 'pro' ? 100000 : 1500,
+                limit: data.limit || 1500, // Dynamic from DB
                 resetAt: data.resetAt,
                 isExceeded: !data.allowed,
                 waitSeconds: data.waitSeconds || 0,
