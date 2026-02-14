@@ -83,6 +83,7 @@ export default function RootLayout({
                 <AuthSync />
                 {children}
                 <Toaster position="top-right" expand={false} richColors />
+                <script src="https://app.lemonsqueezy.com/js/lemon.js" async />
             </body>
         </html>
     );
