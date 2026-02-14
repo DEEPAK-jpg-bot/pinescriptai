@@ -18,7 +18,7 @@ create extension if not exists "uuid-ossp";
 create table public.user_profiles (
   id uuid references auth.users on delete cascade primary key,
   email text,
-  tier text default 'free' check (tier in ('free', 'pro')),
+  tier text default 'free' check (tier in ('free', 'pro', 'trader', 'pro_trader')),
   tokens_monthly_limit bigint default 1500,
   tokens_remaining bigint default 1500,
   last_reset_at timestamptz default now(),
