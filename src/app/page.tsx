@@ -264,7 +264,9 @@ export default function Landing() {
                                     <li className="flex items-center gap-3 text-sm text-slate-400"><CheckCircle2 size={16} className="text-indigo-500" /> Priority queue</li>
                                     <li className="flex items-center gap-3 text-sm text-slate-400"><CheckCircle2 size={16} className="text-indigo-500" /> Email support</li>
                                 </ul>
-                                <Button className="w-full h-12 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all active:scale-95">Start Pro Trial</Button>
+                                <Link href="https://daredevil.lemonsqueezy.com/checkout/buy/9da03299-5619-4254-a7d7-1281da82c5b3?media=0&logo=0&desc=0&discount=0" target="_blank">
+                                    <Button className="w-full h-12 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all active:scale-95">Start Pro Trial</Button>
+                                </Link>
                             </div>
 
                             {/* TRADER - POPULAR */}
@@ -280,7 +282,9 @@ export default function Landing() {
                                     <li className="flex items-center gap-3 text-sm text-slate-300"><CheckCircle2 size={16} className="text-indigo-400" /> Strategy library</li>
                                     <li className="flex items-center gap-3 text-sm text-slate-300"><CheckCircle2 size={16} className="text-indigo-400" /> Discord support</li>
                                 </ul>
-                                <Button className="w-full h-12 rounded-2xl bg-white text-indigo-700 hover:bg-slate-100 font-black transition-all active:scale-95">Get Started</Button>
+                                <Link href="https://daredevil.lemonsqueezy.com/checkout/buy/9da03299-5619-4254-a7d7-1281da82c5b3?media=0&logo=0&desc=0&discount=0" target="_blank">
+                                    <Button className="w-full h-12 rounded-2xl bg-white text-indigo-700 hover:bg-slate-100 font-black transition-all active:scale-95">Get Started</Button>
+                                </Link>
                             </div>
 
                             {/* PRO TRADER */}
@@ -295,7 +299,9 @@ export default function Landing() {
                                     <li className="flex items-center gap-3 text-sm text-slate-300"><CheckCircle2 size={16} className="text-indigo-500" /> API access (Beta)</li>
                                     <li className="flex items-center gap-3 text-sm text-slate-300"><CheckCircle2 size={16} className="text-indigo-500" /> 24/7 Priority Support</li>
                                 </ul>
-                                <Button variant="outline" className="w-full h-12 rounded-2xl border-white/10 hover:border-white/20 hover:bg-white/5 text-slate-300 font-bold transition-all active:scale-95">Go Pro Trader</Button>
+                                <Link href="https://daredevil.lemonsqueezy.com/checkout/buy/9da03299-5619-4254-a7d7-1281da82c5b3?media=0&logo=0&desc=0&discount=0" target="_blank">
+                                    <Button variant="outline" className="w-full h-12 rounded-2xl border-white/10 hover:border-white/20 hover:bg-white/5 text-slate-300 font-bold transition-all active:scale-95">Go Pro Trader</Button>
+                                </Link>
                             </div>
                         </div>
 

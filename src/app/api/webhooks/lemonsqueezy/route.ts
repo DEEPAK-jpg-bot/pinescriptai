@@ -73,11 +73,28 @@ export async function POST(req: NextRequest) {
 
         // 2. Process Events
         if (eventName === 'subscription_created' || eventName === 'subscription_updated' || eventName === 'subscription_resumed') {
+            const variantId = payload.attributes.variant_id.toString();
+
+            // Map Variant IDs to Tiers and Limits
+            let tier = 'pro';
+            let tokenLimit = 1500; // Default fallback
+
+            if (variantId === '1307516') { // Pro
+                tier = 'pro';
+                tokenLimit = 200;
+            } else if (variantId === '1307522') { // Trader
+                tier = 'trader';
+                tokenLimit = 600;
+            } else if (variantId === '1307525') { // Pro Trader
+                tier = 'pro_trader';
+                tokenLimit = 1500;
+            }
+
             const subscriptionData = {
                 id: payload.id,
                 user_id: targetUserId,
                 status: payload.attributes.status,
-                plan_id: payload.attributes.variant_id.toString(),
+                plan_id: variantId,
                 current_period_end: payload.attributes.renews_at || payload.attributes.ends_at,
                 customer_id: customerId.toString(),
                 updated_at: new Date().toISOString()
@@ -91,17 +108,16 @@ export async function POST(req: NextRequest) {
             }
 
             // Sync Profile Tier
-            const tier = payload.attributes.status === 'active' ? 'pro' : 'free';
-            // Logic: Update user profile tier and potentially token limits
-            const tokenLimit = tier === 'pro' ? 100000 : 1500; // Example pro limit
+            const isPaid = payload.attributes.status === 'active' || payload.attributes.status === 'on_trial';
 
-            await supabase.from('user_profiles').update({
-                tier: tier,
-                tokens_monthly_limit: tokenLimit,
-                // Don't overwrite tokens_remaining directly unless it's a renewal? 
-                // Simpler logic: Pro gives high limit.
-            }).eq('id', targetUserId);
-
+            if (isPaid) {
+                await supabase.from('user_profiles').update({
+                    tier: tier,
+                    tokens_monthly_limit: tokenLimit,
+                    // Optionally reset remaining tokens on new subscription?
+                    // tokens_remaining: tokenLimit 
+                }).eq('id', targetUserId);
+            }
         }
         else if (eventName === 'subscription_cancelled' || eventName === 'subscription_expired') {
             await supabase.from('subscriptions').update({
@@ -109,11 +125,11 @@ export async function POST(req: NextRequest) {
                 updated_at: new Date().toISOString()
             }).eq('id', payload.id);
 
-            // Downgrade to free if expired (not if just cancelled but still in period)
+            // Downgrade to free if expired
             if (payload.attributes.status === 'expired') {
                 await supabase.from('user_profiles').update({
                     tier: 'free',
-                    tokens_monthly_limit: 1500
+                    tokens_monthly_limit: 10 // Free tier limit
                 }).eq('id', targetUserId);
             }
         }
