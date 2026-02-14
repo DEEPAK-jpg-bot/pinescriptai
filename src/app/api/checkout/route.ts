@@ -21,20 +21,21 @@ export async function POST(req: Request) {
         }
 
         const { variantId } = result.data;
-        const storeId = process.env.LEMONSQUEEZY_STORE_ID;
+        const storeId = process.env.LEMONSQUEEZY_STORE_ID || "280595";
         const apiKey = process.env.LEMONSQUEEZY_API_KEY;
 
-        console.log('API DEBUG: Initiating Checkout', {
-            hasUserId: !!user.id,
-            hasVariantId: !!variantId,
-            hasStoreId: !!storeId,
-            hasApiKey: !!apiKey,
-            storeIdValue: storeId
-        });
+        if (!apiKey) {
+            console.error('API Error: LEMONSQUEEZY_API_KEY is missing on server');
+            return NextResponse.json({
+                error: 'Payment service API Key missing on server. Please add LEMONSQUEEZY_API_KEY to your deployment environment variables.'
+            }, { status: 500 });
+        }
 
-        if (!storeId || !apiKey) {
-            console.error('API Error: Lemon Squeezy configuration missing');
-            return NextResponse.json({ error: 'Payment service configuration missing on server.' }, { status: 500 });
+        if (!storeId) {
+            console.error('API Error: LEMONSQUEEZY_STORE_ID is missing on server');
+            return NextResponse.json({
+                error: 'Payment Store ID missing on server. Please add LEMONSQUEEZY_STORE_ID to your deployment environment variables.'
+            }, { status: 500 });
         }
 
         // Initialize LS
