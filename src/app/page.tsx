@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-    Terminal as TerminalIcon, Code, Zap, CheckCircle2, ArrowRight, Check, X,
-    ShieldCheck, Sparkles, Globe, Lock, Code2, Layers
+    Terminal as TerminalIcon, ArrowRight, Check, Zap,
+    ShieldCheck, Sparkles, Globe, Lock
 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
@@ -23,7 +23,7 @@ declare global {
     }
 }
 
-export default function Landing() {
+function LandingContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const supabase = createClient();
@@ -42,7 +42,6 @@ export default function Landing() {
         };
         checkUser();
 
-        // Initialize Lemon Squeezy Overlay
         if (typeof window !== 'undefined' && window.createLemonSqueezy) {
             window.createLemonSqueezy();
         }
@@ -66,8 +65,7 @@ export default function Landing() {
             features: ["10 generations / mo", "7-day chat history", "Basic strategy templates", "Community Discord"],
             buttonText: "Current Plan",
             buttonHref: "/signup",
-            active: true,
-            theme: "slate"
+            active: true
         },
         {
             id: 'pro',
@@ -77,9 +75,8 @@ export default function Landing() {
             desc: "Everything you need for active strategy building.",
             features: ["200 generations / mo", "+$0.15/extra generation", "30-day chat history", "Priority cloud queue", "Standard API Access"],
             buttonText: "Select Pro",
-            buttonHref: "https://daredevil.lemonsqueezy.com/buy/893ad243-718e-4903-8758-15103ec4101e", // Variant 1307516
-            highlight: false,
-            theme: "emerald"
+            buttonHref: "https://daredevil.lemonsqueezy.com/buy/893ad243-718e-4903-8758-15103ec4101e",
+            highlight: false
         },
         {
             id: 'trader',
@@ -89,9 +86,8 @@ export default function Landing() {
             desc: "Institutional capacity for volume traders.",
             features: ["600 generations / mo", "+$0.10/extra generation", "90-day history sync", "Custom Logic Guardrails", "1-on-1 Discord Sprints", "Beta Logic Previews"],
             buttonText: "Upgrade to Trader",
-            buttonHref: "https://daredevil.lemonsqueezy.com/buy/4579d46f-f232-475a-a320-f49553bc9697", // Variant 1307522
-            highlight: true,
-            theme: "indigo"
+            buttonHref: "https://daredevil.lemonsqueezy.com/buy/4579d46f-f232-475a-a320-f49553bc9697",
+            highlight: true
         },
         {
             id: 'pro_trader',
@@ -101,30 +97,13 @@ export default function Landing() {
             desc: "The ultimate PineScript engine for firms.",
             features: ["1,500 generations / mo", "Unlimited history", "Full API logic control", "White-label support", "Direct Developer Link", "Custom Logic models"],
             buttonText: "Go Pro Trader",
-            buttonHref: "https://daredevil.lemonsqueezy.com/buy/ebf22be5-21d7-463f-91a5-827d00f80695", // Variant 1307525
-            highlight: false,
-            theme: "violet"
+            buttonHref: "https://daredevil.lemonsqueezy.com/buy/ebf22be5-21d7-463f-91a5-827d00f80695",
+            highlight: false
         }
     ];
 
     return (
         <div className="min-h-screen bg-[#020617] text-white font-sans overflow-x-hidden selection:bg-indigo-500/30">
-            {/* SEO JSON-LD */}
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{
-                    __html: JSON.stringify({
-                        "@context": "https://schema.org",
-                        "@type": "SoftwareApplication",
-                        "name": "PineGen AI",
-                        "description": "High-accuracy Pine Script v6 generator for TradingView.",
-                        "applicationCategory": "FinTech",
-                        "operatingSystem": "Web",
-                        "offers": { "@type": "Offer", "price": "19.00", "priceCurrency": "USD" }
-                    })
-                }}
-            />
-
             {/* NAVBAR */}
             <header className="fixed top-0 w-full z-50 border-b border-white/[0.03] bg-[#020617]/80 backdrop-blur-2xl px-6 py-4">
                 <nav className="max-w-7xl mx-auto flex items-center justify-between">
@@ -202,7 +181,7 @@ export default function Landing() {
                     </motion.div>
                 </section>
 
-                {/* PRICING - "Checkout Items Beautiful" */}
+                {/* PRICING */}
                 <section id="pricing" className="py-32 px-6 bg-[#020617] relative">
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-indigo-950/5 to-transparent pointer-events-none" />
 
@@ -257,10 +236,10 @@ export default function Landing() {
                                             onClick={() => plan.buttonHref.startsWith('http') ? handleCheckout(plan.buttonHref) : router.push(plan.buttonHref)}
                                             disabled={plan.active && isLoggedIn}
                                             className={`w-full h-14 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group ${plan.highlight
-                                                ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-xl shadow-indigo-600/20'
-                                                : plan.active && isLoggedIn
-                                                    ? 'bg-white/5 text-slate-600 cursor-not-allowed opacity-50'
-                                                    : 'bg-white text-slate-950 hover:bg-slate-200'
+                                                    ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-xl shadow-indigo-600/20'
+                                                    : plan.active && isLoggedIn
+                                                        ? 'bg-white/5 text-slate-600 cursor-not-allowed opacity-50'
+                                                        : 'bg-white text-slate-950 hover:bg-slate-200'
                                                 }`}
                                         >
                                             {plan.buttonText}
@@ -271,7 +250,6 @@ export default function Landing() {
                             ))}
                         </div>
 
-                        {/* Visual Proof / Meta info */}
                         <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-10">
                             {[
                                 { icon: <ShieldCheck className="text-emerald-500" />, label: "Secure Payments", sub: "Via Lemon Squeezy" },
@@ -290,7 +268,6 @@ export default function Landing() {
                     </div>
                 </section>
 
-                {/* FOOTER */}
                 <footer className="py-20 bg-[#020617] border-t border-white/[0.03] text-center">
                     <div className="max-w-7xl mx-auto px-6 flex flex-col items-center gap-10">
                         <div className="flex items-center gap-3">
@@ -310,4 +287,12 @@ export default function Landing() {
             </main>
         </div>
     );
-};
+}
+
+export default function Landing() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-[#020617] flex items-center justify-center text-indigo-500 font-bold uppercase tracking-widest text-xs animate-pulse">Initializing v6 Engine...</div>}>
+            <LandingContent />
+        </Suspense>
+    );
+}
