@@ -1,4 +1,4 @@
-"use client";
+"use client"; // Vercel Production Sync Trigger: v2.0.2
 
 import React, { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
