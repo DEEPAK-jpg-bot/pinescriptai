@@ -46,66 +46,56 @@ export const CodeBlock = ({ code, language = 'pinescript' }: CodeBlockProps) => 
     };
 
     return (
-        <div className="my-6 rounded-xl overflow-hidden border border-slate-800 bg-[#1e1e1e] shadow-2xl group relative">
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-2.5 bg-slate-900 border-b border-slate-800">
-                <div className="flex items-center gap-2.5">
-                    <div className="flex gap-1.5 prose-code:">
-                        <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+        <div className="my-8 rounded-2xl overflow-hidden border border-slate-200 bg-[#0d0d0d] shadow-xl group relative">
+            {/* Action Bar */}
+            <div className="flex items-center justify-between px-6 py-4 bg-slate-900/50 backdrop-blur-sm border-b border-white/5">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+                        <Code2 size={18} />
                     </div>
-                    <div className="h-4 w-[1px] bg-slate-700 mx-1" />
-                    <div className="flex items-center gap-2">
-                        <Code2 size={14} className="text-indigo-400" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em]">Pine Script v6</span>
+                    <div>
+                        <span className="block text-xs font-black text-white uppercase tracking-widest leading-none">Code Artifact</span>
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">PineScript v6 Console</span>
                     </div>
                 </div>
-                <div className="flex items-center gap-1.5">
+
+                <div className="flex items-center gap-2">
                     <button
                         onClick={handleCopy}
-                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition-all active:scale-95"
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest text-slate-300 hover:text-white hover:bg-white/5 transition-all active:scale-95 border border-white/5"
                     >
                         {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={13} />}
-                        {copied ? 'Copied' : 'Copy'}
+                        {copied ? 'Copied' : 'Copy Code'}
                     </button>
                     <button
                         onClick={handleDownload}
-                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition-all active:scale-95 border border-transparent hover:border-slate-700"
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest bg-indigo-600 text-white hover:bg-indigo-500 transition-all active:scale-95 shadow-lg shadow-indigo-500/20"
                     >
-                        <Download size={13} />
-                        Download
+                        <Download size={13} strokeWidth={3} />
+                        Download .pine
                     </button>
                 </div>
             </div>
 
-            {/* Code Body */}
-            <div className="relative font-mono text-sm leading-relaxed overflow-hidden">
+            {/* Simple Code Body */}
+            <div className="relative font-mono text-sm leading-relaxed overflow-x-auto custom-scrollbar">
                 <SyntaxHighlighter
                     language={language}
                     style={vscDarkPlus}
                     customStyle={{
                         margin: 0,
-                        padding: '1.5rem',
+                        padding: '2rem',
                         fontSize: '13px',
-                        lineHeight: '1.6',
+                        lineHeight: '1.7',
                         background: 'transparent',
                     }}
-                    showLineNumbers={true}
-                    lineNumberStyle={{
-                        minWidth: '2.5em',
-                        paddingRight: '1em',
-                        color: '#4b5563',
-                        textAlign: 'right',
-                        userSelect: 'none',
-                        fontSize: '11px',
-                    }}
+                    showLineNumbers={false} /* Removed as requested for simplicity */
                 >
                     {code.trim()}
                 </SyntaxHighlighter>
 
-                {/* Visual Flair: Bottom Gradient */}
-                <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+                {/* Bottom decorative bar */}
+                <div className="h-1 w-full bg-gradient-to-r from-indigo-500/50 via-violet-500/50 to-indigo-500/50 opacity-20" />
             </div>
         </div>
     );
