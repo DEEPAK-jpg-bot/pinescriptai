@@ -107,15 +107,15 @@ export async function POST(req: NextRequest) {
                 throw error;
             }
 
-            // Sync Profile Tier
+            // Sync Profile Tier & Reset Tokens on Purchase/Resume
             const isPaid = payload.attributes.status === 'active' || payload.attributes.status === 'on_trial';
 
             if (isPaid) {
                 await supabase.from('user_profiles').update({
                     tier: tier,
                     tokens_monthly_limit: tokenLimit,
-                    // Optionally reset remaining tokens on new subscription?
-                    // tokens_remaining: tokenLimit 
+                    tokens_remaining: tokenLimit, // Refill on upgrade/renewal
+                    last_reset_at: new Date().toISOString()
                 }).eq('id', targetUserId);
             }
         }
@@ -129,7 +129,8 @@ export async function POST(req: NextRequest) {
             if (payload.attributes.status === 'expired') {
                 await supabase.from('user_profiles').update({
                     tier: 'free',
-                    tokens_monthly_limit: 10 // Free tier limit
+                    tokens_monthly_limit: 10,
+                    tokens_remaining: 10 // Reset to free limit
                 }).eq('id', targetUserId);
             }
         }

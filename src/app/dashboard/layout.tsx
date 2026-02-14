@@ -12,20 +12,45 @@ import {
 import { Button } from '@/components/ui/button';
 import { useChatStore } from '@/store/useChatStore';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const { createConversation } = useChatStore();
     const [isDarkMode, setIsDarkMode] = useState(true);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     return (
         <div className={cn("flex h-screen w-full bg-white dark:bg-page-dark transition-colors duration-300 overflow-hidden", isDarkMode && "dark")}>
+            {/* DESKTOP SIDEBAR */}
             <Sidebar />
+
+            {/* MOBILE SIDEBAR OVERLAY */}
+            {isMobileMenuOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-[100] md:hidden backdrop-blur-sm animate-fade-in"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                >
+                    <motion.div
+                        initial={{ x: -280 }}
+                        animate={{ x: 0 }}
+                        className="w-[280px] h-full bg-zinc-100 dark:bg-sidebar-dark shadow-2xl"
+                        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                    >
+                        <Sidebar />
+                    </motion.div>
+                </div>
+            )}
 
             <main className="flex-1 flex flex-col relative h-full">
                 {/* HEADER (Sticky Top, 48px) */}
                 <header className="h-12 flex-shrink-0 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-page-dark/80 backdrop-blur-md flex items-center justify-between px-4 sticky top-0 z-30">
                     <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" className="md:hidden">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="md:hidden"
+                            onClick={() => setIsMobileMenuOpen(true)}
+                        >
                             <Menu size={18} />
                         </Button>
                         <h1 className="text-sm font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">

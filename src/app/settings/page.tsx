@@ -164,20 +164,20 @@ export default function Settings() {
 
                     {/* 3. Subscription Status */}
                     <section className="animate-slide-up" style={{ animationDelay: '200ms' }}>
-                        <div className="p-8 bg-zinc-900 rounded-[2rem] text-white shadow-2xl shadow-indigo-950/20 border border-white/5 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/20 transition-all duration-700" />
+                        <div className="p-8 bg-white dark:bg-zinc-800 border-2 border-primary/20 rounded-[2rem] shadow-xl shadow-primary/5 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/10 transition-all duration-700" />
 
                             <div className="relative z-10 space-y-8">
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-xs font-black uppercase tracking-[0.3em] text-primary flex items-center gap-2">
                                         <CreditCard size={14} /> Subscription Engine
                                     </h3>
-                                    <div className="px-3 py-1 bg-white/10 rounded-lg text-[10px] font-bold uppercase tracking-widest">
+                                    <div className="px-3 py-1 bg-primary/10 text-primary rounded-lg text-[10px] font-bold uppercase tracking-widest">
                                         ID: {subscription?.plan_id || 'Free'}
                                     </div>
                                 </div>
 
-                                <div className="space-y-1">
+                                <div className="space-y-1 text-zinc-900 dark:text-white">
                                     <p className="text-zinc-400 text-sm font-medium">Active Deployment</p>
                                     <p className="text-4xl font-black tracking-tighter tracking-tight">{tierInfo.name}</p>
                                 </div>
@@ -192,7 +192,7 @@ export default function Settings() {
                                     <div className="pt-4 space-y-4">
                                         <Button
                                             variant="outline"
-                                            className="w-full h-12 bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 text-white font-bold transition-all text-sm rounded-xl"
+                                            className="w-full h-12 bg-white/5 border-zinc-200 dark:border-white/10 hover:bg-zinc-50 dark:hover:bg-white/10 text-zinc-900 dark:text-white font-bold transition-all text-sm rounded-xl"
                                             onClick={() => window.open('https://daredevil.lemonsqueezy.com/billing', '_blank')}
                                         >
                                             Billing Dashboard <ExternalLink size={16} className="ml-2 opacity-50" />

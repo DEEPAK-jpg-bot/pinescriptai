@@ -16,27 +16,12 @@ import { generateSchema } from '@/lib/schemas';
 // ... (existing imports)
 
 export async function POST(req: Request) {
-    // 0. Get Keys Dynamically
-    const dynamicApiKey =
-        process.env.GOOGLE_AI_SERVER_KEY ||
-        process.env.GEMINI_API_KEY ||
-        '';
-
-    // DEBUG LOG
-    console.log('DEBUG: API Key Check:', {
-        hasServerKey: !!process.env.GOOGLE_AI_SERVER_KEY,
-        hasGeminiKey: !!process.env.GEMINI_API_KEY,
-        keyLength: dynamicApiKey ? dynamicApiKey.length : 0,
-        availableKeys: Object.keys(process.env).filter(k => k.includes('KEY')).length
-    });
+    const dynamicApiKey = process.env.GOOGLE_AI_SERVER_KEY || process.env.GEMINI_API_KEY || '';
 
     if (!dynamicApiKey) {
-        return NextResponse.json({
-            error: `Google AI API key not configured. (Detected: ServerKey=${!!process.env.GOOGLE_AI_SERVER_KEY}, GeminiKey=${!!process.env.GEMINI_API_KEY})`
-        }, { status: 500 });
+        return NextResponse.json({ error: 'AI Service configuration missing' }, { status: 500 });
     }
 
-    // Re-initialize genAI with latest key
     const genAI = new GoogleGenerativeAI(dynamicApiKey);
 
     const supabase = createAdminClient();
@@ -114,8 +99,8 @@ OUTPUT INSTRUCTIONS:
 
         // 5. Model Fallback Logic (Resilience)
         const modelsToTry = [
-            'gemini-1.5-pro',
-            'gemini-1.5-flash',
+            'gemini-1.5-pro-latest',
+            'gemini-1.5-flash-latest',
             'gemini-pro'
         ];
 

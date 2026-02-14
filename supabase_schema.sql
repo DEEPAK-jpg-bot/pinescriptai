@@ -19,8 +19,8 @@ create table public.user_profiles (
   id uuid references auth.users on delete cascade primary key,
   email text,
   tier text default 'free' check (tier in ('free', 'pro', 'trader', 'pro_trader')),
-  tokens_monthly_limit bigint default 1500,
-  tokens_remaining bigint default 1500,
+  tokens_monthly_limit bigint default 10,
+  tokens_remaining bigint default 10,
   last_reset_at timestamptz default now(),
   created_at timestamptz default now(),
   updated_at timestamptz default now()
@@ -80,6 +80,9 @@ create policy "Users can manage own conversations" on public.conversations for a
 create policy "Users can manage messages" on public.messages for all using (
     exists (select 1 from public.conversations where id = conversation_id and user_id = auth.uid())
 );
+
+create policy "Users can view own subscriptions" on public.subscriptions for select using (auth.uid() = user_id);
+create policy "Users can update own profiles" on public.user_profiles for update using (auth.uid() = id);
 
 -- 10. FUNCTIONS
 create or replace function public.handle_new_user()
@@ -157,8 +160,12 @@ begin
     update public.user_profiles
     set tokens_remaining = tokens_remaining - p_tokens_to_deduct,
         updated_at = now()
-    where id = p_user_id
+    where id = p_user_id and tokens_remaining >= p_tokens_to_deduct
     returning tokens_remaining into v_remaining;
+
+    if v_remaining is null then
+        return json_build_object('success', false, 'error', 'insufficient_quota');
+    end if;
 
     return json_build_object('success', true, 'data', json_build_object('tokens_remaining', v_remaining));
 exception when others then

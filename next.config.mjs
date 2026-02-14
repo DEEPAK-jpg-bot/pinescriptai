@@ -4,15 +4,13 @@ const nextConfig = {
     // The vercel.json handles routing /api/* to the Python backend
     experimental: {
         serverActions: {
-            allowedOrigins: ['localhost:3000'],
+            allowedOrigins: ['localhost:3000', 'pinescript.vercel.app'],
         },
     },
     images: {
         remotePatterns: [
-            {
-                protocol: 'https',
-                hostname: 'images.unsplash.com',
-            },
+            { protocol: 'https', hostname: 'images.unsplash.com' },
+            { protocol: 'https', hostname: 'daredevil.lemonsqueezy.com' },
         ],
     },
 };

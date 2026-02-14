@@ -34,6 +34,33 @@ Go to: `Vercel Dashboard` > `pinescript-ai` > `Settings` > `Environment Variable
 ### 3. Deploy
 `git push` to trigger a new build with the environment variables active.
 
+## 🎨 Lemon Squeezy Store Aesthetics (Professional Polish)
+To make your store look institutional and premium, use these settings in your **Lemon Squeezy Dashboard**:
+
+### 1. Product Description Template
+Copy this into your product description for a professional "SaaS" look:
+```markdown
+# PineGen Institutional AI Logic
+Generate error-free Pine Script v6 indicators and strategies instantly.
+
+### Why Traders Choose PineGen:
+- **v6 Engine**: Built specifically for the modern TradingView standard.
+- **Institutional Logic**: Strategy generation based on real-world order blocks and liquidity.
+- **Zero Errors**: AI-validated syntax reduces code-fixing time by 90%.
+
+*Standard Plan Includes: 200 Gens / mo, 30-day History, Priority Queue.*
+```
+
+### 2. Branding Settings
+- **Storefront Color**: Set to `#4f46e5` (Institutional Indigo) to match the app.
+- **Product Image**: Use a clean, dark-mode screenshot of the PineGen dashboard.
+- **Button Text**: Change from "Buy Now" to "Initialize Access" for a more technical feel.
+
+## 📊 Usage & Quota Calculation
+- **Generation**: Each time a user hits "Enter" or clicking "Generate", **1 token** is deducted from their account.
+- **Tracking**: This is recorded in the Supabase `user_profiles` table under `tokens_remaining`.
+- **Reset**: Quotas are floating (24-hour window) for Free users and monthly for Pro users (synced via webhook on payment renewal).
+
 ### 2. Required Setup
 1.  **Environment Variables**:
     - `LEMONSQUEEZY_WEBHOOK_SECRET`: Must match the secret you provide in Lemon Squeezy Dashboard.

@@ -81,7 +81,7 @@ export default function Dashboard() {
         <div className="flex flex-col h-full bg-transparent">
             {/* CHAT AREA (Scrollable) */}
             <div
-                className="flex-1 overflow-y-auto custom-scrollbar flex justify-center py-6 pb-40"
+                className="flex-1 overflow-y-auto custom-scrollbar flex justify-center py-6 pb-60"
                 ref={scrollRef}
             >
                 <div className="w-full max-w-[768px] px-6 space-y-10">

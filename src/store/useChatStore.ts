@@ -65,8 +65,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     isLoadingMessages: false,
     currentError: null,
     quotaInfo: {
-        remaining: 1500,
-        limit: 1500,
+        remaining: 10,
+        limit: 10,
         resetAt: null,
         isExceeded: false,
         waitSeconds: 0,
