@@ -46,7 +46,7 @@ export default function Sidebar() {
                         isCollapsed ? "px-0" : "px-4"
                     )}
                 >
-                    <Plus size={18} className="text-emerald-500" />
+                    <Plus size={18} className="text-primary" />
                     {!isCollapsed && <span>New Chat</span>}
                 </button>
             </div>
@@ -64,12 +64,12 @@ export default function Sidebar() {
                                 className={cn(
                                     "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all",
                                     activeConversationId === convo.id
-                                        ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/10"
+                                        ? "bg-primary text-white shadow-lg shadow-primary/10"
                                         : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white"
                                 )}
                             >
                                 <MessageSquare size={16} className={cn(
-                                    activeConversationId === convo.id ? "text-white" : "text-emerald-500"
+                                    activeConversationId === convo.id ? "text-white" : "text-primary"
                                 )} />
                                 {!isCollapsed && (
                                     <span className="truncate flex-1 text-left leading-none font-medium">
@@ -106,7 +106,7 @@ export default function Sidebar() {
                             </div>
                             <div className="h-1.5 w-full bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
                                 <div
-                                    className="h-full bg-emerald-500 rounded-full transition-all duration-1000"
+                                    className="h-full bg-primary rounded-full transition-all duration-1000"
                                     style={{ width: `${((quotaInfo.limit - quotaInfo.remaining) / quotaInfo.limit) * 100}%` }}
                                 />
                             </div>
@@ -115,7 +115,7 @@ export default function Sidebar() {
                         {/* Upgrade Button */}
                         {quotaInfo.tier === 'free' && (
                             <Link href="/settings">
-                                <button className="w-full py-2.5 mt-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-sm">
+                                <button className="w-full py-2.5 mt-2 bg-primary hover:bg-primary-dark text-white rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-sm">
                                     <Crown size={14} className="fill-white" />
                                     Upgrade Plan
                                 </button>
@@ -130,7 +130,7 @@ export default function Sidebar() {
                     isCollapsed ? "justify-center" : "px-1"
                 )}>
                     <div className="relative">
-                        <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold text-xs shadow-sm">
+                        <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-white font-bold text-xs shadow-sm">
                             {user?.email?.substring(0, 1).toUpperCase()}
                         </div>
                     </div>
@@ -138,7 +138,7 @@ export default function Sidebar() {
                     {!isCollapsed && (
                         <div className="flex-1 min-w-0">
                             <p className="text-xs font-bold text-zinc-900 dark:text-white truncate">{user?.email}</p>
-                            <Link href="/settings" className="text-[10px] font-bold uppercase text-emerald-500 hover:text-emerald-600 tracking-widest leading-none mt-1 flex items-center gap-1">
+                            <Link href="/settings" className="text-[10px] font-bold uppercase text-primary hover:text-primary-dark tracking-widest leading-none mt-1 flex items-center gap-1">
                                 Settings <Settings size={10} />
                             </Link>
                         </div>

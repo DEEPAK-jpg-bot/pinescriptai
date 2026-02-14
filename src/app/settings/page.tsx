@@ -46,16 +46,16 @@ export default function Settings() {
 
     const getTierDisplay = () => {
         const tier = quotaInfo.tier?.toLowerCase() || 'free';
-        if (tier === 'pro_trader') return { name: 'Pro Trader', color: 'emerald', icon: <ShieldCheck className="text-emerald-500" /> };
-        if (tier === 'trader') return { name: 'Trader', color: 'emerald', icon: <Zap className="text-emerald-500" /> };
-        if (tier === 'pro') return { name: 'Pro', color: 'emerald', icon: <Sparkles className="text-emerald-500" /> };
+        if (tier === 'pro_trader') return { name: 'Pro Trader', color: 'indigo', icon: <ShieldCheck className="text-primary" /> };
+        if (tier === 'trader') return { name: 'Trader', color: 'indigo', icon: <Zap className="text-primary" /> };
+        if (tier === 'pro') return { name: 'Pro', color: 'indigo', icon: <Sparkles className="text-primary" /> };
         return { name: 'Free Tier', color: 'zinc', icon: <User className="text-zinc-400" /> };
     };
 
     const tierInfo = getTierDisplay();
 
     return (
-        <div className="min-h-screen bg-white dark:bg-page-dark text-zinc-900 dark:text-white font-sans selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-300">
+        <div className="min-h-screen bg-white dark:bg-page-dark text-zinc-900 dark:text-white font-sans selection:bg-indigo-100 selection:text-indigo-900 transition-colors duration-300">
             {/* Header (Adaptive 48px Header) */}
             <header className="h-12 sticky top-0 z-50 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-page-dark/80 backdrop-blur-md flex items-center justify-center px-4">
                 <nav className="w-full max-w-[768px] flex items-center justify-between">
@@ -66,7 +66,7 @@ export default function Settings() {
                         <h1 className="text-sm font-bold tracking-tight">Account Settings</h1>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-emerald-500 rounded-lg flex items-center justify-center text-white">
+                        <div className="w-6 h-6 bg-primary rounded-lg flex items-center justify-center text-white">
                             <SettingsIcon size={12} />
                         </div>
                     </div>
@@ -80,10 +80,10 @@ export default function Settings() {
                     <section className="animate-fade-in">
                         <div className="p-8 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-[2rem] flex flex-col md:flex-row gap-8 items-start md:items-center">
                             <div className="relative group">
-                                <div className="w-24 h-24 rounded-3xl bg-zinc-100 dark:bg-zinc-800 border-2 border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-emerald-500 shadow-sm transition-transform group-hover:scale-105">
+                                <div className="w-24 h-24 rounded-3xl bg-zinc-100 dark:bg-zinc-800 border-2 border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-primary shadow-sm transition-transform group-hover:scale-105">
                                     <User size={40} strokeWidth={1.5} />
                                 </div>
-                                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 border-4 border-white dark:border-zinc-900 rounded-full flex items-center justify-center">
+                                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-primary border-4 border-white dark:border-zinc-900 rounded-full flex items-center justify-center">
                                     <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
                                 </div>
                             </div>
@@ -91,7 +91,7 @@ export default function Settings() {
                             <div className="flex-1 space-y-2">
                                 <div className="flex items-center gap-3">
                                     <h2 className="text-3xl font-black tracking-tighter">{user?.email?.split('@')[0]}</h2>
-                                    <span className="px-3 py-1 bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full">
+                                    <span className="px-3 py-1 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-full">
                                         {tierInfo.name}
                                     </span>
                                 </div>
@@ -114,7 +114,7 @@ export default function Settings() {
                     <section className="animate-slide-up" style={{ animationDelay: '100ms' }}>
                         <div className="p-8 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-[2rem] shadow-sm space-y-8">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-emerald-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                                <div className="w-12 h-12 bg-primary text-white rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20">
                                     <BarChart3 size={24} />
                                 </div>
                                 <div>
@@ -126,7 +126,7 @@ export default function Settings() {
                             <div className="space-y-6">
                                 <div className="flex justify-between items-end">
                                     <div className="space-y-1">
-                                        <span className="text-5xl font-black tracking-tighter text-emerald-500">{quotaInfo.remaining}</span>
+                                        <span className="text-5xl font-black tracking-tighter text-primary">{quotaInfo.remaining}</span>
                                         <span className="text-zinc-400 font-bold text-xl ml-2 tracking-tight">/ {quotaInfo.limit} tokens</span>
                                     </div>
                                     <div className="text-right">
@@ -137,21 +137,21 @@ export default function Settings() {
 
                                 <div className="h-3 w-full bg-zinc-100 dark:bg-zinc-700/50 rounded-full overflow-hidden p-0.5 border border-zinc-200 dark:border-zinc-700">
                                     <div
-                                        className="h-full bg-emerald-500 rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                                        className="h-full bg-primary rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(79,70,229,0.5)]"
                                         style={{ width: `${Math.max(2, (1 - (quotaInfo.remaining / (quotaInfo.limit || 1))) * 100)}%` }}
                                     />
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-700/50 flex items-center gap-3 group hover:border-emerald-500/30 transition-all">
-                                        <Clock className="text-zinc-400 group-hover:text-emerald-500 transition-colors" size={20} />
+                                    <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-700/50 flex items-center gap-3 group hover:border-primary/30 transition-all">
+                                        <Clock className="text-zinc-400 group-hover:text-primary transition-colors" size={20} />
                                         <div>
                                             <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Reset Window</p>
                                             <p className="text-xs font-bold">24-hour Floating</p>
                                         </div>
                                     </div>
-                                    <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-700/50 flex items-center gap-3 group hover:border-emerald-500/30 transition-all">
-                                        <Zap className="text-zinc-400 group-hover:text-emerald-500 transition-colors" size={20} />
+                                    <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-700/50 flex items-center gap-3 group hover:border-primary/30 transition-all">
+                                        <Zap className="text-zinc-400 group-hover:text-primary transition-colors" size={20} />
                                         <div>
                                             <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Priority</p>
                                             <p className="text-xs font-bold">{quotaInfo.tier !== 'free' ? 'Tier 1 Logic' : 'Standard Logic'}</p>
@@ -164,12 +164,12 @@ export default function Settings() {
 
                     {/* 3. Subscription Status */}
                     <section className="animate-slide-up" style={{ animationDelay: '200ms' }}>
-                        <div className="p-8 bg-zinc-900 rounded-[2rem] text-white shadow-2xl shadow-emerald-950/20 border border-white/5 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-emerald-500/20 transition-all duration-700" />
+                        <div className="p-8 bg-zinc-900 rounded-[2rem] text-white shadow-2xl shadow-indigo-950/20 border border-white/5 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/20 transition-all duration-700" />
 
                             <div className="relative z-10 space-y-8">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-emerald-400 flex items-center gap-2">
+                                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-primary flex items-center gap-2">
                                         <CreditCard size={14} /> Subscription Engine
                                     </h3>
                                     <div className="px-3 py-1 bg-white/10 rounded-lg text-[10px] font-bold uppercase tracking-widest">
@@ -179,12 +179,12 @@ export default function Settings() {
 
                                 <div className="space-y-1">
                                     <p className="text-zinc-400 text-sm font-medium">Active Deployment</p>
-                                    <p className="text-4xl font-black racking-tighter tracking-tight">{tierInfo.name}</p>
+                                    <p className="text-4xl font-black tracking-tighter tracking-tight">{tierInfo.name}</p>
                                 </div>
 
                                 {quotaInfo.tier === 'free' ? (
                                     <Link href="/?ref=upgrade#pricing">
-                                        <Button className="w-full h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-emerald-500/30 group/btn transition-all active:scale-95">
+                                        <Button className="w-full h-14 bg-primary hover:bg-primary-dark text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/30 group/btn transition-all active:scale-95">
                                             Upgrade Account <ArrowUpRight className="ml-2 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
                                         </Button>
                                     </Link>
@@ -219,14 +219,14 @@ export default function Settings() {
                                         className="flex items-center justify-between p-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900/50 text-zinc-600 dark:text-zinc-400 text-sm font-bold transition-all group"
                                     >
                                         {link.label}
-                                        <ChevronRight size={14} className="text-zinc-300 group-hover:text-emerald-500 transition-colors" />
+                                        <ChevronRight size={14} className="text-zinc-300 group-hover:text-primary transition-colors" />
                                     </Link>
                                 ))}
                             </nav>
                         </div>
 
                         <div className="p-8 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-700 rounded-[2rem] flex flex-col justify-center items-center text-center space-y-4">
-                            <div className="w-12 h-12 bg-emerald-500/10 text-emerald-500 rounded-2xl flex items-center justify-center">
+                            <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
                                 <Sparkles size={24} />
                             </div>
                             <p className="text-xs font-black uppercase tracking-widest text-zinc-400">TradingView v6 Ready</p>
@@ -245,7 +245,7 @@ export default function Settings() {
                     <BarChart3 size={20} />
                 </Link>
                 <div className="w-px h-4 bg-white/10" />
-                <Link href="/settings" className="text-emerald-500 font-bold flex items-center gap-2">
+                <Link href="/settings" className="text-primary font-bold flex items-center gap-2">
                     <SettingsIcon size={20} />
                     <span className="text-[10px] uppercase font-black tracking-widest">Account</span>
                 </Link>

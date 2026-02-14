@@ -19,7 +19,7 @@ export default function Terms() {
             <main className="flex flex-col items-center py-20 px-6">
                 <div className="w-full max-w-[768px] space-y-12 animate-fade-in">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-emerald-500/10 text-emerald-500 rounded-2xl flex items-center justify-center">
+                        <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
                             <FileText size={24} />
                         </div>
                         <div>
@@ -61,7 +61,7 @@ export default function Terms() {
 
                         <div className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-800">
                             <p className="text-sm text-zinc-400 font-bold uppercase tracking-widest">
-                                Legal Inquiries? Contact <Link href="mailto:legal@pinegen.ai" className="text-emerald-500 hover:underline">legal@pinegen.ai</Link>
+                                Legal Inquiries? Contact <Link href="mailto:legal@pinegen.ai" className="text-primary hover:underline">legal@pinegen.ai</Link>
                             </p>
                         </div>
                     </div>

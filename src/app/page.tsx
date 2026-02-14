@@ -64,8 +64,8 @@ function LandingContent() {
                     window.LemonSqueezy.Setup({
                         eventHandler: (event) => {
                             if (event.event === 'Checkout.Success') {
-                                console.log('Successfully upgraded!');
-                                window.location.reload();
+                                // Instead of a hard reload, we can just push back to dash
+                                router.push('/dashboard');
                             }
                         }
                     });
@@ -78,27 +78,33 @@ function LandingContent() {
     }, [router, supabase, searchParams]);
 
     const handleCheckout = (url: string) => {
-        if (window.LemonSqueezy) {
-            window.LemonSqueezy.Url.Open(url);
+        // Double check for LemonSqueezy availability
+        if (typeof window !== 'undefined' && window.LemonSqueezy && window.LemonSqueezy.Url) {
+            try {
+                window.LemonSqueezy.Url.Open(url);
+            } catch (err) {
+                console.error("LS Overlay failed, falling back to new tab", err);
+                window.open(url, '_blank');
+            }
         } else {
             window.open(url, '_blank');
         }
     };
 
     return (
-        <div className="min-h-screen bg-white dark:bg-page-dark text-zinc-900 dark:text-white font-sans selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-300">
+        <div className="min-h-screen bg-white dark:bg-page-dark text-zinc-900 dark:text-white font-sans selection:bg-indigo-100 selection:text-indigo-900 transition-colors duration-300">
 
             {/* Header */}
             <header className="h-12 sticky top-0 z-50 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-page-dark/80 backdrop-blur-md flex items-center justify-center px-4">
                 <nav className="w-full max-w-[768px] flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-emerald-500 rounded-lg flex items-center justify-center">
+                        <div className="w-6 h-6 bg-primary rounded-lg flex items-center justify-center">
                             <TerminalIcon size={12} className="text-white fill-white" />
                         </div>
-                        <h1 className="text-sm font-bold tracking-tight">PineScript AI <span className="text-emerald-500 font-extrabold">v6</span></h1>
+                        <h1 className="text-sm font-bold tracking-tight">PineScript AI <span className="text-primary font-extrabold">v6</span></h1>
                     </div>
                     <div className="flex items-center gap-4">
-                        <Link href="/login" className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-emerald-500 transition-colors">Client Node</Link>
+                        <Link href="/login" className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-primary transition-colors">Client Node</Link>
                         {isLoggedIn ? (
                             <Link href="/dashboard">
                                 <Button size="sm" className="h-8 rounded-lg text-[10px] uppercase font-black tracking-widest px-4">Dashboard</Button>
@@ -119,9 +125,9 @@ function LandingContent() {
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-full text-[10px] font-black uppercase tracking-widest"
+                            className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 text-primary rounded-full text-[10px] font-black uppercase tracking-widest"
                         >
-                            <Sparkles size={12} className="fill-emerald-500" /> New v6 Logic Engine
+                            <Sparkles size={12} className="fill-primary" /> New v6 Logic Engine
                         </motion.div>
                         <motion.h2
                             initial={{ opacity: 0, y: 20 }}
@@ -130,7 +136,7 @@ function LandingContent() {
                             className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.9]"
                         >
                             Institutional <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-emerald-400">Pine Script Lab.</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">Pine Script Lab.</span>
                         </motion.h2>
                         <motion.p
                             initial={{ opacity: 0, y: 20 }}
@@ -144,7 +150,7 @@ function LandingContent() {
 
                     <div className="flex flex-col md:flex-row items-center justify-center gap-4 pt-4">
                         <Link href="/signup" className="w-full md:w-auto">
-                            <Button className="w-full h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest px-10 shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
+                            <Button className="w-full h-14 bg-primary hover:bg-primary-dark text-white rounded-2xl font-black text-xs uppercase tracking-widest px-10 shadow-xl shadow-primary/20 transition-all active:scale-95">
                                 Start Free Session
                             </Button>
                         </Link>
@@ -165,8 +171,8 @@ function LandingContent() {
                             { title: "Risk Engine", desc: "Automated inclusion of TP/SL, trailing stops, and volume-based position sizing.", icon: <ShieldCheck size={20} /> },
                             { title: "Logic Verification", desc: "Real-time checking for look-ahead bias and non-repainting assurance.", icon: <Target size={20} /> }
                         ].map((f, i) => (
-                            <div key={i} className="p-8 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-3xl space-y-4 group hover:border-emerald-500/30 transition-all">
-                                <div className="w-10 h-10 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/10 group-hover:scale-110 transition-transform">{f.icon}</div>
+                            <div key={i} className="p-8 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-3xl space-y-4 group hover:border-primary/30 transition-all shadow-sm">
+                                <div className="w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg shadow-primary/10 group-hover:scale-110 transition-transform">{f.icon}</div>
                                 <h3 className="text-lg font-black tracking-tight leading-none pt-2">{f.title}</h3>
                                 <p className="text-xs text-zinc-500 dark:text-zinc-500 leading-relaxed font-bold uppercase tracking-widest">{f.desc}</p>
                             </div>
@@ -189,14 +195,14 @@ function LandingContent() {
                             ] as { name: string, price: string, features: string[], href: string, highlight?: boolean }[]).map((p, i) => (
                                 <div key={i} className={cn(
                                     "relative p-1.5 rounded-[2.5rem] transition-all duration-500 hover:scale-[1.02]",
-                                    p.highlight ? "bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-[0_0_40px_-10px_rgba(16,185,129,0.3)]" : "bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700"
+                                    p.highlight ? "bg-gradient-to-br from-primary to-blue-600 shadow-[0_0_40px_-10px_rgba(79,70,229,0.3)]" : "bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700"
                                 )}>
                                     {p.highlight && (
-                                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-emerald-500 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg z-20">
+                                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg z-20">
                                             Most Popular
                                         </div>
                                     )}
-                                    <div className="bg-white dark:bg-zinc-900 h-full p-8 rounded-[2rem] flex flex-col items-center text-center space-y-8">
+                                    <div className="bg-white dark:bg-zinc-900 h-full p-8 rounded-[2rem] flex flex-col items-center text-center space-y-8 shadow-inner">
                                         <div className="space-y-1">
                                             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">{p.name}</h3>
                                             <div className="flex items-baseline justify-center gap-1">
@@ -210,7 +216,7 @@ function LandingContent() {
                                         <ul className="space-y-4 flex-1">
                                             {p.features.map((f, fi) => (
                                                 <li key={fi} className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 dark:text-zinc-500 uppercase tracking-widest">
-                                                    <Check size={14} className="text-emerald-500" /> {f}
+                                                    <Check size={14} className="text-primary" /> {f}
                                                 </li>
                                             ))}
                                         </ul>
@@ -220,7 +226,7 @@ function LandingContent() {
                                             className={cn(
                                                 "w-full h-12 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-[0.97] group flex items-center justify-center gap-2",
                                                 p.highlight
-                                                    ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 hover:bg-emerald-600"
+                                                    ? "bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary-dark"
                                                     : "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700"
                                             )}
                                         >
@@ -239,7 +245,7 @@ function LandingContent() {
                 <div className="w-full max-w-[768px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12">
                     <div className="space-y-4">
                         <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-lg flex items-center justify-center">
+                            <div className="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center">
                                 <TerminalIcon size={16} />
                             </div>
                             <h4 className="font-bold tracking-tight">PineScript AI</h4>
@@ -252,17 +258,17 @@ function LandingContent() {
                         <div className="space-y-4">
                             <h5 className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Network</h5>
                             <nav className="flex flex-col gap-3">
-                                <Link href="/login" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-emerald-500 transition-colors">Login</Link>
-                                <Link href="/signup" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-emerald-500 transition-colors">Register</Link>
-                                <Link href="#pricing" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-emerald-500 transition-colors">Pricing</Link>
+                                <Link href="/login" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-primary transition-colors">Login</Link>
+                                <Link href="/signup" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-primary transition-colors">Register</Link>
+                                <Link href="#pricing" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-primary transition-colors">Pricing</Link>
                             </nav>
                         </div>
                         <div className="space-y-4">
                             <h5 className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Terminal</h5>
                             <nav className="flex flex-col gap-3">
-                                <Link href="/privacy" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-emerald-500 transition-colors">Privacy</Link>
-                                <Link href="/terms" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-emerald-500 transition-colors">Terms</Link>
-                                <Link href="mailto:support@pinegen.ai" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-emerald-500 transition-colors">Support</Link>
+                                <Link href="/privacy" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-primary transition-colors">Privacy</Link>
+                                <Link href="/terms" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-primary transition-colors">Terms</Link>
+                                <Link href="mailto:support@pinegen.ai" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-primary transition-colors">Support</Link>
                             </nav>
                         </div>
                     </div>
@@ -277,7 +283,7 @@ function LandingContent() {
 
 export default function Landing() {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center font-black tracking-tighter text-emerald-500 animate-pulse uppercase">Initializing v6 Logic Engine...</div>}>
+        <Suspense fallback={<div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center font-black tracking-tighter text-primary animate-pulse uppercase">Initializing v6 Logic Engine...</div>}>
             <LandingContent />
         </Suspense>
     );

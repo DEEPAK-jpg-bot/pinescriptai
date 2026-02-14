@@ -50,7 +50,7 @@ export default function Login() {
 
                 <div className="flex flex-col items-center gap-6 text-center">
                     <Link href="/" className="group">
-                        <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-xl shadow-emerald-500/20 transform group-hover:scale-110 transition-all duration-300">
+                        <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-xl shadow-primary/20 transform group-hover:scale-110 transition-all duration-300">
                             <Terminal className="text-white" size={24} />
                         </div>
                     </Link>
@@ -70,7 +70,7 @@ export default function Login() {
                                     <Input
                                         type="email"
                                         placeholder="user@domain.com"
-                                        className="pl-12 bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-700 focus:bg-white dark:focus:bg-zinc-900 transition-all"
+                                        className="pl-12 bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-700 focus:bg-white dark:focus:bg-zinc-900 transition-all focus-visible:ring-primary"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
@@ -81,14 +81,14 @@ export default function Login() {
                             <div className="space-y-2">
                                 <div className="flex justify-between items-center ml-1">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Password Key</label>
-                                    <Link href="#" className="text-[10px] font-black uppercase tracking-widest text-emerald-500 hover:text-emerald-600">Reset</Link>
+                                    <Link href="#" className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary-dark">Reset</Link>
                                 </div>
                                 <div className="relative">
                                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
                                     <Input
                                         type="password"
                                         placeholder="••••••••"
-                                        className="pl-12 bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-700 focus:bg-white dark:focus:bg-zinc-900 transition-all"
+                                        className="pl-12 bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-700 focus:bg-white dark:focus:bg-zinc-900 transition-all focus-visible:ring-primary"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
@@ -98,7 +98,7 @@ export default function Login() {
 
                             <Button
                                 type="submit"
-                                className="w-full h-14 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 transition-all active:scale-95 disabled:opacity-70 group"
+                                className="w-full h-14 bg-primary hover:bg-primary-dark text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-95 disabled:opacity-70 group"
                                 disabled={loading}
                             >
                                 {loading ? (
@@ -116,12 +116,12 @@ export default function Login() {
                 <div className="text-center space-y-4">
                     <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
                         Don&apos;t have logic access?{' '}
-                        <Link href="/signup" className="text-emerald-500 font-black hover:underline tracking-tight">
+                        <Link href="/signup" className="text-primary font-black hover:underline tracking-tight">
                             Create Account
                         </Link>
                     </p>
                     <div className="flex items-center justify-center gap-2 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">
-                        <Sparkles size={12} className="text-emerald-500" /> Secure Protocol v6.0
+                        <Sparkles size={12} className="text-primary" /> Secure Protocol v6.0
                     </div>
                 </div>
 

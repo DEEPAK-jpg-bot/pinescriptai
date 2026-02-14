@@ -1,10 +1,13 @@
 @import "tailwindcss";
 
 @theme {
-    --color-primary: #10B981; /* Emerald 500 */
-    --color-primary-dark: #059669; /* Emerald 600 */
-    --color-primary-light: #D1FAE5; /* Emerald 100 */
-    
+    --color-primary: #4f46e5;
+    /* Indigo 600 */
+    --color-primary-dark: #4338ca;
+    /* Indigo 700 */
+    --color-primary-light: #eef2ff;
+    /* Indigo 50 */
+
     --color-zinc-50: #FAFAFA;
     --color-zinc-100: #F4F4F5;
     --color-zinc-200: #E4E4E7;
@@ -22,7 +25,7 @@
 
     --font-sans: "Geist Sans", "Inter", sans-serif;
     --font-mono: "Geist Mono", "Roboto Mono", monospace;
-    
+
     --radius-xl: 12px;
     --radius-2xl: 16px;
 }
@@ -35,8 +38,9 @@
         --card-foreground: 240 10% 3.9%;
         --popover: 0 0% 100%;
         --popover-foreground: 240 10% 3.9%;
-        --primary: 158 79% 42%;
-        --primary-foreground: 355.7 100% 97.3%;
+        --primary: 243.4 75.4% 58.6%;
+        /* Indigo 600 */
+        --primary-foreground: 0 0% 100%;
         --secondary: 240 4.8% 95.9%;
         --secondary-foreground: 240 5.9% 10%;
         --muted: 240 4.8% 95.9%;
@@ -47,18 +51,20 @@
         --destructive-foreground: 0 0% 98%;
         --border: 240 5.9% 90%;
         --input: 240 5.9% 90%;
-        --ring: 158 79% 42%;
+        --ring: 243.4 75.4% 58.6%;
     }
 
     .dark {
-        --background: 0 0% 13%; /* #212121 */
+        --background: 0 0% 13%;
+        /* #212121 */
         --foreground: 0 0% 100%;
-        --card: 240 3.7% 15.9%; /* #27272A */
+        --card: 240 3.7% 15.9%;
+        /* #27272A */
         --card-foreground: 0 0% 100%;
         --popover: 240 3.7% 15.9%;
         --popover-foreground: 0 0% 100%;
-        --primary: 158 64% 52%; /* #34D399 */
-        --primary-foreground: 158 90% 10%;
+        --primary: 243.4 75.4% 58.6%;
+        --primary-foreground: 0 0% 100%;
         --secondary: 240 3.7% 15.9%;
         --secondary-foreground: 0 0% 100%;
         --muted: 240 3.7% 15.9%;
@@ -69,7 +75,7 @@
         --destructive-foreground: 0 0% 100%;
         --border: 240 3.7% 27.5%;
         --input: 240 3.7% 27.5%;
-        --ring: 158 64% 52%;
+        --ring: 243.4 75.4% 58.6%;
     }
 }
 
@@ -81,21 +87,35 @@ body {
 .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
     background: transparent;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
     @apply bg-zinc-200 dark:bg-zinc-700 rounded-full;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes slideUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .animate-fade-in {

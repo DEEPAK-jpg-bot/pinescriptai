@@ -65,7 +65,7 @@ export default function Signup() {
 
                 <div className="flex flex-col items-center gap-6 text-center">
                     <Link href="/" className="group">
-                        <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-xl shadow-emerald-500/20 transform group-hover:scale-110 transition-all duration-300">
+                        <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-xl shadow-primary/20 transform group-hover:scale-110 transition-all duration-300">
                             <Terminal className="text-white" size={24} />
                         </div>
                     </Link>
@@ -77,9 +77,9 @@ export default function Signup() {
 
                 <div className="p-1.5 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-[2.5rem] shadow-sm">
                     <div className="bg-white dark:bg-zinc-800 p-8 rounded-[2rem] border border-zinc-200 dark:border-zinc-700 shadow-xl shadow-zinc-200/50 dark:shadow-none">
-                        <div className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 p-4 rounded-2xl mb-8">
-                            <ShieldCheck className="text-emerald-500 flex-shrink-0" size={18} />
-                            <p className="text-[10px] text-emerald-800 dark:text-emerald-400 font-bold uppercase tracking-widest leading-tight">
+                        <div className="flex items-center gap-3 bg-indigo-50 dark:bg-primary/10 border border-indigo-100 dark:border-primary/20 p-4 rounded-2xl mb-8">
+                            <ShieldCheck className="text-primary flex-shrink-0" size={18} />
+                            <p className="text-[10px] text-primary dark:text-primary font-bold uppercase tracking-widest leading-tight">
                                 Verification Required. Real emails only.
                             </p>
                         </div>
@@ -92,7 +92,7 @@ export default function Signup() {
                                     <Input
                                         type="email"
                                         placeholder="user@domain.com"
-                                        className="pl-12 bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-700 focus:bg-white dark:focus:bg-zinc-900 transition-all"
+                                        className="pl-12 bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-700 focus:bg-white dark:focus:bg-zinc-900 transition-all focus-visible:ring-primary"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
@@ -107,7 +107,7 @@ export default function Signup() {
                                     <Input
                                         type="password"
                                         placeholder="••••••••"
-                                        className="pl-12 bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-700 focus:bg-white dark:focus:bg-zinc-900 transition-all"
+                                        className="pl-12 bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-700 focus:bg-white dark:focus:bg-zinc-900 transition-all focus-visible:ring-primary"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
@@ -117,7 +117,7 @@ export default function Signup() {
 
                             <Button
                                 type="submit"
-                                className="w-full h-14 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 transition-all active:scale-95 disabled:opacity-70 group"
+                                className="w-full h-14 bg-primary hover:bg-primary-dark text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-95 disabled:opacity-70 group"
                                 disabled={loading}
                             >
                                 {loading ? (
@@ -135,12 +135,12 @@ export default function Signup() {
                 <div className="text-center space-y-4">
                     <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
                         Already have an account?{' '}
-                        <Link href="/login" className="text-emerald-500 font-black hover:underline tracking-tight">
+                        <Link href="/login" className="text-primary font-black hover:underline tracking-tight">
                             Log In
                         </Link>
                     </p>
                     <div className="flex items-center justify-center gap-2 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">
-                        <Sparkles size={12} className="text-emerald-500" /> Professional Node v6.0
+                        <Sparkles size={12} className="text-primary" /> Professional Node v6.0
                     </div>
                 </div>
 

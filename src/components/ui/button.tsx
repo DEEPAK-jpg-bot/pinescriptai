@@ -14,11 +14,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         const Comp = asChild ? Slot : "button"
 
         const variants = {
-            default: "bg-emerald-500 text-white hover:bg-emerald-600 shadow-sm",
+            default: "bg-primary text-white hover:bg-primary-dark shadow-sm",
             outline: "border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white",
             ghost: "hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300",
             destructive: "bg-red-500 text-white hover:bg-red-600 shadow-sm",
-            link: "text-emerald-500 underline-offset-4 hover:underline"
+            link: "text-primary underline-offset-4 hover:underline"
         } as const;
 
         const sizes = {
@@ -34,7 +34,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         return (
             <Comp
                 className={cn(
-                    "inline-flex items-center justify-center rounded-xl text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 active:scale-95 disabled:pointer-events-none disabled:opacity-50",
+                    "inline-flex items-center justify-center rounded-xl text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary active:scale-95 disabled:pointer-events-none disabled:opacity-50",
                     variantClass,
                     sizeClass,
                     className

@@ -61,7 +61,7 @@ export default function Dashboard() {
                                     language={match ? match[1] : 'pinescript'}
                                 />
                             ) : (
-                                <code className="bg-zinc-100 dark:bg-zinc-800 text-emerald-500 px-1.5 py-0.5 rounded text-sm font-semibold" {...props}>
+                                <code className="bg-zinc-100 dark:bg-zinc-800 text-primary px-1.5 py-0.5 rounded text-sm font-semibold" {...props}>
                                     {children}
                                 </code>
                             );
@@ -87,7 +87,7 @@ export default function Dashboard() {
                 <div className="w-full max-w-[768px] px-6 space-y-10">
                     {messages.length === 0 ? (
                         <div className="h-[calc(100vh-250px)] flex flex-col items-center justify-center text-center space-y-4 animate-fade-in">
-                            <div className="w-16 h-16 bg-emerald-500/10 text-emerald-500 rounded-[2rem] flex items-center justify-center mb-4 pulse-animation">
+                            <div className="w-16 h-16 bg-primary/10 text-primary rounded-[2rem] flex items-center justify-center mb-4 pulse-animation">
                                 <Sparkles size={32} strokeWidth={1.5} />
                             </div>
                             <h2 className="text-3xl font-bold dark:text-white">What are we coding today?</h2>
@@ -104,7 +104,7 @@ export default function Dashboard() {
                                     <button
                                         key={i}
                                         onClick={() => setInput(s)}
-                                        className="p-4 bg-white dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-2xl text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:border-emerald-500 hover:text-emerald-500 transition-all text-left"
+                                        className="p-4 bg-white dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-2xl text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:border-primary hover:text-primary transition-all text-left"
                                     >
                                         {s}
                                     </button>
@@ -126,7 +126,7 @@ export default function Dashboard() {
                                     "w-9 h-9 flex-shrink-0 rounded-xl flex items-center justify-center font-bold text-xs select-none",
                                     message.role === 'user'
                                         ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-500"
-                                        : "bg-emerald-500 text-white shadow-lg shadow-emerald-500/10"
+                                        : "bg-primary text-white shadow-lg shadow-primary/10"
                                 )}>
                                     {message.role === 'user' ? 'U' : 'AI'}
                                 </div>
@@ -142,7 +142,7 @@ export default function Dashboard() {
 
                     {isGenerating && (
                         <div className="flex gap-6 animate-pulse">
-                            <div className="w-9 h-9 bg-emerald-500/30 rounded-xl flex items-center justify-center text-white font-bold opacity-50">AI</div>
+                            <div className="w-9 h-9 bg-primary/30 rounded-xl flex items-center justify-center text-white font-bold opacity-50">AI</div>
                             <div className="space-y-2 pt-3 flex-1">
                                 <div className="h-3 bg-zinc-100 dark:bg-zinc-800 rounded-full w-[80%]" />
                                 <div className="h-3 bg-zinc-100 dark:bg-zinc-800 rounded-full w-[40%]" />
@@ -162,7 +162,7 @@ export default function Dashboard() {
             {/* INPUT BAR (Sticky Bottom) */}
             <div className="absolute bottom-0 w-full flex justify-center p-6 bg-gradient-to-t from-white dark:from-page-dark via-white dark:via-page-dark to-transparent pt-12 pointer-events-none">
                 <div className="w-full max-w-[768px] relative pointer-events-auto">
-                    <div className="relative bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl shadow-xl transition-all focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500/20">
+                    <div className="relative bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl shadow-xl transition-all focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20">
                         <textarea
                             ref={inputRef}
                             value={input}
@@ -174,7 +174,7 @@ export default function Dashboard() {
                         />
                         <div className="flex items-center justify-between px-4 pb-3">
                             <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
-                                <Sparkles size={12} className="text-emerald-500" /> v6 Logic Engine
+                                <Sparkles size={12} className="text-primary" /> v6 Logic Engine
                             </div>
                             <button
                                 onClick={handleSendMessage}
@@ -182,7 +182,7 @@ export default function Dashboard() {
                                 className={cn(
                                     "p-2 rounded-xl transition-all",
                                     input.trim()
-                                        ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 hover:scale-[1.05]"
+                                        ? "bg-primary text-white shadow-lg shadow-primary/20 hover:scale-[1.05]"
                                         : "text-zinc-400 bg-zinc-200 dark:bg-zinc-700 cursor-not-allowed"
                                 )}
                             >

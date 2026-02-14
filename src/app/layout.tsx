@@ -7,7 +7,7 @@ import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 
 export const viewport: Viewport = {
-    themeColor: "#4f46e5",
+    themeColor: "#4f46e5", // Updated to Indigo 600
     width: "device-width",
     initialScale: 1,
 };
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
         siteName: 'PineGen',
         images: [
             {
-                url: '/og-image.png', // We should generate this or provide a path
+                url: '/og-image.png',
                 width: 1200,
                 height: 630,
                 alt: 'PineGen Dashboard Preview',
@@ -78,7 +78,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
-            <body className={`${GeistSans.className} antialiased selection:bg-emerald-100 selection:text-emerald-900`}>
+            <body className={`${GeistSans.className} antialiased selection:bg-indigo-100 selection:text-indigo-900`}>
                 <AuthSync />
                 {children}
                 <Toaster position="top-right" expand={false} richColors />

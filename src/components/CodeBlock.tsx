@@ -45,16 +45,16 @@ const customTheme = {
         margin: '0',
         overflow: 'auto',
     },
-    'keyword': { color: '#10B981', fontWeight: '600' },
-    'string': { color: '#059669' },
+    'keyword': { color: '#4f46e5', fontWeight: '600' }, // Indigo 600
+    'string': { color: '#0891b2' }, // Cyan 600 for contrast
     'comment': { color: '#71717A', fontStyle: 'italic' },
-    'function': { color: '#10B981' },
-    'boolean': { color: '#10B981' },
-    'number': { color: '#10B981' },
+    'function': { color: '#2563eb' }, // Blue 600
+    'boolean': { color: '#4f46e5' },
+    'number': { color: '#4f46e5' },
     'operator': { color: 'inherit' },
     'punctuation': { color: 'inherit' },
-    'class-name': { color: '#10B981' },
-    'constant': { color: '#10B981' },
+    'class-name': { color: '#4f46e5' },
+    'constant': { color: '#4f46e5' },
 };
 
 interface CodeBlockProps {
@@ -77,14 +77,14 @@ export default function CodeBlock({ code, language = 'pinescript' }: CodeBlockPr
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-2 border-b border-zinc-200 dark:border-zinc-700 bg-zinc-100/50 dark:bg-zinc-800/80">
                 <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <div className="w-2 h-2 rounded-full bg-primary" />
                     <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{language}</span>
                 </div>
                 <button
                     onClick={handleCopy}
-                    className="flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 hover:text-emerald-500 transition-all text-[10px] font-bold uppercase tracking-widest"
+                    className="flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 hover:text-primary transition-all text-[10px] font-bold uppercase tracking-widest"
                 >
-                    {copied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
+                    {copied ? <Check size={12} className="text-primary" /> : <Copy size={12} />}
                     {copied ? 'Copied' : 'Copy'}
                 </button>
             </div>
