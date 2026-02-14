@@ -22,7 +22,7 @@ Go to: `Vercel Dashboard` > `pinescript-ai` > `Settings` > `Environment Variable
 | `LEMONSQUEEZY_STORE_ID` | `280595` | Your Lemon Squeezy Store ID |
 | `LEMONSQUEEZY_WEBHOOK_SECRET` | `pinegen_secure_2026` | webhook validation secret |
 | `GEMINI_API_KEY` | `AIzaSy...` | AI Generation Logic Key |
-| `NEXT_PUBLIC_APP_URL` | `https://your-domain.vercel.app` | Production App URL |
+|| `NEXT_PUBLIC_APP_URL` | `https://pinescript.vercel.app` | Production App URL |
 
 ### 2. Configure Lemon Squeezy Webhooks
 1. Go to `Lemon Squeezy Dashboard` > `Settings` > `Webhooks`.
