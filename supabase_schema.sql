@@ -29,12 +29,14 @@ create table public.user_profiles (
 -- 4. CONVERSATIONS
 create table public.conversations (
   id uuid primary key default gen_random_uuid(),
-  user_id uuid references auth.users on delete cascade not null,
+  user_id uuid references public.user_profiles(id) on delete cascade not null,
   title text not null,
   total_tokens bigint default 0,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
+
+create index idx_conversations_user_id on public.conversations(user_id);
 
 -- 5. MESSAGES
 create table public.messages (
@@ -46,10 +48,12 @@ create table public.messages (
   created_at timestamptz default now()
 );
 
+create index idx_messages_conversation_id on public.messages(conversation_id);
+
 -- 6. SUBSCRIPTIONS
 create table public.subscriptions (
   id text primary key,
-  user_id uuid references auth.users on delete cascade not null,
+  user_id uuid references public.user_profiles(id) on delete cascade not null,
   status text not null,
   plan_id text,
   current_period_end timestamptz,
@@ -57,6 +61,8 @@ create table public.subscriptions (
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
+
+create index idx_subscriptions_user_id on public.subscriptions(user_id);
 
 -- 7. WEBHOOK EVENTS
 create table public.webhook_events (
@@ -89,7 +95,7 @@ create or replace function public.handle_new_user()
 returns trigger as $$
 begin
   insert into public.user_profiles (id, email, tier, tokens_monthly_limit, tokens_remaining)
-  values (new.id, new.email, 'free', 1500, 1500);
+  values (new.id, new.email, 'free', 10, 10);
   return new;
 end;
 $$ language plpgsql security definer;
