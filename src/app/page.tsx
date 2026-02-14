@@ -127,10 +127,62 @@ function LandingContent() {
     };
 
     const pricingPlans = [
-        { name: "Lab", price: "$0", features: ["10 Monthly Cycles", "Standard v6 Runtime", "7-Day Metadata Retention"], href: "/signup" },
-        { name: "Pro", price: "$19", features: ["200 Extended Cycles", "v6 Multi-Logic Aggregator", "Institutional Risk Logic", "Low-Latency Generation"], highlight: true, variantId: "1307516", href: "https://daredevil.lemonsqueezy.com/checkout/buy/1307516" },
-        { name: "Trader", price: "$50", features: ["600 High-Compute Cycles", "Logic Drift Verification", "Advanced ATR Risk Matrix", "Liquidity Gap Detection"], variantId: "1307522", href: "https://daredevil.lemonsqueezy.com/checkout/buy/1307522" },
-        { name: "Pro Trader", price: "$100", features: ["1500 Ultra-Bandwidth", "Infinite Data Persistence", "Alpha Neural Architecture", "Priority v7 Pre-computation"], variantId: "1307525", href: "https://daredevil.lemonsqueezy.com/checkout/buy/1307525" }
+        {
+            name: "Lab",
+            price: "$0",
+            features: [
+                "10 Monthly Cycles",
+                "8K Context Window",
+                "7-Day History",
+                "Standard Queue",
+                "Community Support",
+                "Single-Logic Engine"
+            ],
+            href: "/signup"
+        },
+        {
+            name: "Pro",
+            price: "$19",
+            features: [
+                "200 Extended Cycles",
+                "32K Context Window",
+                "30-Day History",
+                "Priority Compute",
+                "Email Support (24h)",
+                "Multi-Logic Aggregator"
+            ],
+            highlight: true,
+            variantId: "1307516",
+            href: "https://daredevil.lemonsqueezy.com/checkout/buy/1307516"
+        },
+        {
+            name: "Trader",
+            price: "$50",
+            features: [
+                "600 High-Compute Cycles",
+                "128K Context Window",
+                "90-Day History",
+                "Institutional Node",
+                "Priority Technical Support",
+                "Risk Matrix Engine"
+            ],
+            variantId: "1307522",
+            href: "https://daredevil.lemonsqueezy.com/checkout/buy/1307522"
+        },
+        {
+            name: "Pro Trader",
+            price: "$100",
+            features: [
+                "1500 Ultra-Bandwidth",
+                "1M+ Alpha Window",
+                "Infinite Persistence",
+                "Ultra-Low Latency",
+                "24/7 Dedicated Support",
+                "Neural v6 Logic"
+            ],
+            variantId: "1307525",
+            href: "https://daredevil.lemonsqueezy.com/checkout/buy/1307525"
+        }
     ];
 
     return (
