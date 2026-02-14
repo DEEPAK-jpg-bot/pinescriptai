@@ -2,56 +2,53 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useChatStore } from '@/store/useChatStore';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
-    Loader2, Send, AlertTriangle,
-    MessageSquare, Sparkles, Zap,
-    ShieldCheck, CornerDownLeft
+    Send,
+    Sparkles,
+    AlertTriangle
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
-import { CodeBlock } from '@/components/CodeBlock';
-import { motion, AnimatePresence } from 'framer-motion';
+import CodeBlock from '@/components/CodeBlock';
+import { cn } from '@/lib/utils';
 
 export default function Dashboard() {
     const {
-        user,
         messages,
+        sendMessage,
         isGenerating,
         currentError,
         quotaInfo,
-        fetchConversations,
-        sendMessage,
-        checkRateLimit,
+        createConversation
     } = useChatStore();
 
     const [input, setInput] = useState('');
     const scrollRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        if (user) {
-            fetchConversations();
-            checkRateLimit();
-        }
-    }, [user, fetchConversations, checkRateLimit]);
+    const inputRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
-    }, [messages, isGenerating]);
+    }, [messages]);
 
-    const handleSend = async () => {
+    const handleSendMessage = async () => {
         if (!input.trim() || isGenerating) return;
-        const msg = input;
+        const content = input.trim();
         setInput('');
-        await sendMessage(msg);
+        await sendMessage(content);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSendMessage();
+        }
     };
 
     const formatMessage = (content: string) => {
         return (
-            <div className="prose prose-slate max-w-none prose-p:text-slate-700 prose-p:leading-relaxed prose-pre:bg-transparent prose-pre:p-0">
+            <div className="prose prose-zinc dark:prose-invert max-w-none prose-p:text-zinc-700 dark:prose-p:text-zinc-300 prose-p:leading-relaxed prose-pre:bg-transparent prose-pre:p-0">
                 <ReactMarkdown
                     components={{
                         code({ node, inline, className, children, ...props }: any) {
@@ -64,13 +61,13 @@ export default function Dashboard() {
                                     language={match ? match[1] : 'pinescript'}
                                 />
                             ) : (
-                                <code className="bg-slate-100 text-indigo-600 px-1.5 py-0.5 rounded text-sm font-semibold" {...props}>
+                                <code className="bg-zinc-100 dark:bg-zinc-800 text-emerald-500 px-1.5 py-0.5 rounded text-sm font-semibold" {...props}>
                                     {children}
                                 </code>
                             );
                         },
                         p({ children }) {
-                            return <p className="mb-4 last:mb-0 text-slate-700 leading-relaxed font-medium">{children}</p>;
+                            return <p className="mb-4 last:mb-0 text-zinc-700 dark:text-zinc-300 leading-relaxed font-normal">{children}</p>;
                         }
                     }}
                 >
@@ -80,181 +77,120 @@ export default function Dashboard() {
         );
     };
 
-    const getTierDisplay = () => {
-        const tier = quotaInfo.tier?.toLowerCase() || 'free';
-        if (tier === 'pro_trader') return { name: 'Pro Trader', icon: <ShieldCheck size={12} />, bg: 'bg-violet-600' };
-        if (tier === 'trader') return { name: 'Trader', icon: <Zap size={12} />, bg: 'bg-indigo-600' };
-        if (tier === 'pro') return { name: 'Pro', icon: <Sparkles size={12} />, bg: 'bg-emerald-600' };
-        return { name: 'Free', icon: null, bg: 'bg-slate-400' };
-    };
-
-    const tier = getTierDisplay();
-
     return (
-        <div className="flex flex-col h-full w-full bg-[#FBFBFE]">
-            {/* Header / Brand Bar */}
-            <div className="flex-shrink-0 px-8 py-4 bg-white/80 backdrop-blur-md border-b border-slate-200/60 flex justify-between items-center sticky top-0 z-20 shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
-                <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
-                        <MessageSquare size={20} strokeWidth={2.5} />
-                    </div>
-                    <div>
-                        <h1 className="text-lg font-black text-slate-900 leading-tight tracking-tight">Strategy Lab</h1>
-                        <div className="flex items-center gap-2">
-                            <div className={`flex items-center gap-1 px-1.5 py-0.5 ${tier.bg} text-white text-[9px] font-black uppercase tracking-widest rounded`}>
-                                {tier.icon} {tier.name}
+        <div className="flex flex-col h-full bg-transparent">
+            {/* CHAT AREA (Scrollable) */}
+            <div
+                className="flex-1 overflow-y-auto custom-scrollbar flex justify-center py-6 pb-40"
+                ref={scrollRef}
+            >
+                <div className="w-full max-w-[768px] px-6 space-y-10">
+                    {messages.length === 0 ? (
+                        <div className="h-[calc(100vh-250px)] flex flex-col items-center justify-center text-center space-y-4 animate-fade-in">
+                            <div className="w-16 h-16 bg-emerald-500/10 text-emerald-500 rounded-[2rem] flex items-center justify-center mb-4 pulse-animation">
+                                <Sparkles size={32} strokeWidth={1.5} />
                             </div>
-                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{quotaInfo.remaining} / {quotaInfo.limit} credits</span>
+                            <h2 className="text-3xl font-bold dark:text-white">What are we coding today?</h2>
+                            <p className="text-zinc-500 max-w-md mx-auto">
+                                Generate high-accuracy Pine Script v6 indicators and strategies with institutional logic.
+                            </p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-xl pt-8">
+                                {[
+                                    "Create a v6 RSI mean reversion strategy",
+                                    "Add take profit and stop loss to this code...",
+                                    "Convert this v5 indicator to v6",
+                                    "Explain how this session logic works"
+                                ].map((s, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => setInput(s)}
+                                        className="p-4 bg-white dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-2xl text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:border-emerald-500 hover:text-emerald-500 transition-all text-left"
+                                    >
+                                        {s}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                </div>
-
-                {quotaInfo.isExceeded && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 rounded-2xl text-[11px] font-black uppercase tracking-widest border border-amber-200 shadow-sm"
-                    >
-                        <AlertTriangle size={14} className="animate-pulse" />
-                        Daily Quota Reached
-                    </motion.div>
-                )}
-            </div>
-
-            {/* Error Banner */}
-            {currentError && (
-                <div className="bg-red-50 text-red-700 px-6 py-3 text-xs font-bold border-b border-red-200 flex justify-between items-center animate-shake">
-                    <div className="flex items-center gap-2">
-                        <AlertTriangle size={14} />
-                        <span>{currentError}</span>
-                    </div>
-                    <button onClick={() => window.location.reload()} className="underline hover:text-red-900 transition-colors">Emergency Reload</button>
-                </div>
-            )}
-
-            {/* Chat Area */}
-            <div className="flex-1 overflow-y-auto px-4 md:px-8 py-10 space-y-10 custom-scrollbar" ref={scrollRef}>
-                {messages.length === 0 ? (
-                    <div className="h-full flex flex-col items-center justify-center text-center opacity-80 select-none">
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            className="w-24 h-24 bg-gradient-to-br from-indigo-50 to-white rounded-[2rem] border border-indigo-100 flex items-center justify-center mb-8 shadow-sm"
-                        >
-                            <Sparkles className="text-indigo-600" size={40} strokeWidth={1.5} />
-                        </motion.div>
-                        <h3 className="text-2xl font-black text-slate-900 tracking-tight">Deploy Your Alpha</h3>
-                        <p className="text-slate-500 max-w-sm mt-3 font-medium leading-relaxed">
-                            Describe any indicator or strategy concept below. <br />
-                            I will generate institutional-grade PineScript v6 code.
-                        </p>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-12 max-w-2xl mx-auto">
-                            {[
-                                "EMA crossover with volatility filter",
-                                "Volume Profile POC strategy",
-                                "Smart Money Concepts detector",
-                                "RSI divergence with trailing stop"
-                            ].map((suggestion, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => setInput(suggestion)}
-                                    className="px-4 py-3 rounded-2xl border border-slate-200 bg-white text-xs font-bold text-slate-600 hover:border-indigo-400 hover:text-indigo-600 transition-all text-left shadow-sm hover:translate-y-[-2px]"
-                                >
-                                    &ldquo;{suggestion}&rdquo;
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                ) : (
-                    <div className="max-w-4xl mx-auto space-y-8 pb-10">
-                        {messages.map((m) => (
+                    ) : (
+                        messages.map((message, index) => (
                             <motion.div
-                                initial={{ opacity: 0, y: 20 }}
+                                key={index}
+                                initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                key={m.id}
-                                className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                                className={cn(
+                                    "flex gap-6",
+                                    message.role === 'user' ? "flex-row-reverse" : "flex-row"
+                                )}
                             >
-                                <div className={`max-w-[85%] lg:max-w-full rounded-[1.5rem] p-6 shadow-sm ${m.role === 'user'
-                                    ? 'bg-[#1E293B] text-white rounded-tr-none border border-slate-700'
-                                    : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none ring-1 ring-black/5'
-                                    }`}>
-                                    <div className={m.role === 'user' ? 'text-white' : 'text-slate-800'}>
-                                        {m.role === 'user' ? (
-                                            <p className="font-bold text-lg leading-snug">{m.content}</p>
-                                        ) : (
-                                            formatMessage(m.content)
-                                        )}
-                                    </div>
+                                <div className={cn(
+                                    "w-9 h-9 flex-shrink-0 rounded-xl flex items-center justify-center font-bold text-xs select-none",
+                                    message.role === 'user'
+                                        ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-500"
+                                        : "bg-emerald-500 text-white shadow-lg shadow-emerald-500/10"
+                                )}>
+                                    {message.role === 'user' ? 'U' : 'AI'}
+                                </div>
+                                <div className={cn(
+                                    "flex-1 min-w-0 pt-1.5",
+                                    message.role === 'user' ? "text-right" : "text-left"
+                                )}>
+                                    {formatMessage(message.content)}
                                 </div>
                             </motion.div>
-                        ))}
+                        ))
+                    )}
 
-                        {isGenerating && (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="flex justify-start"
-                            >
-                                <div className="bg-white border border-slate-200 px-6 py-4 rounded-[1.5rem] rounded-tl-none shadow-sm shadow-indigo-100 flex items-center gap-4 border-l-4 border-l-indigo-600 ring-1 ring-black/5">
-                                    <div className="flex gap-1">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-bounce [animation-delay:-0.3s]" />
-                                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-bounce [animation-delay:-0.15s]" />
-                                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-bounce" />
-                                    </div>
-                                    <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Architecting Pine Logic...</span>
-                                </div>
-                            </motion.div>
-                        )}
-                    </div>
-                )}
+                    {isGenerating && (
+                        <div className="flex gap-6 animate-pulse">
+                            <div className="w-9 h-9 bg-emerald-500/30 rounded-xl flex items-center justify-center text-white font-bold opacity-50">AI</div>
+                            <div className="space-y-2 pt-3 flex-1">
+                                <div className="h-3 bg-zinc-100 dark:bg-zinc-800 rounded-full w-[80%]" />
+                                <div className="h-3 bg-zinc-100 dark:bg-zinc-800 rounded-full w-[40%]" />
+                            </div>
+                        </div>
+                    )}
+
+                    {currentError && (
+                        <div className="bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 p-4 rounded-2xl text-xs font-bold border border-red-200 dark:border-red-500/20 flex items-center gap-3">
+                            <AlertTriangle size={16} />
+                            {currentError}
+                        </div>
+                    )}
+                </div>
             </div>
 
-            {/* Input Area */}
-            <div className="flex-shrink-0 p-6 bg-white border-t border-slate-200/60 sticky bottom-0 z-20">
-                <div className="max-w-4xl mx-auto relative group">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-violet-500 rounded-2xl blur opacity-10 group-focus-within:opacity-20 transition-opacity" />
-                    <div className="relative flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm transition-all focus-within:border-indigo-500/50 focus-within:ring-4 focus-within:ring-indigo-500/5">
+            {/* INPUT BAR (Sticky Bottom) */}
+            <div className="absolute bottom-0 w-full flex justify-center p-6 bg-gradient-to-t from-white dark:from-page-dark via-white dark:via-page-dark to-transparent pt-12 pointer-events-none">
+                <div className="w-full max-w-[768px] relative pointer-events-auto">
+                    <div className="relative bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl shadow-xl transition-all focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500/20">
                         <textarea
+                            ref={inputRef}
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && !e.shiftKey) {
-                                    e.preventDefault();
-                                    handleSend();
-                                }
-                            }}
+                            onKeyDown={handleKeyDown}
+                            placeholder="Type your message..."
+                            className="w-full bg-transparent border-0 ring-0 focus:ring-0 px-4 py-4 text-sm font-medium text-zinc-900 dark:text-white placeholder:text-zinc-500 min-h-[56px] max-h-40 resize-none custom-scrollbar"
                             rows={1}
-                            style={{ height: 'auto', minHeight: '56px' }}
-                            placeholder={quotaInfo.isExceeded ? "You have reached your daily credit limit." : "Enter strategy requirements..."}
-                            disabled={isGenerating || quotaInfo.isExceeded}
-                            className="w-full px-5 py-4 bg-transparent outline-none text-slate-700 font-bold placeholder:text-slate-400 resize-none overflow-hidden"
-                            onInput={(e: any) => {
-                                e.target.style.height = 'auto';
-                                e.target.style.height = e.target.scrollHeight + 'px';
-                            }}
                         />
-                        <div className="flex items-center justify-between px-4 pb-3 border-t border-slate-50">
-                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-2">
-                                <CornerDownLeft size={10} /> Shift+Enter for new line
+                        <div className="flex items-center justify-between px-4 pb-3">
+                            <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                                <Sparkles size={12} className="text-emerald-500" /> v6 Logic Engine
                             </div>
-                            <Button
-                                onClick={handleSend}
-                                disabled={isGenerating || !input.trim() || quotaInfo.isExceeded}
-                                size="sm"
-                                className={`h-8 px-4 font-black uppercase text-[10px] tracking-widest rounded-lg transition-all ${input.trim() && !isGenerating
-                                    ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 hover:scale-105 active:scale-95'
-                                    : 'bg-slate-100 text-slate-400 border-slate-200'
-                                    }`}
+                            <button
+                                onClick={handleSendMessage}
+                                disabled={isGenerating || !input.trim()}
+                                className={cn(
+                                    "p-2 rounded-xl transition-all",
+                                    input.trim()
+                                        ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 hover:scale-[1.05]"
+                                        : "text-zinc-400 bg-zinc-200 dark:bg-zinc-700 cursor-not-allowed"
+                                )}
                             >
-                                {isGenerating ? <Loader2 className="animate-spin" size={12} /> : "Transmit →"}
-                            </Button>
+                                <Send size={18} />
+                            </button>
                         </div>
                     </div>
                 </div>
-                <p className="text-center text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-4 opacity-60">
-                    Proprietary PineGen v6 Logic Enforcement Active
-                </p>
             </div>
         </div>
     );

@@ -5,11 +5,24 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import {
-    Terminal as TerminalIcon, ArrowRight, Check, Zap,
-    ShieldCheck, Sparkles, Globe, Lock
+    Terminal as TerminalIcon,
+    ArrowRight,
+    Check,
+    Zap,
+    ShieldCheck,
+    Sparkles,
+    Globe,
+    Lock,
+    Target,
+    BarChart3,
+    Code2,
+    Settings,
+    Copy,
+    Layout
 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
+import { cn } from '@/lib/utils';
 
 declare global {
     interface Window {
@@ -18,7 +31,7 @@ declare global {
             Url: {
                 Open: (url: string) => void;
             };
-            Setup: (config: { eventHandler: (event: any) => void }) => void;
+            Setup: (options: { eventHandler: (event: any) => void }) => void;
         };
     }
 }
@@ -55,243 +68,183 @@ function LandingContent() {
         }
     };
 
-    const pricingPlans = [
-        {
-            id: 'free',
-            name: "Free Access",
-            price: "$0",
-            period: "/monthly",
-            desc: "For exploring the basics of Pine v6 logic.",
-            features: ["10 generations / mo", "7-day chat history", "Basic strategy templates", "Community Discord"],
-            buttonText: "Current Plan",
-            buttonHref: "/signup",
-            active: true
-        },
-        {
-            id: 'pro',
-            name: "Professional",
-            price: "$19",
-            period: "/monthly",
-            desc: "Everything you need for active strategy building.",
-            features: ["200 generations / mo", "+$0.15/extra generation", "30-day chat history", "Priority cloud queue", "Standard API Access"],
-            buttonText: "Select Pro",
-            buttonHref: "https://daredevil.lemonsqueezy.com/buy/893ad243-718e-4903-8758-15103ec4101e",
-            highlight: false
-        },
-        {
-            id: 'trader',
-            name: "The Trader",
-            price: "$50",
-            period: "/monthly",
-            desc: "Institutional capacity for volume traders.",
-            features: ["600 generations / mo", "+$0.10/extra generation", "90-day history sync", "Custom Logic Guardrails", "1-on-1 Discord Sprints", "Beta Logic Previews"],
-            buttonText: "Upgrade to Trader",
-            buttonHref: "https://daredevil.lemonsqueezy.com/buy/4579d46f-f232-475a-a320-f49553bc9697",
-            highlight: true
-        },
-        {
-            id: 'pro_trader',
-            name: "Pro Trader",
-            price: "$100",
-            period: "/monthly",
-            desc: "The ultimate PineScript engine for firms.",
-            features: ["1,500 generations / mo", "Unlimited history", "Full API logic control", "White-label support", "Direct Developer Link", "Custom Logic models"],
-            buttonText: "Go Pro Trader",
-            buttonHref: "https://daredevil.lemonsqueezy.com/buy/ebf22be5-21d7-463f-91a5-827d00f80695",
-            highlight: false
-        }
-    ];
-
     return (
-        <div className="min-h-screen bg-[#020617] text-white font-sans overflow-x-hidden selection:bg-indigo-500/30">
-            {/* NAVBAR */}
-            <header className="fixed top-0 w-full z-50 border-b border-white/[0.03] bg-[#020617]/80 backdrop-blur-2xl px-6 py-4">
-                <nav className="max-w-7xl mx-auto flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.2)]">
-                            <TerminalIcon size={20} className="text-white" />
+        <div className="min-h-screen bg-white dark:bg-page-dark text-zinc-900 dark:text-white font-sans selection:bg-emerald-100 selection:text-emerald-900">
+            {/* HEADER (Sticky Top, 48px) */}
+            <header className="h-12 sticky top-0 z-50 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-page-dark/80 backdrop-blur-md flex items-center justify-center px-4">
+                <nav className="w-full max-w-[768px] flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 bg-emerald-500 rounded-lg flex items-center justify-center text-white font-black">
+                            <TerminalIcon size={14} />
                         </div>
-                        <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">
-                            PineGen AI
-                        </span>
-                    </div>
-                    <div className="hidden md:flex items-center gap-10">
-                        {["Features", "Templates", "Pricing"].map((item) => (
-                            <Link key={item} href={`#${item.toLowerCase()}`} className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-all">
-                                {item}
-                            </Link>
-                        ))}
+                        <span className="text-sm font-bold tracking-tight">PineScript AI <span className="text-emerald-500">v6</span></span>
                     </div>
                     <div className="flex items-center gap-4">
-                        {isLoggedIn ? (
-                            <Link href="/dashboard">
-                                <Button className="h-10 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-xl px-6 font-black text-[10px] uppercase tracking-widest transition-all">
-                                    Strategy Lab
-                                </Button>
-                            </Link>
-                        ) : (
-                            <>
-                                <Link href="/login" className="text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors">Log In</Link>
-                                <Link href="/signup">
-                                    <Button className="h-10 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl px-6 font-black text-[10px] uppercase tracking-widest shadow-lg shadow-indigo-500/20 transition-all active:scale-95">
-                                        Join Free
-                                    </Button>
-                                </Link>
-                            </>
-                        )}
+                        <Link href="/login" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-emerald-500 transition-colors">Log In</Link>
+                        <Link href="/signup">
+                            <Button className="h-8 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-4 font-bold text-[10px] uppercase tracking-widest transition-all">
+                                Join Free
+                            </Button>
+                        </Link>
                     </div>
                 </nav>
             </header>
 
-            <main>
-                {/* HERO */}
-                <section className="relative pt-40 pb-32 px-6 text-center">
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[800px] -z-10 group">
-                        <div className="absolute top-0 left-1/4 w-[40%] h-[60%] bg-indigo-600/10 blur-[150px] rounded-full animate-pulse" />
-                        <div className="absolute bottom-0 right-1/4 w-[40%] h-[60%] bg-violet-600/10 blur-[150px] rounded-full animate-pulse [animation-delay:1s]" />
-                    </div>
+            <main className="flex flex-col items-center py-20 px-6">
+                <div className="w-full max-w-[768px] space-y-32">
 
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-                        <span className="inline-flex items-center gap-2 px-4 py-1.5 mb-8 text-[10px] font-black tracking-[0.3em] uppercase rounded-full bg-white/[0.03] text-indigo-400 border border-white/[0.08] backdrop-blur-md">
-                            <Sparkles size={12} className="fill-indigo-400" />
-                            v6 Engine Activated
-                        </span>
-                        <h1 className="text-6xl md:text-8xl font-black mb-8 leading-[0.95] tracking-tighter">
-                            Code your vision.<br />
-                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-violet-400 to-indigo-300">
-                                Trade with precision.
-                            </span>
-                        </h1>
-                        <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-12 font-medium leading-relaxed">
-                            Stop debugging. Start backtesting. The world's most advanced AI engine <br className="hidden md:block" />
-                            specifically trained for Pine Script v6 strict logical standards.
-                        </p>
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                            <Link href={isLoggedIn ? "/dashboard" : "/signup"}>
-                                <Button className="h-14 px-10 bg-white text-slate-950 hover:bg-slate-200 rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-white/10 flex items-center gap-3 group transition-all">
-                                    {isLoggedIn ? "Resume Strategy" : "Start Building"} <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                                </Button>
-                            </Link>
-                            <Link href="#pricing">
-                                <Button className="h-14 px-10 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all">
-                                    Compare Tiers
-                                </Button>
-                            </Link>
+                    {/* HERO SECTION */}
+                    <section className="text-center pt-10">
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+                            <div className="inline-flex items-center gap-2 px-3 py-1 mb-8 text-[10px] font-bold tracking-[0.2em] uppercase rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 border border-emerald-100 dark:border-emerald-500/20">
+                                <Sparkles size={12} className="fill-emerald-500" />
+                                Institutional v6 Intelligence
+                            </div>
+                            <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-[0.95] tracking-tighter">
+                                Code your vision.<br />
+                                <span className="text-emerald-500">Trade with precision.</span>
+                            </h1>
+                            <p className="text-lg text-zinc-500 dark:text-zinc-400 mb-12 font-medium leading-relaxed max-w-xl mx-auto">
+                                The world's most advanced AI engine specifically trained for Pine Script v6 professional standards. Non-stop alpha.
+                            </p>
+                            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                                <Link href="/signup" className="w-full sm:w-auto">
+                                    <Button className="w-full h-12 px-8 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 flex items-center gap-2 transition-all">
+                                        Start Building <ArrowRight size={16} />
+                                    </Button>
+                                </Link>
+                                <Link href="/login" className="w-full sm:w-auto">
+                                    <Button variant="outline" className="w-full h-12 px-8 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-2xl font-bold text-xs uppercase tracking-widest text-zinc-900 dark:text-white transition-all">
+                                        View Tutorials
+                                    </Button>
+                                </Link>
+                            </div>
+                        </motion.div>
+                    </section>
+
+                    {/* TRUST INDICATORS (4 boxes) */}
+                    <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {[
+                            { icon: <Target className="text-emerald-500" />, label: "99.9%", sub: "Accuracy" },
+                            { icon: <ShieldCheck className="text-emerald-500" />, label: "Secure", sub: "Logic" },
+                            { icon: <Zap className="text-emerald-500" />, label: "Instant", sub: "v6 Code" },
+                            { icon: <Globe className="text-emerald-500" />, label: "Live", sub: "Markets" }
+                        ].map((t, i) => (
+                            <div key={i} className="p-6 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-2xl text-center space-y-2 group hover:border-emerald-500/50 transition-all">
+                                <div className="mx-auto w-10 h-10 bg-white dark:bg-zinc-900 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">{t.icon}</div>
+                                <div className="text-lg font-bold">{t.label}</div>
+                                <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t.sub}</div>
+                            </div>
+                        ))}
+                    </section>
+
+                    {/* FEATURE CARDS (3 cards) */}
+                    <section className="space-y-6">
+                        <div className="text-center mb-12">
+                            <h2 className="text-3xl font-bold tracking-tight">Powerful Capabilities</h2>
                         </div>
-                    </motion.div>
-                </section>
-
-                {/* PRICING */}
-                <section id="pricing" className="py-32 px-6 bg-[#020617] relative">
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-indigo-950/5 to-transparent pointer-events-none" />
-
-                    <div className="max-w-7xl mx-auto relative z-10">
-                        <div className="text-center mb-24">
-                            <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tighter">Choose Your Power</h2>
-                            <p className="text-slate-500 font-medium max-w-2xl mx-auto">Scalable limits for independent traders and institutional firms.</p>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            {pricingPlans.map((plan, i) => (
-                                <motion.div
-                                    key={i}
-                                    initial={{ opacity: 0, y: 30 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: i * 0.1 }}
-                                    className={`relative flex flex-col p-1 rounded-[2.5rem] ${plan.highlight ? 'bg-gradient-to-b from-indigo-500 to-indigo-600 shadow-[0_0_50px_-10px_rgba(79,70,229,0.3)] scale-[1.02]' : 'bg-white/[0.03] border border-white/[0.08]'}`}
-                                >
-                                    {plan.highlight && (
-                                        <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-white text-indigo-600 text-[10px] font-black uppercase tracking-[0.2em] rounded-full shadow-xl">
-                                            Peak Performance
-                                        </div>
-                                    )}
-
-                                    <div className={`flex flex-col flex-1 p-8 rounded-[2.3rem] ${plan.highlight ? 'bg-slate-900/90 backdrop-blur-3xl' : 'bg-[#020617]'}`}>
-                                        <div className="mb-10">
-                                            <h3 className={`text-xs font-black uppercase tracking-[0.3em] mb-4 ${plan.highlight ? 'text-indigo-400' : 'text-slate-500'}`}>
-                                                {plan.name}
-                                            </h3>
-                                            <div className="flex items-baseline gap-1 mb-2">
-                                                <span className="text-5xl font-black tracking-tighter">{plan.price}</span>
-                                                <span className="text-xs font-bold text-slate-500">{plan.period}</span>
-                                            </div>
-                                            <p className="text-[11px] font-bold text-slate-500 leading-relaxed min-h-[40px] uppercase tracking-wider">{plan.desc}</p>
-                                        </div>
-
-                                        <div className="space-y-4 mb-12 flex-1">
-                                            {plan.features.map((feature, fi) => (
-                                                <div key={fi} className="flex gap-4 items-start group">
-                                                    <div className={`mt-0.5 p-1 rounded-md ${plan.highlight ? 'bg-indigo-500/10 text-indigo-400' : 'bg-white/[0.03] text-slate-600'}`}>
-                                                        <Check size={12} strokeWidth={3} />
-                                                    </div>
-                                                    <span className={`text-[11px] font-black uppercase tracking-widest ${plan.highlight ? 'text-slate-200' : 'text-slate-500'} group-hover:text-white transition-colors`}>
-                                                        {feature}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        </div>
-
-                                        <button
-                                            onClick={() => plan.buttonHref.startsWith('http') ? handleCheckout(plan.buttonHref) : router.push(plan.buttonHref)}
-                                            disabled={plan.active && isLoggedIn}
-                                            className={`w-full h-14 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group ${plan.highlight
-                                                    ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-xl shadow-indigo-600/20'
-                                                    : plan.active && isLoggedIn
-                                                        ? 'bg-white/5 text-slate-600 cursor-not-allowed opacity-50'
-                                                        : 'bg-white text-slate-950 hover:bg-slate-200'
-                                                }`}
-                                        >
-                                            {plan.buttonText}
-                                            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                                        </button>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-
-                        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-10">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {[
-                                { icon: <ShieldCheck className="text-emerald-500" />, label: "Secure Payments", sub: "Via Lemon Squeezy" },
-                                { icon: <Lock className="text-indigo-400" />, label: "Private Logic", sub: "Your alpha is encrypted" },
-                                { icon: <Globe className="text-violet-400" />, label: "Instant Access", sub: "Zero activation delay" }
-                            ].map((item, i) => (
-                                <div key={i} className="flex items-center gap-4 group p-6 rounded-3xl hover:bg-white/[0.02] transition-all border border-transparent hover:border-white/[0.05]">
-                                    <div className="p-3 bg-white/[0.03] rounded-2xl group-hover:scale-110 transition-transform">{item.icon}</div>
-                                    <div>
-                                        <p className="text-xs font-black uppercase tracking-widest">{item.label}</p>
-                                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{item.sub}</p>
-                                    </div>
+                                { title: "Logic Conversion", desc: "Easily migrate from legacy v4/v5 code to the latest v6 specifications instantly.", icon: <Code2 /> },
+                                { title: "Alpha Generation", desc: "Convert backtesting ideas into production-ready strategies with robust risk management.", icon: <BarChart3 /> },
+                                { title: "Institutional Quality", desc: "Compiler-level checks ensure your code follows strict TradingView logical alignment.", icon: <Lock /> }
+                            ].map((f, i) => (
+                                <div key={i} className="p-8 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl space-y-4 hover:-translate-y-1 transition-all shadow-sm">
+                                    <div className="w-12 h-12 bg-emerald-500/10 text-emerald-500 rounded-xl flex items-center justify-center">{f.icon}</div>
+                                    <h3 className="text-xl font-bold">{f.title}</h3>
+                                    <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">{f.desc}</p>
                                 </div>
                             ))}
                         </div>
-                    </div>
-                </section>
+                    </section>
 
-                <footer className="py-20 bg-[#020617] border-t border-white/[0.03] text-center">
-                    <div className="max-w-7xl mx-auto px-6 flex flex-col items-center gap-10">
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-black">P</div>
-                            <span className="font-bold tracking-tight">PineGen AI</span>
+                    {/* TEMPLATES (4 buttons) */}
+                    <section className="space-y-8">
+                        <div className="text-center">
+                            <h2 className="text-3xl font-bold tracking-tight mb-2">Build from Base</h2>
+                            <p className="text-sm text-zinc-500 font-medium">Standard modules to accelerate your development.</p>
                         </div>
-                        <nav className="flex flex-wrap justify-center gap-10 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-                            {["Dashboard", "Pricing", "Terms", "Privacy", "API Docs"].map(link => (
-                                <Link key={link} href="#" className="hover:text-white transition-colors">{link}</Link>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            {[
+                                { label: "Mean Reversion", icon: <Target size={14} /> },
+                                { label: "Trend Following", icon: <Zap size={14} /> },
+                                { label: "News Scraper", icon: <Globe size={14} /> },
+                                { label: "Grid Trader", icon: <Layout size={14} /> }
+                            ].map((t, i) => (
+                                <button key={i} className="p-4 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-2xl flex flex-col items-center gap-3 hover:border-emerald-500 hover:text-emerald-500 transition-all group">
+                                    <div className="w-8 h-8 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        {t.icon}
+                                    </div>
+                                    <span className="text-[10px] font-bold uppercase tracking-widest">{t.label}</span>
+                                </button>
                             ))}
-                        </nav>
-                        <p className="text-slate-700 text-[10px] font-black uppercase tracking-[0.3em]">
-                            © 2026 PineScript AI. Precision Engineering for Market Alpha.
-                        </p>
-                    </div>
-                </footer>
+                        </div>
+                    </section>
+
+                    {/* PRICING (4 tiers) */}
+                    <section id="pricing" className="space-y-12 pb-20">
+                        <div className="text-center">
+                            <h2 className="text-4xl font-bold tracking-tight mb-4">Scalable Tiers</h2>
+                            <p className="text-zinc-500 font-medium">From independent traders to institutional firms.</p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {([
+                                { name: "Free", price: "$0", features: ["10 gens / mo", "7-day history"], href: "/signup" },
+                                { name: "Pro", price: "$19", features: ["200 gens / mo", "30-day history"], highlight: true, href: "https://daredevil.lemonsqueezy.com/buy/893ad243-718e-4903-8758-15103ec4101e" },
+                                { name: "Trader", price: "$50", features: ["600 gens / mo", "90-day history"], href: "https://daredevil.lemonsqueezy.com/buy/4579d46f-f232-475a-a320-f49553bc9697" },
+                                { name: "Pro Trader", price: "$100", features: ["Unlimited gens", "Infinite history"], href: "https://daredevil.lemonsqueezy.com/buy/ebf22be5-21d7-463f-91a5-827d00f80695" }
+                            ] as { name: string, price: string, features: string[], href: string, highlight?: boolean }[]).map((p, i) => (
+                                <div key={i} className={cn(
+                                    "p-8 bg-white dark:bg-zinc-800 border-2 rounded-2xl flex flex-col transition-all hover:scale-[1.02]",
+                                    p.highlight ? "border-emerald-500 shadow-xl shadow-emerald-500/10" : "border-zinc-200 dark:border-zinc-700"
+                                )}>
+                                    <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-6">{p.name}</h3>
+                                    <div className="flex items-baseline gap-1 mb-8">
+                                        <span className="text-4xl font-bold">{p.price}</span>
+                                        <span className="text-xs text-zinc-500 font-medium">/mo</span>
+                                    </div>
+                                    <ul className="space-y-4 mb-10 flex-1">
+                                        {p.features.map((f, fi) => (
+                                            <li key={fi} className="flex items-center gap-3 text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest">
+                                                <Check size={14} className="text-emerald-500" /> {f}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    <button
+                                        onClick={() => p.href.startsWith('http') ? handleCheckout(p.href) : router.push(p.href)}
+                                        className={cn(
+                                            "w-full h-12 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all",
+                                            p.highlight ? "bg-emerald-500 text-white shadow-lg" : "bg-zinc-100 dark:bg-zinc-700 text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-600"
+                                        )}
+                                    >
+                                        Upgrade
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                </div>
             </main>
+
+            <footer className="py-20 border-t border-zinc-200 dark:border-zinc-800 text-center">
+                <div className="w-full max-w-[768px] mx-auto px-6 space-y-6">
+                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.3em]">
+                        © 2026 PineScript AI • Professional Trading Infrastructure
+                    </p>
+                    <nav className="flex justify-center gap-8 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                        <Link href="/terms" className="hover:text-emerald-500 transition-colors">Terms</Link>
+                        <Link href="/privacy" className="hover:text-emerald-500 transition-colors">Privacy</Link>
+                        <Link href="mailto:support@pinegen.ai" className="hover:text-emerald-500 transition-colors">Support</Link>
+                    </nav>
+                </div>
+            </footer>
         </div>
     );
 }
 
 export default function Landing() {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-[#020617] flex items-center justify-center text-indigo-500 font-bold uppercase tracking-widest text-xs animate-pulse">Initializing v6 Engine...</div>}>
+        <Suspense fallback={<div className="min-h-screen bg-white dark:bg-page-dark flex items-center justify-center text-emerald-500 font-bold uppercase tracking-widest text-xs animate-pulse">Initializing v6 Engine...</div>}>
             <LandingContent />
         </Suspense>
     );

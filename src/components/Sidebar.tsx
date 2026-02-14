@@ -1,229 +1,155 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
 import {
-    Plus,
-    MessageSquare,
-    LogOut,
-    Settings,
-    History,
-    ChevronLeft,
-    ChevronRight,
-    Trash2,
-    Zap,
-    LayoutDashboard,
-    ArrowUpRight
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
-import { useChatStore } from "@/store/useChatStore";
-import { createClient } from "@/utils/supabase/client";
-import { motion, AnimatePresence } from "framer-motion";
+    MessageSquare, Plus, Trash2, Zap,
+    LogOut, ChevronLeft, ChevronRight, User,
+    Crown, BarChart3, Settings
+} from 'lucide-react';
+import { useChatStore } from '@/store/useChatStore';
+import { createClient } from '@/utils/supabase/client';
+import { useRouter } from 'next/navigation';
 
-export function Sidebar() {
-    const pathname = usePathname();
+export default function Sidebar() {
     const router = useRouter();
     const supabase = createClient();
-    const [isCollapsed, setIsCollapsed] = useState(false);
-
     const {
-        user,
         conversations,
         activeConversationId,
         setActiveConversation,
-        deleteConversation,
         createConversation,
-        fetchConversations,
+        deleteConversation,
+        user,
         quotaInfo
     } = useChatStore();
 
-    useEffect(() => {
-        if (user) {
-            fetchConversations();
-        }
-    }, [user, fetchConversations]);
-
-    const handleNewChat = async () => {
-        const id = await createConversation();
-        if (id) {
-            router.push('/dashboard');
-        }
-    };
+    const [isCollapsed, setIsCollapsed] = useState(false);
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
         router.push('/login');
     };
 
-    const isChatActive = pathname === '/dashboard';
-    const isSettingsActive = pathname === '/settings';
-
     return (
         <div className={cn(
-            "flex flex-col h-screen border-r border-slate-200 bg-white transition-all duration-300 relative z-40",
-            isCollapsed ? "w-20" : "w-72"
+            "h-screen flex flex-col bg-zinc-100 dark:bg-sidebar-dark border-r border-zinc-200 dark:border-zinc-800 transition-all duration-300 relative group/sidebar",
+            isCollapsed ? "w-16" : "w-64"
         )}>
-            {/* Brand Section */}
-            <div className="flex items-center h-16 px-6 border-b border-slate-100/80 flex-shrink-0">
-                <div className="w-9 h-9 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl flex items-center justify-center text-white font-black shadow-lg shadow-indigo-200 overflow-hidden">
-                    <span className="text-sm">P</span>
-                </div>
-                <AnimatePresence>
-                    {!isCollapsed && (
-                        <motion.div
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -10 }}
-                            className="ml-3"
-                        >
-                            <span className="text-base font-black text-slate-900 tracking-tighter">PineGen AI</span>
-                            <div className="h-[2px] w-4 bg-indigo-500 rounded-full mt-[-2px]" />
-                        </motion.div>
+            {/* Top Section: Brand & New Chat */}
+            <div className="p-4 flex flex-col gap-4">
+                <button
+                    onClick={() => createConversation()}
+                    className={cn(
+                        "w-full h-10 flex items-center justify-center gap-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white rounded-xl font-semibold text-sm transition-all hover:bg-zinc-50 dark:hover:bg-zinc-700 hover:scale-[1.02] active:scale-[0.98]",
+                        isCollapsed ? "px-0" : "px-4"
                     )}
-                </AnimatePresence>
+                >
+                    <Plus size={18} className="text-emerald-500" />
+                    {!isCollapsed && <span>New Chat</span>}
+                </button>
             </div>
 
-            {/* Main Navigation */}
-            <div className="flex-1 overflow-hidden flex flex-col p-4 pt-6 gap-8">
-
-                {/* Global Links */}
+            {/* Conversation List */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar px-3 py-2">
+                {!isCollapsed && (
+                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-3 mb-2">Recent chats</p>
+                )}
                 <div className="space-y-1">
-                    <button
-                        onClick={handleNewChat}
-                        className={cn(
-                            "flex items-center w-full px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all",
-                            "bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-200 active:scale-95",
-                            isCollapsed && "justify-center px-0"
-                        )}
-                    >
-                        <Plus className="w-5 h-5 flex-shrink-0" strokeWidth={3} />
-                        {!isCollapsed && <span className="ml-3">New Strategy</span>}
-                    </button>
-
-                    <Link
-                        href="/settings"
-                        className={cn(
-                            "flex items-center w-full px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all mt-3",
-                            isSettingsActive
-                                ? "bg-indigo-50 text-indigo-700 border border-indigo-100"
-                                : "text-slate-400 hover:bg-slate-50 hover:text-slate-600",
-                            isCollapsed && "justify-center px-0"
-                        )}
-                    >
-                        <LayoutDashboard className="w-5 h-5 flex-shrink-0" />
-                        {!isCollapsed && <span className="ml-3">Dashboard</span>}
-                    </Link>
-                </div>
-
-                {/* History Section */}
-                <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-                    <div className={cn("flex items-center justify-between mb-4 px-2", isCollapsed && "justify-center")}>
-                        {!isCollapsed && (
-                            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Active Sessions</h3>
-                        )}
-                        <History size={14} className="text-slate-300" />
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto space-y-2 custom-scrollbar pr-1">
-                        {conversations.map((convo) => (
-                            <div key={convo.id} className="group relative">
-                                <button
-                                    onClick={() => {
-                                        setActiveConversation(convo.id);
-                                        if (pathname !== '/dashboard') router.push('/dashboard');
-                                    }}
-                                    className={cn(
-                                        "flex items-center w-full px-4 py-3 rounded-2xl text-[13px] font-bold transition-all group border border-transparent",
-                                        activeConversationId === convo.id
-                                            ? "bg-white border-slate-200 text-indigo-600 shadow-sm ring-1 ring-slate-100"
-                                            : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-                                    )}
-                                >
-                                    <MessageSquare className={cn(
-                                        "w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-110",
-                                        activeConversationId === convo.id ? "text-indigo-600" : "text-slate-300"
-                                    )} />
-                                    {!isCollapsed && (
-                                        <span className="ml-4 truncate pr-6 text-left leading-none tracking-tight">
-                                            {convo.title}
-                                        </span>
-                                    )}
-                                </button>
-
-                                {!isCollapsed && (
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all scale-95 group-hover:scale-100">
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                if (confirm("Delete session?")) deleteConversation(convo.id);
-                                            }}
-                                            className="p-1.5 bg-white border border-slate-100 text-slate-300 hover:text-red-500 hover:border-red-100 rounded-lg transition-all shadow-sm"
-                                        >
-                                            <Trash2 size={12} strokeWidth={2.5} />
-                                        </button>
-                                    </div>
+                    {conversations.map((convo) => (
+                        <div key={convo.id} className="relative group">
+                            <button
+                                onClick={() => setActiveConversation(convo.id)}
+                                className={cn(
+                                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all",
+                                    activeConversationId === convo.id
+                                        ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/10"
+                                        : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white"
                                 )}
-                            </div>
-                        ))}
-                        {conversations.length === 0 && !isCollapsed && (
-                            <div className="py-10 text-center space-y-3 opacity-40 grayscale">
-                                <MessageSquare className="mx-auto text-slate-300" size={24} strokeWidth={1.5} />
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">No Recent Activity</p>
-                            </div>
-                        )}
-                    </div>
+                            >
+                                <MessageSquare size={16} className={cn(
+                                    activeConversationId === convo.id ? "text-white" : "text-emerald-500"
+                                )} />
+                                {!isCollapsed && (
+                                    <span className="truncate flex-1 text-left leading-none font-medium">
+                                        {convo.title || "Untitled Chat"}
+                                    </span>
+                                )}
+                            </button>
+
+                            {!isCollapsed && activeConversationId === convo.id && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (confirm("Delete session?")) deleteConversation(convo.id);
+                                    }}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-white/70 hover:text-white rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                >
+                                    <Trash2 size={12} strokeWidth={2.5} />
+                                </button>
+                            )}
+                        </div>
+                    ))}
                 </div>
             </div>
 
-            {/* Bottom Section */}
-            <div className="p-4 border-t border-slate-100 space-y-4">
-                {/* Upgrade Card */}
-                {!isCollapsed && quotaInfo.tier === 'free' && (
-                    <div className="p-5 rounded-[1.5rem] bg-[#1E293B] text-white shadow-xl shadow-slate-200 border border-slate-800 relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 blur-[40px] rounded-full group-hover:bg-indigo-500/20 transition-all" />
-                        <div className="relative z-10">
-                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 mb-2 flex items-center gap-1.5">
-                                <Zap size={10} className="fill-indigo-400" /> Unlock Pro
-                            </h4>
-                            <p className="text-[11px] font-bold text-slate-400 leading-normal mb-4">Get 20x daily credits & priorityPine v6 speed.</p>
-                            <Link href="/?ref=upgrade#pricing">
-                                <button className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
-                                    Upgrade <ArrowUpRight size={12} />
+            {/* Bottom Section: Usage, Upgrade, Profile */}
+            <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 space-y-4">
+                {!isCollapsed && (
+                    <div className="px-1 space-y-3">
+                        {/* Usage indicator */}
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest text-zinc-500">
+                                <span>Usage</span>
+                                <span>{quotaInfo.limit - quotaInfo.remaining}/{quotaInfo.limit}</span>
+                            </div>
+                            <div className="h-1.5 w-full bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                                <div
+                                    className="h-full bg-emerald-500 rounded-full transition-all duration-1000"
+                                    style={{ width: `${((quotaInfo.limit - quotaInfo.remaining) / quotaInfo.limit) * 100}%` }}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Upgrade Button */}
+                        {quotaInfo.tier === 'free' && (
+                            <Link href="/settings">
+                                <button className="w-full py-2.5 mt-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-sm">
+                                    <Crown size={14} className="fill-white" />
+                                    Upgrade Plan
                                 </button>
                             </Link>
-                        </div>
+                        )}
                     </div>
                 )}
 
                 {/* Account Toggle */}
                 <div className={cn(
-                    "flex items-center gap-4 transition-all",
-                    isCollapsed ? "justify-center" : "px-2"
+                    "flex items-center gap-3",
+                    isCollapsed ? "justify-center" : "px-1"
                 )}>
                     <div className="relative">
-                        <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-900 font-black text-xs border border-slate-200">
+                        <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold text-xs shadow-sm">
                             {user?.email?.substring(0, 1).toUpperCase()}
                         </div>
-                        <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${quotaInfo.tier !== 'free' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
                     </div>
 
                     {!isCollapsed && (
                         <div className="flex-1 min-w-0">
-                            <p className="text-[11px] font-black text-slate-900 truncate tracking-tight">{user?.email}</p>
-                            <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest leading-none mt-1">
-                                {quotaInfo.tier?.replace('_', ' ') || 'Free Tier'}
-                            </p>
+                            <p className="text-xs font-bold text-zinc-900 dark:text-white truncate">{user?.email}</p>
+                            <Link href="/settings" className="text-[10px] font-bold uppercase text-emerald-500 hover:text-emerald-600 tracking-widest leading-none mt-1 flex items-center gap-1">
+                                Settings <Settings size={10} />
+                            </Link>
                         </div>
                     )}
 
                     {!isCollapsed && (
                         <button
                             onClick={handleLogout}
-                            className="p-2 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
-                            title="Sign Out"
+                            className="p-2 text-zinc-400 hover:text-red-500 rounded-xl transition-all"
                         >
-                            <LogOut size={16} strokeWidth={2.5} />
+                            <LogOut size={16} />
                         </button>
                     )}
                 </div>
@@ -232,7 +158,7 @@ export function Sidebar() {
             {/* Collapse Button */}
             <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className="absolute -right-3 top-24 w-6 h-6 bg-white border border-slate-200 rounded-lg flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.05)] z-50 hover:bg-slate-50 transition-colors"
+                className="absolute -right-3 top-20 w-6 h-6 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg flex items-center justify-center shadow-sm z-50 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
             >
                 {isCollapsed ? <ChevronRight size={12} strokeWidth={3} /> : <ChevronLeft size={12} strokeWidth={3} />}
             </button>
