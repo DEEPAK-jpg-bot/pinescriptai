@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Code, Loader2, Mail, Lock } from 'lucide-react';
+import { Terminal, Loader2, Mail, Lock, ChevronLeft, Sparkles } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { Input } from '@/components/ui/input';
 
@@ -45,88 +45,86 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 px-4 font-sans text-slate-900">
-            <div className="w-full max-w-[400px] space-y-8">
-                <div className="flex flex-col items-center gap-2 text-center">
-                    <Link href="/" className="flex items-center gap-2 mb-6 group">
-                        <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
-                            <Code className="text-white" size={24} />
+        <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-page-dark px-4 font-sans text-zinc-900 dark:text-white transition-colors duration-300">
+            <div className="w-full max-w-[400px] space-y-12 animate-fade-in">
+
+                <div className="flex flex-col items-center gap-6 text-center">
+                    <Link href="/" className="group">
+                        <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-xl shadow-emerald-500/20 transform group-hover:scale-110 transition-all duration-300">
+                            <Terminal className="text-white" size={24} />
                         </div>
                     </Link>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900">Welcome Back</h1>
-                    <p className="text-slate-500">Sign in to your account</p>
-                </div>
-
-                <div className="bg-white p-8 rounded-xl shadow-xl border border-slate-200">
-                    <form onSubmit={handleLogin} className="space-y-5">
-                        <div className="space-y-2">
-                            <label className="text-sm font-semibold text-slate-700 ml-1">Email Address</label>
-                            <div className="relative">
-                                <Mail className="absolute left-3 top-3 text-slate-400" size={18} />
-                                <Input
-                                    type="email"
-                                    placeholder="you@example.com"
-                                    className="pl-10 h-12 bg-slate-50 border-slate-200 focus:bg-white transition-all shadow-none"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <div className="flex justify-between items-center ml-1">
-                                <label className="text-sm font-semibold text-slate-700">Password</label>
-                                <Link href="#" className="text-[11px] font-bold text-indigo-600 hover:text-indigo-700">Forgot password?</Link>
-                            </div>
-                            <div className="relative">
-                                <Lock className="absolute left-3 top-3 text-slate-400" size={18} />
-                                <Input
-                                    type="password"
-                                    placeholder="••••••••"
-                                    className="pl-10 h-12 bg-slate-50 border-slate-200 focus:bg-white transition-all shadow-none"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <Button
-                            type="submit"
-                            className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-lg shadow-indigo-100 transition-all active:scale-95 disabled:opacity-70"
-                            disabled={loading}
-                        >
-                            {loading ? (
-                                <span className="flex items-center gap-2">
-                                    <Loader2 className="animate-spin" size={18} /> Logging in...
-                                </span>
-                            ) : (
-                                "Sign In"
-                            )}
-                        </Button>
-                    </form>
-
-                    <div className="relative my-7">
-                        <div className="absolute inset-0 flex items-center">
-                            <span className="w-full border-t border-slate-200" />
-                        </div>
-                        <div className="relative flex justify-center text-[10px] uppercase tracking-widest font-bold">
-                            <span className="bg-white px-3 text-slate-400">Secure Access</span>
-                        </div>
+                    <div className="space-y-2">
+                        <h1 className="text-4xl font-black tracking-tighter leading-none">Welcome Back</h1>
+                        <p className="text-zinc-500 dark:text-zinc-400 font-medium">Access your Pine v6 workspace</p>
                     </div>
-
-                    <p className="text-center text-[11px] text-slate-400 leading-relaxed px-2">
-                        Automated access is strictly prohibited and rate-limited.
-                    </p>
                 </div>
 
-                <p className="text-sm text-center text-slate-500">
-                    Don&apos;t have an account?{' '}
-                    <Link href="/signup" className="text-indigo-600 font-bold hover:underline">
-                        Sign up
-                    </Link>
-                </p>
+                <div className="p-1.5 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-[2.5rem] shadow-sm">
+                    <div className="bg-white dark:bg-zinc-800 p-8 rounded-[2rem] border border-zinc-200 dark:border-zinc-700 shadow-xl shadow-zinc-200/50 dark:shadow-none">
+                        <form onSubmit={handleLogin} className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Email Terminal</label>
+                                <div className="relative">
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
+                                    <Input
+                                        type="email"
+                                        placeholder="user@domain.com"
+                                        className="pl-12 bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-700 focus:bg-white dark:focus:bg-zinc-900 transition-all"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-center ml-1">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Password Key</label>
+                                    <Link href="#" className="text-[10px] font-black uppercase tracking-widest text-emerald-500 hover:text-emerald-600">Reset</Link>
+                                </div>
+                                <div className="relative">
+                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
+                                    <Input
+                                        type="password"
+                                        placeholder="••••••••"
+                                        className="pl-12 bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-700 focus:bg-white dark:focus:bg-zinc-900 transition-all"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <Button
+                                type="submit"
+                                className="w-full h-14 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 transition-all active:scale-95 disabled:opacity-70 group"
+                                disabled={loading}
+                            >
+                                {loading ? (
+                                    <span className="flex items-center gap-2">
+                                        <Loader2 className="animate-spin" size={18} /> Validating...
+                                    </span>
+                                ) : (
+                                    <span className="flex items-center gap-2">Enter Dashboard <ChevronLeft className="rotate-180" size={16} /></span>
+                                )}
+                            </Button>
+                        </form>
+                    </div>
+                </div>
+
+                <div className="text-center space-y-4">
+                    <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                        Don&apos;t have logic access?{' '}
+                        <Link href="/signup" className="text-emerald-500 font-black hover:underline tracking-tight">
+                            Create Account
+                        </Link>
+                    </p>
+                    <div className="flex items-center justify-center gap-2 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">
+                        <Sparkles size={12} className="text-emerald-500" /> Secure Protocol v6.0
+                    </div>
+                </div>
+
             </div>
         </div>
     );

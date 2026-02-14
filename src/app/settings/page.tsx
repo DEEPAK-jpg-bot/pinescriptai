@@ -6,12 +6,14 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-    User, LogOut, FileText, CreditCard,
+    User, LogOut, CreditCard,
     ExternalLink, Zap, ShieldCheck, Clock,
     BarChart3, Settings as SettingsIcon,
-    ChevronRight, ArrowUpRight
+    ChevronRight, ArrowUpRight, ChevronLeft,
+    Sparkles
 } from 'lucide-react';
 import { useChatStore } from '@/store/useChatStore';
+import { cn } from '@/lib/utils';
 
 interface Subscription {
     status: string;
@@ -31,7 +33,7 @@ export default function Settings() {
             if (!user) return;
             const { data } = await supabase.from('subscriptions').select('*').eq('user_id', user.id).single();
             setSubscription(data as Subscription);
-            await checkRateLimit(); // Refresh quota info
+            await checkRateLimit();
         };
         loadSub();
     }, [user, supabase, checkRateLimit]);
@@ -44,194 +46,208 @@ export default function Settings() {
 
     const getTierDisplay = () => {
         const tier = quotaInfo.tier?.toLowerCase() || 'free';
-        if (tier === 'pro_trader') return { name: 'Pro Trader', color: 'from-violet-600 to-indigo-600', icon: <ShieldCheck className="text-violet-500" /> };
-        if (tier === 'trader') return { name: 'Trader', color: 'from-indigo-500 to-blue-500', icon: <Zap className="text-indigo-500" /> };
-        if (tier === 'pro') return { name: 'Pro', color: 'from-emerald-500 to-teal-500', icon: <User className="text-emerald-500" /> };
-        return { name: 'Free Tier', color: 'from-slate-500 to-slate-600', icon: <User className="text-slate-400" /> };
+        if (tier === 'pro_trader') return { name: 'Pro Trader', color: 'emerald', icon: <ShieldCheck className="text-emerald-500" /> };
+        if (tier === 'trader') return { name: 'Trader', color: 'emerald', icon: <Zap className="text-emerald-500" /> };
+        if (tier === 'pro') return { name: 'Pro', color: 'emerald', icon: <Sparkles className="text-emerald-500" /> };
+        return { name: 'Free Tier', color: 'zinc', icon: <User className="text-zinc-400" /> };
     };
 
     const tierInfo = getTierDisplay();
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] font-sans selection:bg-indigo-100">
-            {/* Header */}
-            <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
-                <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="min-h-screen bg-white dark:bg-page-dark text-zinc-900 dark:text-white font-sans selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-300">
+            {/* Header (Adaptive 48px Header) */}
+            <header className="h-12 sticky top-0 z-50 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-page-dark/80 backdrop-blur-md flex items-center justify-center px-4">
+                <nav className="w-full max-w-[768px] flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <Link href="/dashboard" className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
-                            <BarChart3 className="text-indigo-600" size={20} />
+                        <Link href="/dashboard" className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-all">
+                            <ChevronLeft size={18} className="text-zinc-500" />
                         </Link>
-                        <ChevronRight size={14} className="text-slate-300" />
-                        <h1 className="text-sm font-bold text-slate-900 tracking-tight">Account Settings</h1>
+                        <h1 className="text-sm font-bold tracking-tight">Account Settings</h1>
                     </div>
-                </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 bg-emerald-500 rounded-lg flex items-center justify-center text-white">
+                            <SettingsIcon size={12} />
+                        </div>
+                    </div>
+                </nav>
             </header>
 
-            <main className="max-w-5xl mx-auto px-6 py-10 pb-24">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <main className="flex flex-col items-center py-12 px-6">
+                <div className="w-full max-w-[768px] space-y-12">
 
-                    {/* LEFT COLUMN: Main Info */}
-                    <div className="lg:col-span-8 space-y-8">
-
-                        {/* 1. Profile Card */}
-                        <section className="bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm">
-                            <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
-                                <div className={`w-20 h-20 rounded-3xl bg-gradient-to-br ${tierInfo.color} p-[2px]`}>
-                                    <div className="w-full h-full bg-white rounded-[22px] flex items-center justify-center text-slate-900">
-                                        <User size={32} strokeWidth={1.5} />
-                                    </div>
+                    {/* 1. Profile Section */}
+                    <section className="animate-fade-in">
+                        <div className="p-8 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-[2rem] flex flex-col md:flex-row gap-8 items-start md:items-center">
+                            <div className="relative group">
+                                <div className="w-24 h-24 rounded-3xl bg-zinc-100 dark:bg-zinc-800 border-2 border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-emerald-500 shadow-sm transition-transform group-hover:scale-105">
+                                    <User size={40} strokeWidth={1.5} />
                                 </div>
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-3 mb-1">
-                                        <h2 className="text-2xl font-black text-slate-900 leading-none">Your Profile</h2>
-                                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white bg-gradient-to-r ${tierInfo.color}`}>
-                                            {tierInfo.name}
-                                        </span>
-                                    </div>
-                                    <p className="text-slate-500 font-medium">{user?.email}</p>
+                                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 border-4 border-white dark:border-zinc-900 rounded-full flex items-center justify-center">
+                                    <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
                                 </div>
-                                <Button
-                                    variant="outline"
-                                    onClick={handleLogout}
-                                    className="rounded-xl border-slate-200 text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all font-bold"
-                                >
-                                    <LogOut size={16} className="mr-2" />
-                                    Sign Out
-                                </Button>
                             </div>
-                        </section>
 
-                        {/* 2. Usage Section */}
-                        <section className="bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm">
-                            <div className="flex items-center gap-3 mb-8">
-                                <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
-                                    <BarChart3 size={20} />
+                            <div className="flex-1 space-y-2">
+                                <div className="flex items-center gap-3">
+                                    <h2 className="text-3xl font-black tracking-tighter">{user?.email?.split('@')[0]}</h2>
+                                    <span className="px-3 py-1 bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full">
+                                        {tierInfo.name}
+                                    </span>
+                                </div>
+                                <p className="text-zinc-500 dark:text-zinc-400 font-medium text-sm">{user?.email}</p>
+                            </div>
+
+                            <Button
+                                variant="outline"
+                                onClick={handleLogout}
+                                disabled={loading}
+                                className="h-10 rounded-xl border-zinc-200 dark:border-zinc-700 hover:bg-red-50 dark:hover:bg-red-500/10 text-zinc-600 dark:text-zinc-400 hover:text-red-600 transition-all font-bold text-xs"
+                            >
+                                <LogOut size={14} className="mr-2" />
+                                {loading ? 'Signing out...' : 'Sign Out'}
+                            </Button>
+                        </div>
+                    </section>
+
+                    {/* 2. Usage & Quota Card */}
+                    <section className="animate-slide-up" style={{ animationDelay: '100ms' }}>
+                        <div className="p-8 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-[2rem] shadow-sm space-y-8">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-emerald-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                                    <BarChart3 size={24} />
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-black text-slate-900 leading-tight">Usage & Capacity</h3>
-                                    <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Monthly Generation Quota</p>
+                                    <h3 className="text-xl font-black leading-none">Usage Stats</h3>
+                                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Institutional Quota Monitor</p>
                                 </div>
                             </div>
 
                             <div className="space-y-6">
-                                <div>
-                                    <div className="flex justify-between items-end mb-3">
-                                        <div className="space-y-1">
-                                            <span className="text-4xl font-black text-slate-900 tracking-tighter">{quotaInfo.remaining}</span>
-                                            <span className="text-slate-400 font-bold text-lg ml-2">/ {quotaInfo.limit} remaining</span>
-                                        </div>
-                                        <div className="text-right">
-                                            <span className="block text-xs font-bold text-slate-400 uppercase tracking-widest leading-none">Usage Rate</span>
-                                            <span className="text-sm font-black text-slate-600">{Math.round(((quotaInfo.limit - quotaInfo.remaining) / quotaInfo.limit) * 100)}%</span>
-                                        </div>
+                                <div className="flex justify-between items-end">
+                                    <div className="space-y-1">
+                                        <span className="text-5xl font-black tracking-tighter text-emerald-500">{quotaInfo.remaining}</span>
+                                        <span className="text-zinc-400 font-bold text-xl ml-2 tracking-tight">/ {quotaInfo.limit} tokens</span>
                                     </div>
-
-                                    {/* Progress Bar */}
-                                    <div className="h-4 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200 p-1">
-                                        <div
-                                            className={`h-full rounded-full transition-all duration-1000 ease-in-out bg-gradient-to-r ${tierInfo.color}`}
-                                            style={{ width: `${Math.max(5, (quotaInfo.remaining / quotaInfo.limit) * 100)}%` }}
-                                        />
+                                    <div className="text-right">
+                                        <span className="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">Utilization</span>
+                                        <span className="text-lg font-black">{Math.round(((quotaInfo.limit - quotaInfo.remaining) / quotaInfo.limit) * 100)}%</span>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-3">
-                                        <Clock className="text-slate-400" size={18} />
+                                <div className="h-3 w-full bg-zinc-100 dark:bg-zinc-700/50 rounded-full overflow-hidden p-0.5 border border-zinc-200 dark:border-zinc-700">
+                                    <div
+                                        className="h-full bg-emerald-500 rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                                        style={{ width: `${Math.max(2, (1 - (quotaInfo.remaining / (quotaInfo.limit || 1))) * 100)}%` }}
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-700/50 flex items-center gap-3 group hover:border-emerald-500/30 transition-all">
+                                        <Clock className="text-zinc-400 group-hover:text-emerald-500 transition-colors" size={20} />
                                         <div>
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Next Reset</p>
-                                            <p className="text-sm font-bold text-slate-700">Daily Window (Floating)</p>
+                                            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Reset Window</p>
+                                            <p className="text-xs font-bold">24-hour Floating</p>
                                         </div>
                                     </div>
-                                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-3">
-                                        <Zap className="text-amber-500" size={18} />
+                                    <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-700/50 flex items-center gap-3 group hover:border-emerald-500/30 transition-all">
+                                        <Zap className="text-zinc-400 group-hover:text-emerald-500 transition-colors" size={20} />
                                         <div>
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Speed</p>
-                                            <p className="text-sm font-bold text-slate-700">{quotaInfo.tier !== 'free' ? 'Priority Queue' : 'Standard Rate'}</p>
+                                            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Priority</p>
+                                            <p className="text-xs font-bold">{quotaInfo.tier !== 'free' ? 'Tier 1 Logic' : 'Standard Logic'}</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </section>
-                    </div>
+                        </div>
+                    </section>
 
-                    {/* RIGHT COLUMN: Subscription & Billing */}
-                    <div className="lg:col-span-4 space-y-8">
+                    {/* 3. Subscription Status */}
+                    <section className="animate-slide-up" style={{ animationDelay: '200ms' }}>
+                        <div className="p-8 bg-zinc-900 rounded-[2rem] text-white shadow-2xl shadow-emerald-950/20 border border-white/5 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-emerald-500/20 transition-all duration-700" />
 
-                        {/* Subscription Card */}
-                        <section className="bg-slate-900 rounded-[2rem] p-8 text-white shadow-xl shadow-indigo-900/10 border border-white/10 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-[50px] rounded-full -translate-y-1/2 translate-x-1/2" />
+                            <div className="relative z-10 space-y-8">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-emerald-400 flex items-center gap-2">
+                                        <CreditCard size={14} /> Subscription Engine
+                                    </h3>
+                                    <div className="px-3 py-1 bg-white/10 rounded-lg text-[10px] font-bold uppercase tracking-widest">
+                                        ID: {subscription?.plan_id || 'Free'}
+                                    </div>
+                                </div>
 
-                            <div className="relative z-10 flex flex-col h-full">
-                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-indigo-400 mb-6 flex items-center gap-2">
-                                    <CreditCard size={14} /> Subscription
-                                </h3>
-
-                                <div className="mb-8">
-                                    <p className="text-sm font-bold text-slate-400 mb-1">Current Plan</p>
-                                    <p className="text-3xl font-black">{tierInfo.name}</p>
-                                    <p className="text-xs text-indigo-300 font-bold mt-2 flex items-center gap-1.5 leading-none">
-                                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                                        {subscription?.status === 'active' ? 'Account in good standing' : 'Status: ' + (subscription?.status || 'Active')}
-                                    </p>
+                                <div className="space-y-1">
+                                    <p className="text-zinc-400 text-sm font-medium">Active Deployment</p>
+                                    <p className="text-4xl font-black racking-tighter tracking-tight">{tierInfo.name}</p>
                                 </div>
 
                                 {quotaInfo.tier === 'free' ? (
-                                    <div className="space-y-4">
-                                        <Link href="/?ref=upgrade#pricing">
-                                            <Button className="w-full h-12 rounded-xl bg-white text-slate-950 hover:bg-slate-100 font-black transition-all group">
-                                                Upgrade Now <ArrowUpRight size={18} className="ml-2 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                                            </Button>
-                                        </Link>
-                                    </div>
+                                    <Link href="/?ref=upgrade#pricing">
+                                        <Button className="w-full h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-emerald-500/30 group/btn transition-all active:scale-95">
+                                            Upgrade Account <ArrowUpRight className="ml-2 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
+                                        </Button>
+                                    </Link>
                                 ) : (
-                                    <div className="space-y-3">
-                                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Billing Information</p>
+                                    <div className="pt-4 space-y-4">
                                         <Button
                                             variant="outline"
-                                            className="w-full h-11 rounded-xl bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 text-white font-bold transition-all text-xs"
+                                            className="w-full h-12 bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 text-white font-bold transition-all text-sm rounded-xl"
                                             onClick={() => window.open('https://daredevil.lemonsqueezy.com/billing', '_blank')}
                                         >
-                                            Manage Dashboard <ExternalLink size={14} className="ml-2 opacity-50" />
+                                            Billing Dashboard <ExternalLink size={16} className="ml-2 opacity-50" />
                                         </Button>
                                     </div>
                                 )}
                             </div>
-                        </section>
+                        </div>
+                    </section>
 
-                        {/* Quick Links */}
-                        <section className="bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm">
-                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 leading-none">Legal & Support</h4>
-                            <nav className="space-y-1">
+                    {/* 4. Support & Links */}
+                    <section className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-slide-up" style={{ animationDelay: '300ms' }}>
+                        <div className="p-8 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-[2rem] shadow-sm">
+                            <h4 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-6">Support Portal</h4>
+                            <nav className="space-y-2">
                                 {[
                                     { label: 'Privacy Policy', href: '/privacy' },
                                     { label: 'Terms of Service', href: '/terms' },
-                                    { label: 'Technical Support', href: 'mailto:support@pinegen.ai' },
+                                    { label: 'Institutional Support', href: 'mailto:support@pinegen.ai' },
                                 ].map((link, i) => (
                                     <Link
                                         key={i}
                                         href={link.href}
-                                        className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 text-slate-600 text-sm font-bold transition-all group"
+                                        className="flex items-center justify-between p-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900/50 text-zinc-600 dark:text-zinc-400 text-sm font-bold transition-all group"
                                     >
                                         {link.label}
-                                        <ChevronRight size={14} className="text-slate-300 group-hover:text-indigo-400 transition-colors" />
+                                        <ChevronRight size={14} className="text-zinc-300 group-hover:text-emerald-500 transition-colors" />
                                     </Link>
                                 ))}
                             </nav>
-                        </section>
-                    </div>
+                        </div>
+
+                        <div className="p-8 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-700 rounded-[2rem] flex flex-col justify-center items-center text-center space-y-4">
+                            <div className="w-12 h-12 bg-emerald-500/10 text-emerald-500 rounded-2xl flex items-center justify-center">
+                                <Sparkles size={24} />
+                            </div>
+                            <p className="text-xs font-black uppercase tracking-widest text-zinc-400">TradingView v6 Ready</p>
+                            <p className="text-zinc-500 dark:text-zinc-500 text-[10px] font-bold leading-relaxed max-w-[200px]">
+                                Your logic is verified against modern TradingView standards.
+                            </p>
+                        </div>
+                    </section>
+
                 </div>
             </main>
 
-            {/* Sticky Mobile Nav Toggle (Optional) */}
-            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-full px-6 py-3 shadow-2xl flex items-center gap-6">
-                <Link href="/dashboard" className="text-slate-400 hover:text-white transition-colors">
+            {/* Mobile Nav Overlay (Institutional Style) */}
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-zinc-900/90 backdrop-blur-xl border border-white/10 rounded-3xl px-6 py-3 shadow-2xl flex items-center gap-8">
+                <Link href="/dashboard" className="text-zinc-500 hover:text-white transition-colors">
                     <BarChart3 size={20} />
                 </Link>
                 <div className="w-px h-4 bg-white/10" />
-                <Link href="/settings" className="text-indigo-400 font-bold flex items-center gap-2">
+                <Link href="/settings" className="text-emerald-500 font-bold flex items-center gap-2">
                     <SettingsIcon size={20} />
-                    <span className="text-xs">Account</span>
+                    <span className="text-[10px] uppercase font-black tracking-widest">Account</span>
                 </Link>
             </div>
         </div>
