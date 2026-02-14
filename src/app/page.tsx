@@ -127,10 +127,10 @@ function LandingContent() {
     };
 
     const pricingPlans = [
-        { name: "Lab", price: "$0", features: ["10 gens / mo", "7-day history", "Standard Engine"], href: "/signup" },
-        { name: "Pro", price: "$19", features: ["200 gens / mo", "30-day history", "Priority Engine", "v6 Multi-logic"], highlight: true, variantId: "1307516", href: "https://daredevil.lemonsqueezy.com/checkout/buy/1307516" },
-        { name: "Trader", price: "$50", features: ["600 gens / mo", "90-day history", "Institutional Engine", "Advanced Risk Matrix"], variantId: "1307522", href: "https://daredevil.lemonsqueezy.com/checkout/buy/1307522" },
-        { name: "Pro Trader", price: "$100", features: ["1500 gens / mo", "Infinite history", "Alpha v6 Engine", "1-on-1 Strategy Audit"], variantId: "1307525", href: "https://daredevil.lemonsqueezy.com/checkout/buy/1307525" }
+        { name: "Lab", price: "$0", features: ["10 Monthly Cycles", "Standard v6 Runtime", "7-Day Metadata Retention"], href: "/signup" },
+        { name: "Pro", price: "$19", features: ["200 Extended Cycles", "v6 Multi-Logic Aggregator", "Institutional Risk Logic", "Low-Latency Generation"], highlight: true, variantId: "1307516", href: "https://daredevil.lemonsqueezy.com/checkout/buy/1307516" },
+        { name: "Trader", price: "$50", features: ["600 High-Compute Cycles", "Logic Drift Verification", "Advanced ATR Risk Matrix", "Liquidity Gap Detection"], variantId: "1307522", href: "https://daredevil.lemonsqueezy.com/checkout/buy/1307522" },
+        { name: "Pro Trader", price: "$100", features: ["1500 Ultra-Bandwidth", "Infinite Data Persistence", "Alpha Neural Architecture", "Priority v7 Pre-computation"], variantId: "1307525", href: "https://daredevil.lemonsqueezy.com/checkout/buy/1307525" }
     ];
 
     return (
