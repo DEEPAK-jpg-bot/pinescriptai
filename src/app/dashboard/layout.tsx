@@ -29,24 +29,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             <Menu size={18} />
                         </Button>
                         <h1 className="text-sm font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
-                            <div className="w-6 h-6 bg-emerald-500 rounded-lg flex items-center justify-center">
+                            <div className="w-6 h-6 bg-primary rounded-lg flex items-center justify-center">
                                 <Sparkles size={12} className="text-white fill-white" />
                             </div>
-                            PineScript AI <span className="text-emerald-500 font-extrabold">v6</span>
+                            PineScript AI <span className="text-primary font-extrabold">v6</span>
                         </h1>
                     </div>
 
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => createConversation()}
-                            className="p-2 text-zinc-500 hover:text-emerald-500 transition-colors"
+                            className="p-2 text-zinc-500 hover:text-primary transition-colors"
                             title="New Chat"
                         >
                             <Plus size={18} />
                         </button>
                         <button
                             onClick={() => setIsDarkMode(!isDarkMode)}
-                            className="p-2 text-zinc-500 hover:text-emerald-500 transition-colors"
+                            className="p-2 text-zinc-500 hover:text-primary transition-colors"
                             title="Toggle Theme"
                         >
                             {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}

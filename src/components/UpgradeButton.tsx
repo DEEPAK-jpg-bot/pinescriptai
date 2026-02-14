@@ -42,7 +42,7 @@ export default function UpgradeButton({ userId, email }: { userId: string, email
         <Button
             onClick={handleUpgrade}
             disabled={loading}
-            className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white border-0"
+            className="w-full bg-primary hover:bg-primary-dark text-white shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
         >
             {loading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Zap className="mr-2 fill-white" size={16} />}
             Upgrade to Pro

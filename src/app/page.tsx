@@ -19,11 +19,13 @@ import {
     Settings,
     Copy,
     Layout,
-    ArrowUpRight
+    ArrowUpRight,
+    Loader2
 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 declare global {
     interface Window {
@@ -42,6 +44,7 @@ function LandingContent() {
     const searchParams = useSearchParams();
     const supabase = createClient();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isCheckingOut, setIsCheckingOut] = useState<string | null>(null);
 
     useEffect(() => {
         const checkUser = async () => {
@@ -64,7 +67,6 @@ function LandingContent() {
                     window.LemonSqueezy.Setup({
                         eventHandler: (event) => {
                             if (event.event === 'Checkout.Success') {
-                                // Instead of a hard reload, we can just push back to dash
                                 router.push('/dashboard');
                             }
                         }
@@ -77,24 +79,63 @@ function LandingContent() {
         initLS();
     }, [router, supabase, searchParams]);
 
-    const handleCheckout = (url: string) => {
-        // Double check for LemonSqueezy availability
-        if (typeof window !== 'undefined' && window.LemonSqueezy && window.LemonSqueezy.Url) {
-            try {
-                window.LemonSqueezy.Url.Open(url);
-            } catch (err) {
-                console.error("LS Overlay failed, falling back to new tab", err);
-                window.open(url, '_blank');
+    const handleTierSelection = async (tier: any) => {
+        if (!isLoggedIn) {
+            router.push(`/signup?ref=upgrade&tier=${tier.name.toLowerCase()}`);
+            return;
+        }
+
+        if (tier.price === "$0") {
+            router.push('/dashboard');
+            return;
+        }
+
+        setIsCheckingOut(tier.name);
+        try {
+            // Dynamic Checkout initiation via API
+            // This ensures we use the correct STORE_ID and VARIANT_ID from environment
+            const response = await fetch('/api/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    variantId: tier.variantId || "1307516" // Default to Pro if missing
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.url) {
+                // Try overlay first, fallback to redirect
+                if (window.LemonSqueezy && window.LemonSqueezy.Url) {
+                    window.LemonSqueezy.Url.Open(data.url);
+                } else {
+                    window.location.href = data.url;
+                }
+            } else {
+                throw new Error(data.error || 'Checkout initiation failed');
             }
-        } else {
-            window.open(url, '_blank');
+        } catch (error: any) {
+            console.error("Checkout Error:", error);
+            toast.error(error.message || "Failed to start checkout. Please try again.");
+            // Last resort fallback
+            if (tier.href) {
+                window.open(tier.href, '_blank');
+            }
+        } finally {
+            setIsCheckingOut(null);
         }
     };
+
+    const pricingPlans = [
+        { name: "Lab", price: "$0", features: ["10 gens / mo", "7-day history", "Standard Speed"], href: "/signup" },
+        { name: "Pro", price: "$19", features: ["200 gens / mo", "30-day history", "Priority Queue"], highlight: true, variantId: "1307516", href: "https://pinescriptai.lemonsqueezy.com/buy/893ad243-718e-4903-8758-15103ec4101e" },
+        { name: "Trader", price: "$50", features: ["600 gens / mo", "90-day history", "Priority Queue", "v6 Multi-logic"], variantId: "1307522", href: "https://pinescriptai.lemonsqueezy.com/checkout/buy/4579d46f-f232-475a-a320-f49553bc9697" },
+        { name: "Pro Trader", price: "$100", features: ["Unlimited gens", "Infinite history", "24/7 Priority", "Early v7 Access"], variantId: "1307525", href: "https://pinescriptai.lemonsqueezy.com/checkout/buy/ebf22be5-21d7-463f-91a5-827d00f80695" }
+    ];
 
     return (
         <div className="min-h-screen bg-white dark:bg-page-dark text-zinc-900 dark:text-white font-sans selection:bg-indigo-100 selection:text-indigo-900 transition-colors duration-300">
 
-            {/* Header */}
             <header className="h-12 sticky top-0 z-50 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-page-dark/80 backdrop-blur-md flex items-center justify-center px-4">
                 <nav className="w-full max-w-[768px] flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -119,7 +160,6 @@ function LandingContent() {
             </header>
 
             <main className="flex flex-col items-center">
-                {/* HERO */}
                 <section className="w-full max-w-[768px] px-6 py-24 md:py-32 space-y-12">
                     <div className="space-y-6 text-center">
                         <motion.div
@@ -163,8 +203,6 @@ function LandingContent() {
                 </section>
 
                 <div className="w-full max-w-[768px] px-6 space-y-32 py-20 pb-40">
-
-                    {/* FEATURES (3 cards) */}
                     <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {[
                             { title: "v6 Runtime", desc: "Native support for the latest TradingView Pine Script v6 runtime and logic components.", icon: <Zap size={20} /> },
@@ -179,7 +217,6 @@ function LandingContent() {
                         ))}
                     </section>
 
-                    {/* PRICING */}
                     <section id="pricing" className="space-y-16">
                         <div className="text-center space-y-4">
                             <h2 className="text-5xl font-black tracking-tighter">Scalable Power.</h2>
@@ -187,12 +224,7 @@ function LandingContent() {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            {([
-                                { name: "Lab", price: "$0", features: ["10 gens / mo", "7-day history", "Standard Speed"], href: "/signup" },
-                                { name: "Pro", price: "$19", features: ["200 gens / mo", "30-day history", "Priority Queue"], highlight: true, href: "https://daredevil.lemonsqueezy.com/buy/893ad243-718e-4903-8758-15103ec4101e" },
-                                { name: "Trader", price: "$50", features: ["600 gens / mo", "90-day history", "Priority Queue", "v6 Multi-logic"], href: "https://daredevil.lemonsqueezy.com/buy/4579d46f-f232-475a-a320-f49553bc9697" },
-                                { name: "Pro Trader", price: "$100", features: ["Unlimited gens", "Infinite history", "24/7 Priority", "Early v7 Access"], href: "https://daredevil.lemonsqueezy.com/buy/ebf22be5-21d7-463f-91a5-827d00f80695" }
-                            ] as { name: string, price: string, features: string[], href: string, highlight?: boolean }[]).map((p, i) => (
+                            {pricingPlans.map((p: any, i) => (
                                 <div key={i} className={cn(
                                     "relative p-1.5 rounded-[2.5rem] transition-all duration-500 hover:scale-[1.02]",
                                     p.highlight ? "bg-gradient-to-br from-primary to-blue-600 shadow-[0_0_40px_-10px_rgba(79,70,229,0.3)]" : "bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700"
@@ -214,7 +246,7 @@ function LandingContent() {
                                         <div className="w-full h-px bg-zinc-100 dark:bg-zinc-800" />
 
                                         <ul className="space-y-4 flex-1">
-                                            {p.features.map((f, fi) => (
+                                            {p.features.map((f: string, fi: number) => (
                                                 <li key={fi} className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 dark:text-zinc-500 uppercase tracking-widest">
                                                     <Check size={14} className="text-primary" /> {f}
                                                 </li>
@@ -222,7 +254,8 @@ function LandingContent() {
                                         </ul>
 
                                         <button
-                                            onClick={() => p.href.startsWith('http') ? handleCheckout(p.href) : router.push(p.href)}
+                                            onClick={() => handleTierSelection(p)}
+                                            disabled={isCheckingOut === p.name}
                                             className={cn(
                                                 "w-full h-12 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-[0.97] group flex items-center justify-center gap-2",
                                                 p.highlight
@@ -230,8 +263,8 @@ function LandingContent() {
                                                     : "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700"
                                             )}
                                         >
-                                            {p.price === "$0" ? "Initialize" : "Select Tier"}
-                                            {p.highlight && <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />}
+                                            {isCheckingOut === p.name ? <Loader2 className="animate-spin" size={14} /> : (p.price === "$0" ? "Initialize" : "Select Tier")}
+                                            {!isCheckingOut && p.highlight && <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />}
                                         </button>
                                     </div>
                                 </div>
