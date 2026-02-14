@@ -127,10 +127,10 @@ function LandingContent() {
     };
 
     const pricingPlans = [
-        { name: "Lab", price: "$0", features: ["10 gens / mo", "7-day history", "Standard Speed"], href: "/signup" },
-        { name: "Pro", price: "$19", features: ["200 gens / mo", "30-day history", "Priority Queue"], highlight: true, variantId: "1307516", href: "https://daredevil.lemonsqueezy.com/checkout/buy/1307516" },
-        { name: "Trader", price: "$50", features: ["600 gens / mo", "90-day history", "Priority Queue", "v6 Multi-logic"], variantId: "1307522", href: "https://daredevil.lemonsqueezy.com/checkout/buy/1307522" },
-        { name: "Pro Trader", price: "$100", features: ["Unlimited gens", "Infinite history", "24/7 Priority", "Early v7 Access"], variantId: "1307525", href: "https://daredevil.lemonsqueezy.com/checkout/buy/1307525" }
+        { name: "Lab", price: "$0", features: ["10 gens / mo", "7-day history", "Standard Engine"], href: "/signup" },
+        { name: "Pro", price: "$19", features: ["200 gens / mo", "30-day history", "Priority Engine", "v6 Multi-logic"], highlight: true, variantId: "1307516", href: "https://daredevil.lemonsqueezy.com/checkout/buy/1307516" },
+        { name: "Trader", price: "$50", features: ["600 gens / mo", "90-day history", "Institutional Engine", "Advanced Risk Matrix"], variantId: "1307522", href: "https://daredevil.lemonsqueezy.com/checkout/buy/1307522" },
+        { name: "Pro Trader", price: "$100", features: ["1500 gens / mo", "Infinite history", "Alpha v6 Engine", "1-on-1 Strategy Audit"], variantId: "1307525", href: "https://daredevil.lemonsqueezy.com/checkout/buy/1307525" }
     ];
 
     return (

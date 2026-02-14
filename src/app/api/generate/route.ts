@@ -99,8 +99,9 @@ OUTPUT INSTRUCTIONS:
 
         // 5. Model Fallback Logic (Resilience)
         const modelsToTry = [
-            'gemini-1.5-flash',
+            'gemini-1.5-flash-002',
             'gemini-1.5-pro-002',
+            'gemini-1.5-flash',
             'gemini-pro'
         ];
 

@@ -56,6 +56,27 @@ Generate error-free Pine Script v6 indicators and strategies instantly.
 - **Product Image**: Use a clean, dark-mode screenshot of the PineGen dashboard.
 - **Button Text**: Change from "Buy Now" to "Initialize Access" for a more technical feel.
 
+## ✨ Checkout Beautification Template
+To make your checkout page look premium, add these to your **Lemon Squeezy Product** settings:
+
+### 1. Banner Image (Recommended)
+Use an image with a dark indigo gradient and a subtle Pine Script code overlay. 
+*   **Text on Image**: "PineGen v6: Alpha Compute Node"
+*   **Style**: Glassmorphism or Carbon Fiber texture.
+
+### 2. High-Conversion Features List
+Paste this into the **Product Description** for the checkout:
+```markdown
+✅ **Institutional Performance**: 600+ Generations/mo (Trader Tier)
+✅ **v6 Native**: Guaranteed TradingView v6 logic compliance
+✅ **Alpha Discovery**: Access to exclusive institutional risk-management templates
+✅ **Cloud Sync**: 90-day strategy history with instant recall
+```
+
+### 3. Payment Button
+- **Label**: "Unfreeze Bandwidth" or "Sync Subscription"
+- **Color**: `#4f46e5` (Institutional Indigo)
+
 ## 📊 Usage & Cycle Logic
 - **Generation**: Each time a user hits "Enter", **1 token** is deducted.
 - **Tracking**: This is recorded in the `user_profiles` table.
