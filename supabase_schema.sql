@@ -1,9 +1,11 @@
--- PINESCRIPT AI: MASTER COMMERCIAL SCHEMA v2.0
--- 1. AGGRESSIVE CLEANUP
+-- PINESCRIPT AI: MASTER COMMERCIAL SCHEMA v3.0
+-- 1. AGGRESSIVE CLEANUP (Purging old token-based logic)
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 DROP FUNCTION IF EXISTS public.handle_new_user() CASCADE;
 DROP FUNCTION IF EXISTS public.check_token_quota(uuid) CASCADE;
+DROP FUNCTION IF EXISTS public.check_gen_quota(uuid) CASCADE;
 DROP FUNCTION IF EXISTS public.deduct_user_tokens(uuid, int, uuid, text) CASCADE;
+DROP FUNCTION IF EXISTS public.deduct_user_gens(uuid, int) CASCADE;
 DROP FUNCTION IF EXISTS public.record_request(uuid, int) CASCADE;
 DROP FUNCTION IF EXISTS public.check_rate_limit(uuid) CASCADE;
 
@@ -23,8 +25,8 @@ CREATE TABLE public.user_profiles (
   id uuid REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   email text,
   tier text DEFAULT 'free' CHECK (tier IN ('free', 'pro', 'trader', 'pro_trader')),
-  tokens_monthly_limit bigint DEFAULT 10,
-  tokens_remaining bigint DEFAULT 10,
+  gens_monthly_limit bigint DEFAULT 10,
+  gens_remaining bigint DEFAULT 10,
   last_reset_at timestamptz DEFAULT now(),
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
@@ -35,7 +37,7 @@ CREATE TABLE public.conversations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid REFERENCES public.user_profiles(id) ON DELETE CASCADE NOT NULL,
   title text NOT NULL,
-  total_tokens bigint DEFAULT 0,
+  total_gens bigint DEFAULT 0,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
@@ -46,7 +48,7 @@ CREATE TABLE public.messages (
   conversation_id uuid REFERENCES public.conversations ON DELETE CASCADE NOT NULL,
   role text NOT NULL CHECK (role IN ('user', 'assistant', 'system')),
   content text NOT NULL,
-  tokens bigint DEFAULT 0,
+  gens bigint DEFAULT 1, -- Default to 1 generation per response
   created_at timestamptz DEFAULT now()
 );
 
@@ -96,7 +98,7 @@ CREATE POLICY "Users view own subs" ON public.subscriptions FOR SELECT USING (au
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.user_profiles (id, email, tier, tokens_monthly_limit, tokens_remaining)
+  INSERT INTO public.user_profiles (id, email, tier, gens_monthly_limit, gens_remaining)
   VALUES (new.id, new.email, 'free', 10, 10);
   RETURN new;
 END;
@@ -106,33 +108,31 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
--- Atomic Token Deduction (One-Way / No Reversal)
-CREATE OR REPLACE FUNCTION public.deduct_user_tokens(
+-- Atomic Generation Deduction (One-Way / No Reversal)
+CREATE OR REPLACE FUNCTION public.deduct_user_gens(
     p_user_id uuid, 
-    p_tokens_to_deduct int,
-    p_unused_1 uuid DEFAULT NULL,
-    p_unused_2 text DEFAULT NULL
+    p_gens_to_deduct int
 )
 RETURNS json AS $$
 DECLARE v_remaining bigint;
 BEGIN
     UPDATE public.user_profiles
-    SET tokens_remaining = tokens_remaining - p_tokens_to_deduct, updated_at = now()
-    WHERE id = p_user_id AND tokens_remaining >= p_tokens_to_deduct
-    RETURNING tokens_remaining INTO v_remaining;
+    SET gens_remaining = gens_remaining - p_gens_to_deduct, updated_at = now()
+    WHERE id = p_user_id AND gens_remaining >= p_gens_to_deduct
+    RETURNING gens_remaining INTO v_remaining;
     
     IF v_remaining IS NULL THEN 
         RETURN json_build_object('success', false, 'error', 'insufficient_quota'); 
     END IF;
     
-    RETURN json_build_object('success', true, 'data', json_build_object('tokens_remaining', v_remaining));
+    RETURN json_build_object('success', true, 'data', json_build_object('gens_remaining', v_remaining));
 EXCEPTION WHEN OTHERS THEN
     RETURN json_build_object('success', false, 'error', SQLERRM);
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Monthly Quota Check & Reset
-CREATE OR REPLACE FUNCTION public.check_token_quota(p_user_id uuid)
+CREATE OR REPLACE FUNCTION public.check_gen_quota(p_user_id uuid)
 RETURNS json AS $$
 DECLARE v_profile record;
 BEGIN
@@ -145,22 +145,22 @@ BEGIN
   -- 30-Day Monthly Cycle Reset
   IF v_profile.last_reset_at < now() - interval '30 days' THEN
     UPDATE public.user_profiles 
-    SET tokens_remaining = tokens_monthly_limit, 
+    SET gens_remaining = gens_monthly_limit, 
         last_reset_at = now() 
     WHERE id = p_user_id;
     
     RETURN json_build_object(
         'allowed', true, 
-        'remaining', v_profile.tokens_monthly_limit, 
-        'limit', v_profile.tokens_monthly_limit, 
+        'remaining', v_profile.gens_monthly_limit, 
+        'limit', v_profile.gens_monthly_limit, 
         'tier', v_profile.tier
     );
   END IF;
 
   RETURN json_build_object(
-      'allowed', v_profile.tokens_remaining > 0,
-      'remaining', v_profile.tokens_remaining,
-      'limit', v_profile.tokens_monthly_limit,
+      'allowed', v_profile.gens_remaining > 0,
+      'remaining', v_profile.gens_remaining,
+      'limit', v_profile.gens_monthly_limit,
       'tier', v_profile.tier,
       'resetAt', v_profile.last_reset_at + interval '30 days'
   );

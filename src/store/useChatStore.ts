@@ -102,7 +102,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
             .insert({
                 user_id: user.id,
                 title: title || 'New Conversation',
-                total_tokens: 0,
+                total_gens: 0,
             })
             .select()
             .single();
@@ -170,7 +170,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         const user = get().user;
         if (!user) return { allowed: false };
 
-        const { data, error } = await supabase.rpc('check_token_quota', { p_user_id: user.id });
+        const { data, error } = await supabase.rpc('check_gen_quota', { p_user_id: user.id });
 
         if (error) {
             console.error('Rate limit check failed:', error);
@@ -219,7 +219,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
                 conversation_id: conversationId,
                 role: 'user',
                 content: sanitizeInput(content),
-                tokens: 0,
+                gens: 0,
             })
             .select()
             .single();
@@ -325,7 +325,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
                     conversation_id: conversationId,
                     role: 'assistant',
                     content: aiResponse,
-                    tokens: Math.ceil(aiResponse.length / 4),
+                    gens: 1,
                 })
                 .select()
                 .single();

@@ -127,7 +127,7 @@ export default function Settings() {
                                 <div className="flex justify-between items-end">
                                     <div className="space-y-1">
                                         <span className="text-5xl font-black tracking-tighter text-primary">{quotaInfo.remaining}</span>
-                                        <span className="text-zinc-400 font-bold text-xl ml-2 tracking-tight">/ {quotaInfo.limit} tokens</span>
+                                        <span className="text-zinc-400 font-bold text-xl ml-2 tracking-tight">/ {quotaInfo.limit} gens</span>
                                     </div>
                                     <div className="text-right">
                                         <span className="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">Utilization</span>

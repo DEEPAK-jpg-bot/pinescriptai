@@ -51,7 +51,7 @@ export async function POST(req: Request) {
         }
 
         // 2. Quota & Reset Logic (Trigger via RPC)
-        const { data: quota, error: quotaError } = await supabase.rpc('check_token_quota', { p_user_id: user.id });
+        const { data: quota, error: quotaError } = await supabase.rpc('check_gen_quota', { p_user_id: user.id });
 
         if (quotaError) {
             console.error('Quota Check Failed:', quotaError);
@@ -155,11 +155,9 @@ OUTPUT INSTRUCTIONS:
                     }
                     controller.enqueue(encoder.encode('data: [DONE]\n\n'));
 
-                    // 7. Deduct Token Quota (Atomic)
-                    await supabase.rpc('deduct_user_tokens', {
+                    await supabase.rpc('deduct_user_gens', {
                         p_user_id: user.id,
-                        p_tokens_to_deduct: 1,
-                        p_action: 'generate'
+                        p_gens_to_deduct: 1
                     });
 
                 } catch (e: unknown) {

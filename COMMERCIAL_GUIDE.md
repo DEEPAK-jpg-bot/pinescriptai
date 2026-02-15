@@ -78,9 +78,9 @@ Paste this into the **Product Description** for the checkout:
 - **Color**: `#4f46e5` (Institutional Indigo)
 
 ## 📊 Usage & Cycle Logic
-- **Generation**: Each time a user hits "Enter", **1 token** is deducted.
-- **Tracking**: This is recorded in the `user_profiles` table.
-- **Protocol Recovery**: Quotas reset on a standard 24-hour cycle for Free users, ensuring they return to the app daily. Pro users have monthly capacity resets synced with their billing cycle.
+- **Generation**: Each time a user hits "Enter", **1 Generation** is deducted.
+- **Tracking**: This is recorded in the `user_profiles` table under `gens_remaining`.
+- **Protocol Recovery**: Quotas reset on a standard **30-day cycle** for Free users (10 Gens/mo). Pro users have monthly capacity resets synced with their billing cycle (e.g., 200, 600, or 1500 Gens).
 
 ### 2. Required Setup
 1.  **Environment Variables**:

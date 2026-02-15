@@ -2,8 +2,8 @@ export type User = {
     id: string;
     email: string;
     tier?: string;
-    tokens_monthly_limit?: number;
-    tokens_remaining?: number;
+    gens_monthly_limit?: number;
+    gens_remaining?: number;
 };
 
 export type Message = {
@@ -12,7 +12,7 @@ export type Message = {
     role: 'user' | 'assistant';
     content: string;
     created_at: string;
-    tokens?: number;
+    gens?: number;
 };
 
 export type Conversation = {
@@ -21,7 +21,7 @@ export type Conversation = {
     title: string;
     created_at?: string;
     updated_at: string;
-    total_tokens: number;
+    total_gens: number;
 };
 
 export type QuotaInfo = {

@@ -77,17 +77,17 @@ export async function POST(req: NextRequest) {
 
             // Map Variant IDs to Tiers and Limits
             let tier = 'pro';
-            let tokenLimit = 1500; // Default fallback
+            let genLimit = 1500; // Default fallback
 
             if (variantId === '1307516') { // Pro
                 tier = 'pro';
-                tokenLimit = 200;
+                genLimit = 200;
             } else if (variantId === '1307522') { // Trader
                 tier = 'trader';
-                tokenLimit = 600;
+                genLimit = 600;
             } else if (variantId === '1307525') { // Pro Trader
                 tier = 'pro_trader';
-                tokenLimit = 1500;
+                genLimit = 1500;
             }
 
             const subscriptionData = {
@@ -113,8 +113,8 @@ export async function POST(req: NextRequest) {
             if (isPaid) {
                 await supabase.from('user_profiles').update({
                     tier: tier,
-                    tokens_monthly_limit: tokenLimit,
-                    tokens_remaining: tokenLimit, // Refill on upgrade/renewal
+                    gens_monthly_limit: genLimit,
+                    gens_remaining: genLimit, // Refill on upgrade/renewal
                     last_reset_at: new Date().toISOString()
                 }).eq('id', targetUserId);
             }
@@ -129,8 +129,8 @@ export async function POST(req: NextRequest) {
             if (payload.attributes.status === 'expired') {
                 await supabase.from('user_profiles').update({
                     tier: 'free',
-                    tokens_monthly_limit: 10,
-                    tokens_remaining: 10 // Reset to free limit
+                    gens_monthly_limit: 10,
+                    gens_remaining: 10 // Reset to free limit
                 }).eq('id', targetUserId);
             }
         }

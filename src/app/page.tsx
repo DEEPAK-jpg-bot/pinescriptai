@@ -131,7 +131,7 @@ function LandingContent() {
             name: "Lab",
             price: "$0",
             features: [
-                "10 Monthly Cycles",
+                "10 /mo Generations",
                 "8K Context Window",
                 "7-Day History",
                 "Standard Queue",
@@ -144,7 +144,7 @@ function LandingContent() {
             name: "Pro",
             price: "$19",
             features: [
-                "200 Extended Cycles",
+                "200 /mo Generations",
                 "32K Context Window",
                 "30-Day History",
                 "Priority Compute",
@@ -159,7 +159,7 @@ function LandingContent() {
             name: "Trader",
             price: "$50",
             features: [
-                "600 High-Compute Cycles",
+                "600 /mo Generations",
                 "128K Context Window",
                 "90-Day History",
                 "Institutional Node",
@@ -173,7 +173,7 @@ function LandingContent() {
             name: "Pro Trader",
             price: "$100",
             features: [
-                "1500 Ultra-Bandwidth",
+                "1500 /mo Generations",
                 "1M+ Alpha Window",
                 "Infinite Persistence",
                 "Ultra-Low Latency",
