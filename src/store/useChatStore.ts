@@ -192,158 +192,203 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     },
 
     sendMessage: async (content: string) => {
-        const { user, activeConversationId, checkRateLimit } = get();
+        const { user, activeConversationId, checkRateLimit, setError } = get();
         if (!user) {
-            set({ currentError: "You must be logged in." });
+            setError("You must be logged in to generate logic.");
             return;
         }
 
-        const rateCheck = await checkRateLimit();
-        if (rateCheck && !rateCheck.allowed) {
-            set({
-                currentError: rateCheck.reason === 'daily_quota_exceeded'
-                    ? `Daily quota exceeded. Resets at ${new Date(rateCheck.resetAt!).toLocaleString()}`
-                    : `Rate limit exceeded. Wait ${rateCheck.waitSeconds} seconds.`,
-            });
-            return;
-        }
-
-        let conversationId = activeConversationId;
-        if (!conversationId) {
-            conversationId = await get().createConversation(content.slice(0, 30) + '...');
-            if (!conversationId) return;
-        }
-
-        const { data: userMessage, error: userError } = await supabase
-            .from('messages')
-            .insert({
-                conversation_id: conversationId,
-                role: 'user',
-                content: sanitizeInput(content),
-                gens: 0,
-            })
-            .select()
-            .single();
-
-        if (userError) {
-            set({ currentError: userError.message });
-            return;
-        }
-
-        set((state) => ({
-            messages: [...state.messages, userMessage],
-            isGenerating: true,
-        }));
+        // 1. Initial State Activation
+        set({ isGenerating: true, currentError: null });
 
         try {
-            let response;
-            let attempt = 0;
-            const maxAttempts = 3;
-
-            while (attempt < maxAttempts) {
-                try {
-                    if (attempt > 0) await new Promise(r => setTimeout(r, 1000));
-
-                    let { session } = get();
-                    if (!session) {
-                        const { data } = await supabase.auth.getSession();
-                        session = data.session;
-                        set({ session });
-                    }
-
-                    response = await fetch('/api/generate', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${session?.access_token}`
-                        },
-                        body: JSON.stringify({
-                            messages: get().messages.map(m => ({ role: m.role, content: m.content })),
-                            conversationId: conversationId,
-                        }),
-                    });
-
-                    if (response.ok) break;
-                    if (response.status !== 429 && response.status < 500) break;
-                } catch (e) {
-                    if (attempt === maxAttempts - 1) throw e;
-                }
-                attempt++;
+            const sanitized = sanitizeInput(content);
+            if (!sanitized) {
+                set({ isGenerating: false });
+                return;
             }
 
-            if (!response || !response.ok) {
-                const errorData = await response?.json().catch(() => ({}));
-                const errorMessage = errorData?.suggestion
-                    ? `${errorData.error} - ${errorData.suggestion}`
-                    : (errorData?.error || 'AI generation failed');
-                throw new Error(errorMessage);
+            // 2. Quota Verification
+            const rateCheck = await checkRateLimit();
+            if (rateCheck && !rateCheck.allowed) {
+                set({
+                    currentError: rateCheck.reason === 'daily_quota_exceeded'
+                        ? `Daily quota exceeded. Resets at ${new Date(rateCheck.resetAt!).toLocaleString()}`
+                        : `Protocol Execution Blocked: ${rateCheck.reason || 'Insufficient Quota'}`,
+                    isGenerating: false
+                });
+                return;
             }
 
-            const reader = response.body?.getReader();
-            const decoder = new TextDecoder();
-            if (!reader) throw new Error('No response body');
-
-            let aiResponse = '';
-            let loop = true;
-
-            while (loop) {
-                const { done, value } = await reader.read();
-                if (done) {
-                    loop = false;
-                    break;
-                }
-
-                const chunk = decoder.decode(value, { stream: true });
-                const lines = chunk.split('\n');
-
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        const data = line.slice(6).trim();
-                        if (data === '[DONE]') {
-                            loop = false;
-                            break;
-                        }
-                        try {
-                            const parsed = JSON.parse(data);
-                            if (parsed.text) {
-                                aiResponse += parsed.text;
-                                // Simple update strategy
-                                set((state) => ({
-                                    messages: state.messages.map(m =>
-                                        m.id === undefined ? m : (m.role === 'assistant' && m.content === '') ? { ...m, content: aiResponse } : m
-                                    )
-                                }));
-                            }
-                        } catch { /* ignore */ }
-                    }
+            // 3. Conversation Resolution
+            let conversationId = activeConversationId;
+            if (!conversationId) {
+                conversationId = await get().createConversation(sanitized.slice(0, 30) + '...');
+                if (!conversationId) {
+                    throw new Error("Failed to initialize logic session.");
                 }
             }
 
-            // Save AI Message
-            const { data: aiMessage, error: aiError } = await supabase
+            // 4. Optimistic Message Display
+            const tempUserMsg: Message = {
+                role: 'user',
+                content: sanitized,
+                conversation_id: conversationId,
+                created_at: new Date().toISOString(),
+                id: 'temp-' + Date.now()
+            } as any;
+
+            set((state) => ({
+                messages: [...state.messages, tempUserMsg],
+            }));
+
+            // 5. Database Synchronization (User Message)
+            const { data: userMessage, error: userError } = await supabase
                 .from('messages')
                 .insert({
                     conversation_id: conversationId,
-                    role: 'assistant',
-                    content: aiResponse,
-                    gens: 1,
+                    role: 'user',
+                    content: sanitized,
+                    gens: 0,
                 })
                 .select()
                 .single();
 
-            if (aiError) throw aiError;
+            if (userError) throw userError;
 
-            // Correct mapping for UI update
+            // Replace temp user message with DB version (to get real ID)
             set((state) => ({
-                messages: [...state.messages.filter(m => m.id !== undefined), aiMessage],
-                isGenerating: false,
+                messages: state.messages.map(m => m.id === tempUserMsg.id ? userMessage : m),
             }));
 
-            await supabase.from('conversations').update({ updated_at: new Date().toISOString() }).eq('id', conversationId);
-            await checkRateLimit();
+            // 6. AI Placeholder Initialization
+            set((state) => ({
+                messages: [
+                    ...state.messages,
+                    { role: 'assistant', content: '', id: 'temp-ai', conversation_id: conversationId, created_at: new Date().toISOString() } as any
+                ]
+            }));
 
-        } catch (error: any) {
-            set({ currentError: error.message || 'An unknown error occurred', isGenerating: false });
+            try {
+                let response;
+                let attempt = 0;
+                const maxAttempts = 3;
+
+                while (attempt < maxAttempts) {
+                    try {
+                        if (attempt > 0) await new Promise(r => setTimeout(r, 1000));
+
+                        let { session } = get();
+                        if (!session) {
+                            const { data } = await supabase.auth.getSession();
+                            session = data.session;
+                            set({ session });
+                        }
+
+                        response = await fetch('/api/generate', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${session?.access_token}`
+                            },
+                            body: JSON.stringify({
+                                messages: get().messages.filter(m => m.id !== 'temp-ai').map(m => ({ role: m.role, content: m.content })),
+                                conversationId: conversationId,
+                            }),
+                        });
+
+                        if (response.ok) break;
+                        if (response.status !== 429 && response.status < 500) break;
+                    } catch (e) {
+                        if (attempt === maxAttempts - 1) throw e;
+                    }
+                    attempt++;
+                }
+
+                if (!response || !response.ok) {
+                    const errorData = await response?.json().catch(() => ({}));
+                    const errorMessage = errorData?.suggestion
+                        ? `${errorData.error} - ${errorData.suggestion}`
+                        : (errorData?.error || 'AI generation failed');
+                    throw new Error(errorMessage);
+                }
+
+                const reader = response.body?.getReader();
+                const decoder = new TextDecoder();
+                if (!reader) throw new Error('No response body');
+
+                let aiResponse = '';
+                let loop = true;
+
+                while (loop) {
+                    const { done, value } = await reader.read();
+                    if (done) {
+                        loop = false;
+                        break;
+                    }
+
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n');
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6).trim();
+                            if (data === '[DONE]') {
+                                loop = false;
+                                break;
+                            }
+                            try {
+                                const parsed = JSON.parse(data);
+                                if (parsed.text) {
+                                    aiResponse += parsed.text;
+                                    // Simple update strategy
+                                    set((state) => ({
+                                        messages: state.messages.map(m =>
+                                            m.id === 'temp-ai' ? { ...m, content: aiResponse } : m
+                                        )
+                                    }));
+                                }
+                            } catch { /* ignore */ }
+                        }
+                    }
+                }
+
+                // Save AI Message
+                const { data: aiMessage, error: aiError } = await supabase
+                    .from('messages')
+                    .insert({
+                        conversation_id: conversationId,
+                        role: 'assistant',
+                        content: aiResponse,
+                        gens: 1,
+                    })
+                    .select()
+                    .single();
+
+                if (aiError) throw aiError;
+
+                // Final Update: Swap temp for real
+                set((state) => ({
+                    messages: [...state.messages.filter(m => m.id !== 'temp-ai'), aiMessage],
+                    isGenerating: false,
+                }));
+
+                await supabase.from('conversations').update({ updated_at: new Date().toISOString() }).eq('id', conversationId);
+                await checkRateLimit();
+
+            } catch (innerError: any) {
+                // If anything fails in the stream, clean up the temp AI message
+                set((state) => ({
+                    messages: state.messages.filter(m => m.id !== 'temp-ai'),
+                    isGenerating: false,
+                    currentError: innerError.message || 'Logic generation failed.'
+                }));
+            }
+        } catch (outerError: any) {
+            set({
+                currentError: outerError.message || 'Protocol Failure.',
+                isGenerating: false
+            });
         }
     },
 }));
