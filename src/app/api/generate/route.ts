@@ -97,16 +97,13 @@ OUTPUT INSTRUCTIONS:
             parts: [{ text: msg.content }]
         }));
 
-        // 5. Model Fallback Logic (Active Network Resilience)
-        // Using -latest and -exp aliases for maximum compatibility across regions/API versions
+        // 5. Model Fallback Logic (Total Resilience v3)
+        // Using versioned names + explicit API versioning to bypass regional 404s
         const modelsToTry = [
-            'gemini-1.5-flash-latest',
-            'gemini-1.5-pro-latest',
-            'gemini-2.0-flash-exp',
             'gemini-1.5-flash',
             'gemini-1.5-pro',
-            'gemini-pro',
-            'gemini-1.0-pro'
+            'gemini-1.5-flash-8b',
+            'gemini-pro'
         ];
 
         let result;
@@ -115,6 +112,7 @@ OUTPUT INSTRUCTIONS:
 
         for (const modelId of modelsToTry) {
             try {
+                // Try stable v1 first for these models
                 const testModel = genAI.getGenerativeModel({
                     model: modelId,
                     systemInstruction: {
@@ -125,29 +123,47 @@ OUTPUT INSTRUCTIONS:
                         temperature: 0.5,
                         maxOutputTokens: 8192,
                     }
-                });
+                }, { apiVersion: 'v1' });
 
                 const chat = testModel.startChat({ history });
 
-                // We trigger the actual network call here to verify model availability
+                // Verify connectivity with a real stream initiation
                 const lastMessage = messages[messages.length - 1];
                 result = await chat.sendMessageStream(lastMessage.content);
 
-                // If we reach here, the model is valid and the stream is open
-                console.log(`Successfully initiated stream with: ${modelId}`);
+                console.log(`Verified stable link with: ${modelId} (v1)`);
                 break;
             } catch (e: unknown) {
                 const msg = e instanceof Error ? e.message : String(e);
-                console.warn(`Model check failed for ${modelId}: ${msg}`);
-                if (!firstGenerationError) firstGenerationError = e;
-                lastGenerationError = e;
+                console.warn(`v1 check failed for ${modelId}: ${msg}. Trying v1beta...`);
+
+                try {
+                    // Fallback to v1beta for the same model
+                    const betaModel = genAI.getGenerativeModel({
+                        model: modelId,
+                        systemInstruction: { role: 'system', parts: [{ text: systemPrompt }] },
+                        generationConfig: { temperature: 0.5, maxOutputTokens: 8192 }
+                    }, { apiVersion: 'v1beta' });
+
+                    const betaChat = betaModel.startChat({ history });
+                    const lastMessage = messages[messages.length - 1];
+                    result = await betaChat.sendMessageStream(lastMessage.content);
+
+                    console.log(`Verified beta link with: ${modelId} (v1beta)`);
+                    break;
+                } catch (be: unknown) {
+                    const bMsg = be instanceof Error ? be.message : String(be);
+                    console.error(`Both v1 and v1beta failed for ${modelId}: ${bMsg}`);
+                    if (!firstGenerationError) firstGenerationError = be;
+                    lastGenerationError = be;
+                }
             }
         }
 
         if (!result) {
-            const primaryErr = firstGenerationError instanceof Error ? firstGenerationError.message : 'Primary model failed';
-            const lastErr = lastGenerationError instanceof Error ? lastGenerationError.message : 'All fallbacks exhausted';
-            throw new Error(`AI Gateway exhausted all model fallbacks. Primary failure: ${primaryErr}. Last attempt error: ${lastErr}. Please check your API key and region status.`);
+            const primaryErr = firstGenerationError instanceof Error ? firstGenerationError.message : 'Primary connection failed';
+            const lastErr = lastGenerationError instanceof Error ? lastGenerationError.message : 'All failover gates exhausted';
+            throw new Error(`AI Service Unavailable. Connection diagnostics: [Primary: ${primaryErr}] [Final: ${lastErr}]. Verify your API key has "Generative Language API" enabled in Google AI Studio.`);
         }
 
         // 6. Stream Response Handler
