@@ -98,16 +98,20 @@ OUTPUT INSTRUCTIONS:
         }));
 
         // 5. Model Fallback Logic (Active Network Resilience)
+        // Using -latest and -exp aliases for maximum compatibility across regions/API versions
         const modelsToTry = [
+            'gemini-1.5-flash-latest',
+            'gemini-1.5-pro-latest',
+            'gemini-2.0-flash-exp',
             'gemini-1.5-flash',
             'gemini-1.5-pro',
             'gemini-pro',
-            'gemini-1.5-flash-002',
-            'gemini-1.5-pro-002'
+            'gemini-1.0-pro'
         ];
 
         let result;
         let lastGenerationError;
+        let firstGenerationError;
 
         for (const modelId of modelsToTry) {
             try {
@@ -134,14 +138,16 @@ OUTPUT INSTRUCTIONS:
                 break;
             } catch (e: unknown) {
                 const msg = e instanceof Error ? e.message : String(e);
-                console.warn(`Model ${modelId} failed: ${msg}. Attempting fallback...`);
+                console.warn(`Model check failed for ${modelId}: ${msg}`);
+                if (!firstGenerationError) firstGenerationError = e;
                 lastGenerationError = e;
             }
         }
 
         if (!result) {
-            const errMatch = lastGenerationError instanceof Error ? lastGenerationError.message : 'Unknown model failure';
-            throw new Error(`AI Gateway exhausted all model fallbacks. Last error: ${errMatch}`);
+            const primaryErr = firstGenerationError instanceof Error ? firstGenerationError.message : 'Primary model failed';
+            const lastErr = lastGenerationError instanceof Error ? lastGenerationError.message : 'All fallbacks exhausted';
+            throw new Error(`AI Gateway exhausted all model fallbacks. Primary failure: ${primaryErr}. Last attempt error: ${lastErr}. Please check your API key and region status.`);
         }
 
         // 6. Stream Response Handler
