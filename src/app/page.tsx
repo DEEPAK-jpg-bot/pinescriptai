@@ -131,7 +131,7 @@ function LandingContent() {
             name: "Lab",
             price: "$0",
             features: [
-                "10 Generations/month",
+                "10 Generations / month",
                 "8K Context Window",
                 "7-Day History",
                 "Standard Queue",
@@ -144,7 +144,7 @@ function LandingContent() {
             name: "Pro",
             price: "$19",
             features: [
-                "200 Generations/month",
+                "200 Generations / month",
                 "32K Context Window",
                 "30-Day History",
                 "Priority Compute",
@@ -159,7 +159,7 @@ function LandingContent() {
             name: "Trader",
             price: "$50",
             features: [
-                "600 Generations/month",
+                "600 Generations / month",
                 "128K Context Window",
                 "90-Day History",
                 "Institutional Node",
@@ -173,7 +173,7 @@ function LandingContent() {
             name: "Pro Trader",
             price: "$100",
             features: [
-                "1500 Generations/month",
+                "1500 Generations / month",
                 "1M+ Alpha Window",
                 "Infinite Persistence",
                 "Ultra-Low Latency",
@@ -319,7 +319,7 @@ function LandingContent() {
 
                                         <ul className="space-y-4 flex-1 w-full">
                                             {p.features.map((f: string, fi: number) => (
-                                                <li key={fi} className="flex items-start gap-3 text-[10px] text-zinc-600 dark:text-zinc-400 uppercase text-left leading-relaxed">
+                                                <li key={fi} className="flex items-start gap-3 text-[10px] text-zinc-600 dark:text-zinc-400 text-left leading-relaxed">
                                                     <div className="w-4 h-4 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                                                         <Check size={10} className="text-primary" />
                                                     </div>

@@ -22,7 +22,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return (
         <div className={cn("flex h-screen w-full bg-white dark:bg-page-dark transition-colors duration-300 overflow-hidden", isDarkMode && "dark")}>
             {/* DESKTOP SIDEBAR */}
-            <Sidebar />
+            <div className="hidden md:flex h-full">
+                <Sidebar />
+            </div>
 
             {/* MOBILE SIDEBAR OVERLAY */}
             {isMobileMenuOpen && (

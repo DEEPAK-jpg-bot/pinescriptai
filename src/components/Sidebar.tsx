@@ -34,7 +34,7 @@ export default function Sidebar() {
 
     return (
         <div className={cn(
-            "h-screen hidden md:flex flex-col bg-zinc-100 dark:bg-sidebar-dark border-r border-zinc-200 dark:border-zinc-800 transition-all duration-300 relative group/sidebar",
+            "h-full flex flex-col bg-zinc-100 dark:bg-sidebar-dark border-r border-zinc-200 dark:border-zinc-800 transition-all duration-300 relative group/sidebar",
             isCollapsed ? "w-16" : "w-64"
         )}>
             {/* Top Section: Brand & New Chat */}
