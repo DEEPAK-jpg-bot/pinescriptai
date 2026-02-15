@@ -81,7 +81,7 @@ export default function Dashboard() {
         <div className="flex flex-col h-full bg-transparent">
             {/* CHAT AREA (Scrollable) */}
             <div
-                className="flex-1 overflow-y-auto custom-scrollbar flex justify-center py-6 pb-60"
+                className="flex-1 overflow-y-auto custom-scrollbar flex justify-center py-6 pb-[200px]"
                 ref={scrollRef}
             >
                 <div className="w-full max-w-[768px] px-6 space-y-10">
@@ -112,49 +112,54 @@ export default function Dashboard() {
                             </div>
                         </div>
                     ) : (
-                        messages.map((message, index) => (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className={cn(
-                                    "flex gap-6",
-                                    message.role === 'user' ? "flex-row-reverse" : "flex-row"
-                                )}
-                            >
-                                <div className={cn(
-                                    "w-9 h-9 flex-shrink-0 rounded-xl flex items-center justify-center font-bold text-xs select-none",
-                                    message.role === 'user'
-                                        ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-500"
-                                        : "bg-primary text-white shadow-lg shadow-primary/10"
-                                )}>
-                                    {message.role === 'user' ? 'U' : 'AI'}
-                                </div>
-                                <div className={cn(
-                                    "flex-1 min-w-0 pt-1.5",
-                                    message.role === 'user' ? "text-right" : "text-left"
-                                )}>
-                                    {formatMessage(message.content)}
-                                </div>
-                            </motion.div>
-                        ))
-                    )}
+                        <>
+                            {messages.map((message, index) => (
+                                <motion.div
+                                    key={index}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className={cn(
+                                        "flex gap-6",
+                                        message.role === 'user' ? "flex-row-reverse" : "flex-row"
+                                    )}
+                                >
+                                    <div className={cn(
+                                        "w-9 h-9 flex-shrink-0 rounded-xl flex items-center justify-center font-bold text-xs select-none",
+                                        message.role === 'user'
+                                            ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-500"
+                                            : "bg-primary text-white shadow-lg shadow-primary/10"
+                                    )}>
+                                        {message.role === 'user' ? 'U' : 'AI'}
+                                    </div>
+                                    <div className={cn(
+                                        "flex-1 min-w-0 pt-1.5",
+                                        message.role === 'user' ? "text-right" : "text-left"
+                                    )}>
+                                        {formatMessage(message.content)}
+                                    </div>
+                                </motion.div>
+                            ))}
 
-                    {isGenerating && (
-                        <div className="flex gap-6 animate-pulse">
-                            <div className="w-9 h-9 bg-primary/30 rounded-xl flex items-center justify-center text-white font-bold opacity-50">AI</div>
-                            <div className="space-y-2 pt-3 flex-1">
-                                <div className="h-3 bg-zinc-100 dark:bg-zinc-800 rounded-full w-[80%]" />
-                                <div className="h-3 bg-zinc-100 dark:bg-zinc-800 rounded-full w-[40%]" />
-                            </div>
-                        </div>
-                    )}
+                            {isGenerating && (
+                                <div className="flex gap-6 animate-pulse">
+                                    <div className="w-9 h-9 bg-primary/30 rounded-xl flex items-center justify-center text-white font-bold opacity-50">AI</div>
+                                    <div className="space-y-2 pt-3 flex-1">
+                                        <div className="h-3 bg-zinc-100 dark:bg-zinc-800 rounded-full w-[80%]" />
+                                        <div className="h-3 bg-zinc-100 dark:bg-zinc-800 rounded-full w-[40%]" />
+                                    </div>
+                                </div>
+                            )}
 
-                    {currentError && (
-                        <div className="bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 p-4 rounded-2xl text-xs font-bold border border-red-200 dark:border-red-500/20 flex items-center gap-3">
-                            <AlertTriangle size={16} />
-                            {currentError}
-                        </div>
+                            {currentError && (
+                                <div className="bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 p-6 rounded-3xl text-sm font-bold border border-red-200 dark:border-red-500/20 flex items-start gap-3 shadow-xl shadow-red-500/5 mt-4">
+                                    <AlertTriangle size={20} className="shrink-0 mt-0.5" />
+                                    <div className="space-y-1">
+                                        <p className="font-black uppercase tracking-widest text-[10px] opacity-70">Protocol Error Detected</p>
+                                        <p className="leading-relaxed">{currentError}</p>
+                                    </div>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>

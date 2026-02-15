@@ -131,7 +131,7 @@ function LandingContent() {
             name: "Lab",
             price: "$0",
             features: [
-                "10 /mo Generations",
+                "10 Generations/month",
                 "8K Context Window",
                 "7-Day History",
                 "Standard Queue",
@@ -144,7 +144,7 @@ function LandingContent() {
             name: "Pro",
             price: "$19",
             features: [
-                "200 /mo Generations",
+                "200 Generations/month",
                 "32K Context Window",
                 "30-Day History",
                 "Priority Compute",
@@ -159,7 +159,7 @@ function LandingContent() {
             name: "Trader",
             price: "$50",
             features: [
-                "600 /mo Generations",
+                "600 Generations/month",
                 "128K Context Window",
                 "90-Day History",
                 "Institutional Node",
@@ -173,7 +173,7 @@ function LandingContent() {
             name: "Pro Trader",
             price: "$100",
             features: [
-                "1500 /mo Generations",
+                "1500 Generations/month",
                 "1M+ Alpha Window",
                 "Infinite Persistence",
                 "Ultra-Low Latency",
@@ -278,8 +278,8 @@ function LandingContent() {
                             >
                                 <Target size={12} className="text-primary" /> Scalable Compute Protocols
                             </motion.div>
-                            <h2 className="text-6xl font-black tracking-tighter leading-[0.8] mb-4">Select your logic <br /><span className="text-primary">bandwidth.</span></h2>
-                            <p className="text-zinc-500 dark:text-zinc-400 font-medium max-w-sm mx-auto text-sm">Deploy high-performance Pine Script generation across 4 specialized bandwidth tiers.</p>
+                            <h2 className="text-6xl font-black tracking-tighter leading-[0.8] mb-4">Select your logic <br /><span className="text-primary">capacity.</span></h2>
+                            <p className="text-zinc-500 dark:text-zinc-400 font-medium max-w-sm mx-auto text-sm">Deploy high-performance Pine Script generation across 4 specialized generation tiers.</p>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

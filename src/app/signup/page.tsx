@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Terminal, Loader2, ShieldCheck, Mail, Lock, Sparkles, ChevronLeft } from 'lucide-react';
+import { Terminal, Loader2, ShieldCheck, Mail, Lock, Sparkles, ChevronLeft, AlertTriangle } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { isAllowedEmail } from '@/lib/email-check';
 import { Input } from '@/components/ui/input';
@@ -47,7 +47,7 @@ export default function Signup() {
 
             if (error) throw error;
 
-            toast.success('Check your email for the confirmation link!');
+            toast.success('Protocol Initiated. Check your email (and Spam folder) for the confirmation link!');
             setEmail('');
             setPassword('');
 
@@ -129,6 +129,13 @@ export default function Signup() {
                                 )}
                             </Button>
                         </form>
+
+                        <div className="mt-6 flex items-start gap-3 p-4 bg-orange-50 dark:bg-orange-500/5 border border-orange-100 dark:border-orange-500/10 rounded-2xl">
+                            <AlertTriangle className="text-orange-500 shrink-0 mt-0.5" size={14} />
+                            <p className="text-[10px] text-orange-600 dark:text-orange-400 font-bold uppercase tracking-widest leading-relaxed">
+                                Note: Confirmation emails may arrive in your <span className="underline decoration-2 underline-offset-2">Spam Folder</span>. Please check it if you don't receive the link within 60 seconds.
+                            </p>
+                        </div>
                     </div>
                 </div>
 

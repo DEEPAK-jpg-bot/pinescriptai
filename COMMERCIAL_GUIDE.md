@@ -37,41 +37,39 @@ Go to: `Vercel Dashboard` > `pinescript-ai` > `Settings` > `Environment Variable
 ## 🎨 Lemon Squeezy Store Aesthetics (Professional Polish)
 To make your store look institutional and premium, use these settings in your **Lemon Squeezy Dashboard**:
 
-### 1. Product Description Template
-Copy this into your product description for a professional "SaaS" look:
+### 1. Product Description Template (High Performance)
+Copy this into your product description for a premium, high-conversion look:
 ```markdown
-# PineGen Institutional AI Logic
-Generate error-free Pine Script v6 indicators and strategies instantly.
+# 💎 PineGen Institutional Alpha
+Deploy the definitive Pine Script v6 logic engine to your trading stack.
 
-### Why Traders Choose PineGen:
-- **v6 Engine**: Built specifically for the modern TradingView standard.
-- **Institutional Logic**: Strategy generation based on real-world order blocks and liquidity.
-- **Zero Errors**: AI-validated syntax reduces code-fixing time by 90%.
+### 🚀 Why Professional Traders Source Logic from PineGen:
+- ✅ **v6 Native Compiler**: Guaranteed compliance with the latest TradingView v6 standards.
+- ✅ **Institutional Logic**: Strategies engineered around order blocks, liquidity, and volume profiles.
+- ✅ **Neural Validation**: AI-driven syntax checking eliminates 99% of run-time mapping errors.
+- ✅ **Zero Look-Ahead Bias**: Built-in verification protocols ensure non-repainting precision.
 
-*Standard Plan Includes: 200 Gens / mo, 30-day History, Priority Queue.*
+### 📊 Performance Capacity:
+*   **Generations**: 200 - 1500 Generations/month (Tier Dependent)
+*   **Persistence**: Up to 90-Day Cloud History Retrieval
+*   **Compute**: Priority Queue Access for Instant v6 Compilation
+
+---
+*Powered by the PineGen v6 Logic Network.*
 ```
 
-### 2. Branding Settings
-- **Storefront Color**: Set to `#4f46e5` (Institutional Indigo) to match the app.
-- **Product Image**: Use a clean, dark-mode screenshot of the PineGen dashboard.
-- **Button Text**: Change from "Buy Now" to "Initialize Access" for a more technical feel.
+### 2. Branding Settings (Visual Excellence)
+- **Storefront Color**: `#4f46e5` (Institutional Indigo).
+- **Product Image**: Upload a high-resolution dark-mode render of the dashboard.
+- **Button Text**: Change to "Initialize Access" or "Sync Subscription".
 
-## ✨ Checkout Beautification Template
-To make your checkout page look premium, add these to your **Lemon Squeezy Product** settings:
+## ✨ High-Conversion Checkout Assets
+Use these bullet points in the **Feature List** section of the Lemon Squeezy Checkout:
 
-### 1. Banner Image (Recommended)
-Use an image with a dark indigo gradient and a subtle Pine Script code overlay. 
-*   **Text on Image**: "PineGen v6: Alpha Compute Node"
-*   **Style**: Glassmorphism or Carbon Fiber texture.
-
-### 2. High-Conversion Features List
-Paste this into the **Product Description** for the checkout:
-```markdown
-✅ **Institutional Performance**: 600+ Generations/mo (Trader Tier)
-✅ **v6 Native**: Guaranteed TradingView v6 logic compliance
-✅ **Alpha Discovery**: Access to exclusive institutional risk-management templates
-✅ **Cloud Sync**: 90-day strategy history with instant recall
-```
+*   ✅ **Alpha Discovery Unit**: 1500 Generations/month (Pro Trader)
+*   ✅ **Logic Persistence**: Infinite history and state recall
+*   ✅ **v6 Compliance**: Guaranteed TradingView v6 logic safety
+*   ✅ **Neural Support**: 24/7 Priority Technical Access
 
 ### 3. Payment Button
 - **Label**: "Unfreeze Bandwidth" or "Sync Subscription"
