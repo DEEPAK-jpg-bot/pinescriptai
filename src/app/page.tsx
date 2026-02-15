@@ -319,7 +319,7 @@ function LandingContent() {
 
                                         <ul className="space-y-4 flex-1 w-full">
                                             {p.features.map((f: string, fi: number) => (
-                                                <li key={fi} className="flex items-center gap-3 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest text-left">
+                                                <li key={fi} className="flex items-start gap-3 text-[10px] text-zinc-600 dark:text-zinc-400 uppercase text-left leading-relaxed">
                                                     <div className="w-4 h-4 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                                                         <Check size={10} className="text-primary" />
                                                     </div>

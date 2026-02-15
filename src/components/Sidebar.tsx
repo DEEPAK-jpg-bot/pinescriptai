@@ -101,8 +101,8 @@ export default function Sidebar() {
                         {/* Usage indicator */}
                         <div className="space-y-2">
                             <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest text-zinc-500">
-                                <span>Usage</span>
-                                <span>{quotaInfo.limit - quotaInfo.remaining}/{quotaInfo.limit}</span>
+                                <span>Gens Used</span>
+                                <span>{quotaInfo.limit - quotaInfo.remaining} / {quotaInfo.limit}</span>
                             </div>
                             <div className="h-1.5 w-full bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
                                 <div
