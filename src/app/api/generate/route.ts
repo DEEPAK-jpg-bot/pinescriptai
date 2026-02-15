@@ -5,8 +5,8 @@ import { NextResponse } from 'next/server';
 // Manual dotenv config can break Vercel Turbopack builds
 
 // Initialize Google AI
-const apiKey = process.env.GOOGLE_AI_SERVER_KEY || process.env.GEMINI_API_KEY || '';
-const genAI = new GoogleGenerativeAI(apiKey);
+// Moved inside POST to use dynamic API keys and avoid initialization errors
+// in environments without initial env vars.
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60; // Increased duration for detailed response
@@ -97,21 +97,21 @@ OUTPUT INSTRUCTIONS:
             parts: [{ text: msg.content }]
         }));
 
-        // 5. Model Fallback Logic (Resilience)
+        // 5. Model Fallback Logic (Active Network Resilience)
         const modelsToTry = [
-            'gemini-1.5-flash-002',
-            'gemini-1.5-pro-002',
             'gemini-1.5-flash',
-            'gemini-pro'
+            'gemini-1.5-pro',
+            'gemini-pro',
+            'gemini-1.5-flash-002',
+            'gemini-1.5-pro-002'
         ];
 
-        let model;
+        let result;
         let lastGenerationError;
 
         for (const modelId of modelsToTry) {
             try {
-                console.log(`Trying model: ${modelId}`);
-                model = genAI.getGenerativeModel({
+                const testModel = genAI.getGenerativeModel({
                     model: modelId,
                     systemInstruction: {
                         role: 'system',
@@ -123,25 +123,28 @@ OUTPUT INSTRUCTIONS:
                     }
                 });
 
-                // Test the model with a tiny message if needed, or just proceed
+                const chat = testModel.startChat({ history });
+
+                // We trigger the actual network call here to verify model availability
+                const lastMessage = messages[messages.length - 1];
+                result = await chat.sendMessageStream(lastMessage.content);
+
+                // If we reach here, the model is valid and the stream is open
+                console.log(`Successfully initiated stream with: ${modelId}`);
                 break;
-            } catch (e) {
-                console.error(`Model ${modelId} configuration failed, trying next...`);
+            } catch (e: unknown) {
+                const msg = e instanceof Error ? e.message : String(e);
+                console.warn(`Model ${modelId} failed: ${msg}. Attempting fallback...`);
                 lastGenerationError = e;
             }
         }
 
-        if (!model) {
-            throw new Error(`All models failed to initialize. Last error: ${(lastGenerationError as any)?.message}`);
+        if (!result) {
+            const errMatch = lastGenerationError instanceof Error ? lastGenerationError.message : 'Unknown model failure';
+            throw new Error(`AI Gateway exhausted all model fallbacks. Last error: ${errMatch}`);
         }
 
-        const chat = model.startChat({
-            history: history,
-        });
-
-        // 6. Stream Response
-        const lastMessage = messages[messages.length - 1];
-        const result = await chat.sendMessageStream(lastMessage.content);
+        // 6. Stream Response Handler
 
         const stream = new ReadableStream({
             async start(controller) {
@@ -172,11 +175,11 @@ OUTPUT INSTRUCTIONS:
             headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' },
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('API Error:', error);
 
-        const errorMsg = error.message || String(error);
-        const status = error.status || (errorMsg.includes('429') ? 429 : 500);
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        const status = (error as { status?: number })?.status || (errorMsg.includes('429') ? 429 : 500);
 
         // Return a clear diagnostic message
         return NextResponse.json({

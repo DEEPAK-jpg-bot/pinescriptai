@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { SupabaseClient } from '@supabase/supabase-js'
 
 export async function createClient() {
   const cookieStore = await cookies()
@@ -8,7 +9,6 @@ export async function createClient() {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn('Supabase configuration missing for server client.');
     return {
       auth: {
         getUser: async () => ({ data: { user: null }, error: null }),
@@ -17,7 +17,7 @@ export async function createClient() {
       from: () => ({
         select: () => ({ eq: () => ({ single: () => ({ data: null, error: null }) }) }),
       })
-    } as any;
+    } as unknown as SupabaseClient;
   }
 
   return createServerClient(

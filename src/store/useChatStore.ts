@@ -209,14 +209,14 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
         // 1. ATOMIC INSTANT UPDATE
         console.log('Step 1: UI Optimistic Update');
-        const tempId = 'temp-' + Date.now();
+        const tempId = `temp-${Date.now()}`;
         const tempUserMsg: Message = {
             role: 'user',
             content: sanitized,
             conversation_id: activeConversationId || 'pending',
             created_at: new Date().toISOString(),
             id: tempId
-        } as any;
+        } as Message;
 
         set((state) => ({
             messages: [...state.messages, tempUserMsg],
@@ -262,7 +262,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
             // Sync ID and set up AI placeholder
             set((state) => ({
                 messages: state.messages.map(m => m.id === tempId ? userMessage : m).concat([
-                    { role: 'assistant', content: '', id: 'temp-ai', conversation_id: conversationId, created_at: new Date().toISOString() } as any
+                    { role: 'assistant', content: '', id: 'temp-ai', conversation_id: conversationId, created_at: new Date().toISOString() } as Message
                 ])
             }));
 
@@ -343,12 +343,13 @@ export const useChatStore = create<ChatStore>((set, get) => ({
             await supabase.from('conversations').update({ updated_at: new Date().toISOString() }).eq('id', conversationId);
             await checkRateLimit();
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Logic Execution Error:', error);
+            const message = error instanceof Error ? error.message : 'Protocol failure. Please try again.';
             set((state) => ({
                 messages: state.messages.filter(m => m.id !== 'temp-ai'),
                 isGenerating: false,
-                currentError: error.message || 'Protocol failure. Please try again.'
+                currentError: message
             }));
         }
     },

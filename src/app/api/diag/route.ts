@@ -6,9 +6,24 @@ import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
+interface DiagResult {
+    timestamp: string;
+    environment: {
+        node_env: string | undefined;
+        has_supabase_url: boolean;
+        has_supabase_anon_key: boolean;
+        has_supabase_service_key: boolean;
+        has_gemini_key: boolean;
+    };
+    database: {
+        status: string;
+        tables: Record<string, string>;
+    };
+}
+
 export async function GET() {
     const supabase = createAdminClient();
-    const results: any = {
+    const results: DiagResult = {
         timestamp: new Date().toISOString(),
         environment: {
             node_env: process.env.NODE_ENV,
@@ -32,12 +47,13 @@ export async function GET() {
         // Check core tables
         const tables = ['user_profiles', 'conversations', 'messages', 'subscriptions'];
         for (const table of tables) {
-            const { error } = await supabase.from(table).select('count', { count: 'exact', head: true });
+            const { error } = await supabase.from(table).select('*', { count: 'exact', head: true });
             results.database.tables[table] = error ? `Error: ${error.message}` : 'Healthy';
         }
         results.database.status = 'Connected';
-    } catch (e: any) {
-        results.database.status = `Connection Failed: ${e.message}`;
+    } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : String(e);
+        results.database.status = `Connection Failed: ${message}`;
     }
 
     return NextResponse.json(results);

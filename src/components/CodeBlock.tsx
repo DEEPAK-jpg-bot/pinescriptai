@@ -93,7 +93,7 @@ export default function CodeBlock({ code, language = 'pinescript' }: CodeBlockPr
             <div className="relative font-mono text-zinc-800 dark:text-zinc-200">
                 <SyntaxHighlighter
                     language={language}
-                    style={customTheme as any}
+                    style={customTheme as { [key: string]: React.CSSProperties }}
                     customStyle={{
                         background: 'transparent',
                         fontSize: '13px',

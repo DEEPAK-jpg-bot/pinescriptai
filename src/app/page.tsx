@@ -6,19 +6,11 @@ import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import {
     Terminal as TerminalIcon,
-    ArrowRight,
     Check,
     Zap,
     ShieldCheck,
     Sparkles,
-    Globe,
-    Lock,
     Target,
-    BarChart3,
-    Code2,
-    Settings,
-    Copy,
-    Layout,
     ArrowUpRight,
     Loader2
 } from 'lucide-react';
@@ -34,9 +26,18 @@ declare global {
             Url: {
                 Open: (url: string) => void;
             };
-            Setup: (options: { eventHandler: (event: any) => void }) => void;
+            Setup: (options: { eventHandler: (event: { event: string }) => void }) => void;
         };
     }
+}
+
+interface PricingPlan {
+    name: string;
+    price: string;
+    features: string[];
+    highlight?: boolean;
+    variantId?: string;
+    href?: string;
 }
 
 function LandingContent() {
@@ -79,7 +80,7 @@ function LandingContent() {
         initLS();
     }, [router, supabase, searchParams]);
 
-    const handleTierSelection = async (tier: any) => {
+    const handleTierSelection = async (tier: PricingPlan) => {
         if (!isLoggedIn) {
             router.push(`/signup?ref=upgrade&tier=${tier.name.toLowerCase()}`);
             return;
@@ -126,7 +127,7 @@ function LandingContent() {
         }
     };
 
-    const pricingPlans = [
+    const pricingPlans: PricingPlan[] = [
         {
             name: "Lab",
             price: "$0",
@@ -283,7 +284,7 @@ function LandingContent() {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {pricingPlans.map((p: any, i) => (
+                            {pricingPlans.map((p, i) => (
                                 <motion.div
                                     key={i}
                                     initial={{ opacity: 0, y: 20 }}

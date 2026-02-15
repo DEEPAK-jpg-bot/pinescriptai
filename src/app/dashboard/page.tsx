@@ -7,8 +7,8 @@ import {
     Sparkles,
     AlertTriangle
 } from 'lucide-react';
-import { motion } from 'framer-motion';
-import ReactMarkdown from 'react-markdown';
+// motion import removed as it was unused
+import ReactMarkdown, { Components } from 'react-markdown';
 import CodeBlock from '@/components/CodeBlock';
 import { cn } from '@/lib/utils';
 
@@ -18,8 +18,6 @@ export default function Dashboard() {
         sendMessage,
         isGenerating,
         currentError,
-        quotaInfo,
-        createConversation
     } = useChatStore();
 
     const [input, setInput] = useState('');
@@ -53,30 +51,30 @@ export default function Dashboard() {
     };
 
     const formatMessage = (content: string) => {
+        const components: Components = {
+            code({ className, children, ...props }) {
+                const match = /language-(\w+)/.exec(className || '');
+                const codeValue = String(children).replace(/\n$/, '');
+
+                return !(props as { inline?: boolean }).inline ? (
+                    <CodeBlock
+                        code={codeValue}
+                        language={match ? match[1] : 'pinescript'}
+                    />
+                ) : (
+                    <code className="bg-zinc-100 dark:bg-zinc-800 text-primary px-1.5 py-0.5 rounded text-sm font-semibold" {...props}>
+                        {children}
+                    </code>
+                );
+            },
+            p({ children }) {
+                return <p className="mb-4 last:mb-0 text-zinc-700 dark:text-zinc-300 leading-relaxed font-normal">{children}</p>;
+            }
+        };
+
         return (
             <div className="prose prose-zinc dark:prose-invert max-w-none prose-p:text-zinc-700 dark:prose-p:text-zinc-300 prose-p:leading-relaxed prose-pre:bg-transparent prose-pre:p-0">
-                <ReactMarkdown
-                    components={{
-                        code({ node, inline, className, children, ...props }: any) {
-                            const match = /language-(\w+)/.exec(className || '');
-                            const codeValue = String(children).replace(/\n$/, '');
-
-                            return !inline ? (
-                                <CodeBlock
-                                    code={codeValue}
-                                    language={match ? match[1] : 'pinescript'}
-                                />
-                            ) : (
-                                <code className="bg-zinc-100 dark:bg-zinc-800 text-primary px-1.5 py-0.5 rounded text-sm font-semibold" {...props}>
-                                    {children}
-                                </code>
-                            );
-                        },
-                        p({ children }) {
-                            return <p className="mb-4 last:mb-0 text-zinc-700 dark:text-zinc-300 leading-relaxed font-normal">{children}</p>;
-                        }
-                    }}
-                >
+                <ReactMarkdown components={components}>
                     {content}
                 </ReactMarkdown>
             </div>

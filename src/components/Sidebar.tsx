@@ -4,9 +4,9 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import {
-    MessageSquare, Plus, Trash2, Zap,
-    LogOut, ChevronLeft, ChevronRight, User,
-    Crown, BarChart3, Settings
+    MessageSquare, Plus, Trash2,
+    LogOut, ChevronLeft, ChevronRight,
+    Crown, Settings
 } from 'lucide-react';
 import { useChatStore } from '@/store/useChatStore';
 import { createClient } from '@/utils/supabase/client';

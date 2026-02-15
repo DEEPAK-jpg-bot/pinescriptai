@@ -1,18 +1,21 @@
 import { createBrowserClient } from '@supabase/ssr'
+import { SupabaseClient } from '@supabase/supabase-js'
 
-export function createClient() {
+export function createClient(): SupabaseClient {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
     if (!supabaseUrl || !supabaseAnonKey) {
-        console.warn('Supabase configuration missing. Auth will be disabled.');
-        // Return a dummy object to prevent "cannot read property of null"
+        if (process.env.NODE_ENV !== 'production') {
+            console.warn('Supabase configuration missing.');
+        }
+
         const missingKeyError = () => {
-            const msg = "Supabase configuration missing. Ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set in your Vercel Environment Variables.";
-            console.error(msg);
+            const msg = "Supabase credentials missing. Check your environment variables.";
             throw new Error(msg);
         };
 
+        // Return a structural fallback to avoid early crashes in CI or build steps
         return {
             auth: {
                 signInWithOAuth: missingKeyError,
@@ -24,13 +27,16 @@ export function createClient() {
                 signOut: async () => { },
             },
             from: () => ({
-                select: () => ({ order: () => ({ limit: () => ({ data: [], error: null }), eq: () => ({ single: () => ({ data: null, error: null }) }) }), eq: () => ({ single: () => ({ data: null, error: null }) }) }),
+                select: () => ({
+                    order: () => ({ limit: () => ({ data: [], error: null }), eq: () => ({ single: () => ({ data: null, error: null }) }) }),
+                    eq: () => ({ single: () => ({ data: null, error: null }) })
+                }),
                 insert: () => ({ select: () => ({ single: () => ({ data: null, error: null }) }) }),
                 update: () => ({ eq: () => ({ data: null, error: null }) }),
                 delete: () => ({ eq: () => ({ error: null }) }),
             }),
             rpc: async () => ({ data: null, error: null }),
-        } as any;
+        } as unknown as SupabaseClient;
     }
 
     return createBrowserClient(

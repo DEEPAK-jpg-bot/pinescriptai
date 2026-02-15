@@ -28,7 +28,7 @@ export default function AuthSync() {
         initSession();
 
         // 2. Listen for Auth Changes (Sign In, Sign Out, Token Refresh)
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             if (session?.user) {
                 setUser({ id: session.user.id, email: session.user.email! });
                 setSession(session);

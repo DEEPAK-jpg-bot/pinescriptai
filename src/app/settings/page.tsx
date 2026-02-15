@@ -13,7 +13,6 @@ import {
     Sparkles
 } from 'lucide-react';
 import { useChatStore } from '@/store/useChatStore';
-import { cn } from '@/lib/utils';
 
 interface Subscription {
     status: string;
