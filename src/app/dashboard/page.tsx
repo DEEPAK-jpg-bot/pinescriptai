@@ -30,7 +30,13 @@ export default function Dashboard() {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
-    }, [messages]);
+        console.log('Dashboard State:', {
+            messageCount: messages.length,
+            isGenerating,
+            hasError: !!currentError,
+            activeConv: useChatStore.getState().activeConversationId
+        });
+    }, [messages, isGenerating, currentError]);
 
     const handleSendMessage = async () => {
         if (!input.trim() || isGenerating) return;
@@ -114,12 +120,10 @@ export default function Dashboard() {
                     ) : (
                         <>
                             {messages.map((message, index) => (
-                                <motion.div
+                                <div
                                     key={index}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
                                     className={cn(
-                                        "flex gap-6",
+                                        "flex gap-6 opacity-100",
                                         message.role === 'user' ? "flex-row-reverse" : "flex-row"
                                     )}
                                 >
@@ -137,7 +141,7 @@ export default function Dashboard() {
                                     )}>
                                         {formatMessage(message.content)}
                                     </div>
-                                </motion.div>
+                                </div>
                             ))}
 
                             {isGenerating && (
@@ -150,16 +154,17 @@ export default function Dashboard() {
                                 </div>
                             )}
 
-                            {currentError && (
-                                <div className="bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 p-6 rounded-3xl text-sm font-bold border border-red-200 dark:border-red-500/20 flex items-start gap-3 shadow-xl shadow-red-500/5 mt-4">
-                                    <AlertTriangle size={20} className="shrink-0 mt-0.5" />
-                                    <div className="space-y-1">
-                                        <p className="font-black uppercase tracking-widest text-[10px] opacity-70">Protocol Error Detected</p>
-                                        <p className="leading-relaxed">{currentError}</p>
-                                    </div>
-                                </div>
-                            )}
                         </>
+                    )}
+
+                    {currentError && (
+                        <div className="bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 p-6 rounded-3xl text-sm font-bold border border-red-200 dark:border-red-500/20 flex items-start gap-3 shadow-xl shadow-red-500/5 mt-4 animate-fade-in">
+                            <AlertTriangle size={20} className="shrink-0 mt-0.5 text-red-500" />
+                            <div className="space-y-1">
+                                <p className="font-black uppercase tracking-widest text-[10px] opacity-70">Protocol Error Detected</p>
+                                <p className="leading-relaxed">{currentError}</p>
+                            </div>
+                        </div>
                     )}
                 </div>
             </div>
@@ -188,10 +193,15 @@ export default function Dashboard() {
                                     "p-2 rounded-xl transition-all",
                                     input.trim()
                                         ? "bg-primary text-white shadow-lg shadow-primary/20 hover:scale-[1.05]"
-                                        : "text-zinc-400 bg-zinc-200 dark:bg-zinc-700 cursor-not-allowed"
+                                        : "text-zinc-400 bg-zinc-200 dark:bg-zinc-700 cursor-not-allowed",
+                                    isGenerating && "animate-pulse"
                                 )}
                             >
-                                <Send size={18} />
+                                {isGenerating ? (
+                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                ) : (
+                                    <Send size={18} />
+                                )}
                             </button>
                         </div>
                     </div>
