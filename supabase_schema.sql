@@ -134,12 +134,23 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- Monthly Quota Check & Reset
 CREATE OR REPLACE FUNCTION public.check_gen_quota(p_user_id uuid)
 RETURNS json AS $$
-DECLARE v_profile record;
+DECLARE 
+  v_profile record;
+  v_user_email text;
 BEGIN
   SELECT * INTO v_profile FROM public.user_profiles WHERE id = p_user_id;
   
+  -- AUTO-RECOVERY: If profile missing but user exists in auth.users
   IF v_profile IS NULL THEN
-    RETURN json_build_object('allowed', false, 'reason', 'profile_not_found');
+    SELECT email INTO v_user_email FROM auth.users WHERE id = p_user_id;
+    
+    IF v_user_email IS NOT NULL THEN
+      INSERT INTO public.user_profiles (id, email, tier, gens_monthly_limit, gens_remaining)
+      VALUES (p_user_id, v_user_email, 'free', 10, 10)
+      RETURNING * INTO v_profile;
+    ELSE
+      RETURN json_build_object('allowed', false, 'reason', 'profile_not_found');
+    END IF;
   END IF;
 
   -- 30-Day Monthly Cycle Reset
@@ -162,7 +173,7 @@ BEGIN
       'remaining', v_profile.gens_remaining,
       'limit', v_profile.gens_monthly_limit,
       'tier', v_profile.tier,
-      'resetAt', v_profile.last_reset_at + interval '30 days'
+      'resetAt', (v_profile.last_reset_at + interval '30 days')
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
