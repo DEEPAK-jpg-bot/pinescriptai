@@ -177,10 +177,11 @@ export const useChatStore = create<ChatStore>((set, get) => ({
             return { allowed: true };
         }
 
+        const safeLimit = data.limit || 10;
         set({
             quotaInfo: {
-                remaining: data.remaining || 0,
-                limit: data.limit || 10, // Dynamic from DB
+                remaining: (data.remaining !== undefined && data.remaining !== null) ? data.remaining : safeLimit,
+                limit: safeLimit,
                 resetAt: data.resetAt,
                 isExceeded: !data.allowed,
                 waitSeconds: data.waitSeconds || 0,

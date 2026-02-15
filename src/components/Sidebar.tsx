@@ -35,7 +35,8 @@ export default function Sidebar() {
     return (
         <div className={cn(
             "h-full flex flex-col bg-zinc-100 dark:bg-sidebar-dark border-r border-zinc-200 dark:border-zinc-800 transition-all duration-300 relative group/sidebar",
-            isCollapsed ? "w-16" : "w-64"
+            isCollapsed ? "md:w-16" : "md:w-64",
+            "w-full"
         )}>
             {/* Top Section: Brand & New Chat */}
             <div className="p-4 flex flex-col gap-4">
